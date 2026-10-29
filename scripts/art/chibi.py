@@ -455,35 +455,45 @@ def poop():
 # Two layers so treats sit inside: the back (far rim and the cream inside)
 # and the front (near lip and the body with a paw print).
 
-BOWL_W, BOWL_H = 28, 16
+BOWL_W, BOWL_H = 28, 20
 BOWLS = {
-    "appleReminders": {"R": "#FFC98A", "b": "#F7A04E", "s": "#D97B32", "h": "#FFE3BE", "line": "#5A2C12"},
-    "googleTasks": {"R": "#A9D2FF", "b": "#5E9FEC", "s": "#3F7BCB", "h": "#D8EBFF", "line": "#1C2F5A"},
+    "appleReminders": {"R": "#FFD3A6", "b": "#FFB074", "s": "#EF8C4E", "h": "#FFE9D2", "line": "#6A3416"},
+    "googleTasks": {"R": "#BCDCFF", "b": "#84B9F6", "s": "#5A94E0", "h": "#E3F1FF", "line": "#1F3462"},
 }
-BOWL_INSIDE = {"d": "#F6E9D2", "D": "#DCC6A2", "w": "#FFFFFF"}
+BOWL_INSIDE = {"d": "#FFF3E0", "D": "#E8D2B0", "e": "#2A1A1A", "p": "#F79AB0", "k": "#2A1A1A"}
 
 
 def bowl(colors):
+    """A cat-face bowl: ears on the back rim, a little face and feet."""
     pal = dict(colors, **BOWL_INSIDE)
     back = Grid(BOWL_W, BOWL_H)
-    back.rect(6, 1, 21, 1, "R")
-    back.rect(3, 2, 24, 2, "R")
-    back.rect(2, 3, 25, 3, "R")
-    back.rect(1, 4, 26, 5, "R")
-    back.rect(7, 2, 20, 2, "D")
-    back.rect(4, 3, 23, 3, "D")
-    back.rect(3, 4, 24, 5, "d")
+    # Ears behind the rim.
+    for tip, rows in ((5, [(5, 5), (5, 6), (5, 7), (4, 8)]), (22, [(22, 22), (21, 22), (20, 22), (19, 23)])):
+        for y, (x0, x1) in enumerate(rows, start=1):
+            back.rect(x0, y, x1, y, "b")
+    back.px([(6, 3), (21, 3)], "p")
+    back.rect(6, 4, 21, 4, "R")
+    back.rect(3, 5, 24, 5, "R")
+    back.rect(2, 6, 25, 6, "R")
+    back.rect(1, 7, 26, 8, "R")
+    back.rect(7, 5, 20, 5, "D")
+    back.rect(4, 6, 23, 6, "D")
+    back.rect(3, 7, 24, 8, "d")
 
     front = Grid(BOWL_W, BOWL_H)
-    front.rect(1, 6, 26, 6, "R")
-    front.rect(4, 6, 7, 6, "h")
-    for y, (x0, x1) in enumerate([(1, 26), (1, 26), (2, 25), (2, 25), (3, 24), (4, 23), (6, 21)], start=7):
-        front.rect(x0, y, x1, y, "s" if y == 13 else "b")
+    front.rect(1, 9, 26, 9, "R")
+    front.rect(4, 9, 7, 9, "h")
+    for y, (x0, x1) in enumerate([(1, 26), (1, 26), (2, 25), (2, 25), (3, 24), (4, 23), (6, 21)], start=10):
+        front.rect(x0, y, x1, y, "s" if y == 16 else "b")
         front.px([(x1 - 1, y), (x1, y)], "s")
-    front.px([(3, 8), (3, 9), (4, 10)], "h")
-    # Paw print.
-    front.px([(11, 9), (13, 8), (14, 8), (16, 9)], "w")
-    front.rect(12, 10, 15, 12, "w", round_=1)
+    front.px([(3, 11), (3, 12)], "h")
+    # Face: eyes with a shine, blush, a "w" mouth.
+    front.px([(10, 11), (10, 12), (17, 11), (17, 12)], "e")
+    front.px([(8, 13), (9, 13), (18, 13), (19, 13)], "p")
+    front.px([(12, 13), (13, 14), (14, 13), (15, 14), (16, 13)], "k")
+    # Little feet.
+    front.rect(6, 17, 8, 17, "s")
+    front.rect(19, 17, 21, 17, "s")
     return back.render(pal, colors["line"]), front.render(pal, colors["line"])
 
 
