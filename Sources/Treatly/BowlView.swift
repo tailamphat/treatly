@@ -11,7 +11,7 @@ protocol BowlViewDelegate: AnyObject {
 
 /// What a pet keeps its treats in. Chosen by the pet pack.
 enum ContainerStyle: String {
-    /// A pet bowl heaped with kibble; treats sit on top.
+    /// A dog bowl; treats sit inside on the kibble.
     case bowl
     /// A banana tree; treats hang under the crown.
     case tree
@@ -22,7 +22,7 @@ enum ContainerStyle: String {
 
     var viewSize: NSSize {
         switch self {
-        case .bowl: return NSSize(width: 92, height: 56)
+        case .bowl: return NSSize(width: 92, height: 60)
         case .tree: return NSSize(width: 104, height: 136)
         }
     }
@@ -93,7 +93,7 @@ final class BowlView: NSView {
             switch style {
             case .bowl:
                 // Treats pile up inside; the front rim covers their bottoms.
-                let pile: [(CGFloat, CGFloat, Bool)] = [(13, 4, false), (21, 4, true), (17, 2.5, false), (9, 5.5, true), (25, 5.5, false)]
+                let pile: [(CGFloat, CGFloat, Bool)] = [(12, 7, false), (20, 7, true), (16, 6, false), (9, 7.5, true), (23, 7.5, false)]
                 let t = NSSize(width: CGFloat(treat.width) * 1.2, height: CGFloat(treat.height) * 1.2)
                 for (x, y, flip) in pile.prefix(min(treatCount, pile.count)) {
                     let c = point(x, y)

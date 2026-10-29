@@ -576,56 +576,64 @@ def poop(style="cute"):
 # Two layers so treats sit inside: the back (far rim and the cream inside)
 # and the front (near lip and the body with a paw print).
 
-BOWL_W, BOWL_H = 34, 19
+BOWL_W, BOWL_H = 32, 21
 BOWLS = {
-    "appleReminders": {"R": "#FFB36B", "h": "#FFE2BF", "b": "#F08A3A", "s": "#CC6A24", "S": "#A0501A",
-                       "B": "#FFA055", "P": "#6A2E0E", "line": "#4A1E08"},
-    "googleTasks": {"R": "#6FA8FF", "h": "#CFE3FF", "b": "#3D78E0", "s": "#2C5BB8", "S": "#1F4590",
-                    "B": "#5A93F0", "P": "#17306A", "line": "#0F1E44"},
+    "appleReminders": {"R": "#FFBD7A", "H": "#FFE6C8", "I": "#C0621F", "b": "#F08A3A", "h": "#FFC089",
+                       "S": "#C2621F", "s": "#A0501A", "line": "#4A1E08"},
+    "googleTasks": {"R": "#7FB2FF", "H": "#D6E8FF", "I": "#2C5BB8", "b": "#3D78E0", "h": "#8DB8FF",
+                    "S": "#2A57A8", "s": "#23498F", "line": "#0F1E44"},
 }
-KIBBLE = {"1": "#B9773A", "2": "#8E5424", "3": "#D99A55", "4": "#6E3E18"}
+KIBBLE = {"1": "#B9773A", "2": "#8E5424", "3": "#D99A55", "w": "#FFFFFF"}
+BOWL_CX = 16
+RIM = (6.0, 14.5, 5.5)      # outer rim ellipse: cy, rx, ry
+OPENING = (6.3, 11.8, 4.0)  # the hole
+
+
+def _in(x, y, ellipse):
+    cy, rx, ry = ellipse
+    return ((x + 0.5 - BOWL_CX) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2 <= 1
 
 
 def bowl(colors):
-    """A plastic pet bowl heaped with kibble: flared base, paw print on the side."""
+    """A dog bowl seen from a little above: rim, dark inside wall, kibble at
+    the bottom, a body flaring out to the base and a white paw print."""
     pal = dict(colors, **KIBBLE)
     back = Grid(BOWL_W, BOWL_H)
-    back.rect(6, 5, 27, 5, "R")
-    back.rect(4, 6, 29, 6, "R")
-    back.rect(3, 7, 30, 8, "R")
-    # A dome of kibble above the rim: round pieces with a lit top-left.
-    for y, (x0, x1) in enumerate([(13, 20), (10, 23), (8, 25), (6, 27), (5, 28), (5, 28), (5, 28), (5, 28)], start=1):
-        for x in range(x0, x1 + 1):
-            back.px([(x, y)], "1")
-    for y in range(1, 9):
-        for x in range(4, 30):
-            if back.get(x, y) != "1":
-                continue
-            cx, cy = (x + (y // 2) % 2 * 2) % 4, y % 2
-            if cx == 3:
-                back.px([(x, y)], "2")
-            elif cx == 0 and cy == 1:
-                back.px([(x, y)], "3")
-            elif cx == 2 and cy == 0 and y > 4:
-                back.px([(x, y)], "4")
-
     front = Grid(BOWL_W, BOWL_H)
-    front.rect(2, 9, 31, 9, "R")
-    front.rect(6, 9, 12, 9, "h")
-    front.rect(24, 9, 26, 9, "h")
-    for y, (x0, x1, role) in enumerate([(2, 31, "b"), (2, 31, "b"), (1, 32, "b"), (1, 32, "s"), (1, 32, "s")], start=10):
-        front.rect(x0, y, x1, y, role)
-        front.px([(x1 - 1, y), (x1, y)], "S")
-    front.px([(4, 10), (4, 11), (5, 10), (4, 12)], "h")
-    # Flared base.
-    front.rect(0, 15, 33, 15, "B")
-    front.rect(0, 16, 33, 16, "s")
-    front.px([(3, 15), (4, 15), (5, 15)], "h")
-    front.px([(32, 15), (33, 15), (32, 16), (33, 16)], "S")
-    # Paw print.
-    front.px([(14, 11), (16, 10), (18, 10), (20, 11)], "P")
-    front.rect(15, 12, 19, 13, "P", round_=1)
-    front.px([(17, 14)], "P")
+    for y in range(BOWL_H):
+        for x in range(BOWL_W):
+            if _in(x, y, OPENING):
+                if y + 0.5 < OPENING[0] - 0.8:
+                    back.px([(x, y)], "I")
+                else:
+                    n = ((x * 73856093) ^ (y * 19349663)) % 7
+                    back.px([(x, y)], "3" if n == 0 else "2" if n in (1, 2) else "1")
+            elif _in(x, y, RIM):
+                lit = x < BOWL_CX - 4 and y <= RIM[0]
+                back.px([(x, y)], "H" if lit and y <= 3 else "R")
+                if y + 0.5 >= RIM[0]:
+                    front.px([(x, y)], "R")
+            elif y + 0.5 > RIM[0]:
+                # Body: flares out a little toward a rounded base.
+                hw = RIM[1] + (y - RIM[0]) * 0.16
+                dx = x + 0.5 - BOWL_CX
+                if abs(dx) > hw:
+                    continue
+                bottom = 16 + 2 * max(0.0, 1 - (dx / hw) ** 2) ** 0.5
+                if y > bottom:
+                    continue
+                if y > bottom - 1.5:
+                    role = "s"
+                elif dx > hw - 3:
+                    role = "S"
+                elif -hw + 2 <= dx < -hw + 3:
+                    role = "h"
+                else:
+                    role = "b"
+                front.px([(x, y)], role)
+    # Paw print on the front.
+    front.px([(13, 14), (15, 13), (17, 13), (19, 14)], "w")
+    front.rect(14, 15, 18, 16, "w", round_=1)
     return back.render(pal, colors["line"]), front.render(pal, colors["line"])
 
 
