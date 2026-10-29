@@ -2,10 +2,10 @@ cask "treatly" do
   version "0.1.0"
   sha256 "86dc3b83f0d28827a8188b0aadccf4606a8e556cc4cac195d3a3504a2ebae635"
 
-  url "https://github.com/tailamphat/desktop-pet/releases/download/v#{version}/Treatly-#{version}.zip"
+  url "https://github.com/tailamphat/treatly/releases/download/v#{version}/Treatly-#{version}.zip"
   name "Treatly"
   desc "Desktop pet that turns your reminders into treats and nags you to finish them"
-  homepage "https://github.com/tailamphat/desktop-pet"
+  homepage "https://github.com/tailamphat/treatly"
 
   livecheck do
     url :url
