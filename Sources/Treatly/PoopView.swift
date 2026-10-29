@@ -4,7 +4,7 @@ import TreatlyCore
 /// A poop left behind after the pet eats a treat. It ignores the mouse and
 /// fades out at the end of its life.
 final class PoopView: NSView {
-    static let scale: CGFloat = 1.5
+    static let scale: CGFloat = 1
     private static var cache: [PoopStyle: SpriteImage] = [:]
 
     static func art(for style: PoopStyle) -> SpriteImage? {
