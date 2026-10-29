@@ -44,7 +44,7 @@ For screenshots and development, `open --env TREATLY_DEMO=1 build/Treatly.app` a
 
 ## Make your own pet
 
-Pets are plain JSON with text pixel art. See [docs/pet-packs.md](docs/pet-packs.md). Drop a pack into the folder that **Open Pets Folder** opens.
+Pets are plain JSON with text pixel art. See [docs/pet-packs.md](docs/pet-packs.md). Drop a pack into the folder that the **Pets Folder** button in Settings opens.
 
 ## Project layout
 

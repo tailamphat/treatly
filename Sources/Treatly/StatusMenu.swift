@@ -84,7 +84,6 @@ final class StatusMenu: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
 
         menu.addItem(app.actionItem("Refresh Treats") { $0.refresh() })
-        menu.addItem(app.actionItem("Open Pets Folder") { $0.openPetsFolder() })
     }
 
     func submenu(_ title: String, _ submenu: NSMenu) -> NSMenuItem {
