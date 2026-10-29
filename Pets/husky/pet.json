@@ -1,0 +1,103 @@
+{
+  "id": "husky",
+  "name": "Husky",
+  "species": "dog",
+  "defaultName": "Luna",
+  "credit": "Treatly contributors, MIT (scripts/art/chibi.py)",
+  "treat": {
+    "name": "bone",
+    "image": "treat.png"
+  },
+  "sheet": {
+    "image": "sheet.png",
+    "frameWidth": 32,
+    "frameHeight": 26,
+    "scale": 2.5,
+    "footPadding": 1,
+    "mouth": [
+      29,
+      15
+    ],
+    "animations": {
+      "idle": {
+        "row": 0,
+        "count": 4,
+        "fps": 2
+      },
+      "walk": {
+        "row": 1,
+        "count": 4,
+        "fps": 8
+      },
+      "run": {
+        "row": 1,
+        "count": 4,
+        "fps": 14
+      },
+      "sit": {
+        "row": 2,
+        "count": 1
+      },
+      "bark": {
+        "row": 3,
+        "count": 2,
+        "fps": 5
+      },
+      "beg": {
+        "row": 4,
+        "count": 2,
+        "fps": 1.5
+      },
+      "sleep": {
+        "row": 5,
+        "count": 2,
+        "fps": 0.6
+      }
+    },
+    "wardrobe": [
+      "party-hat",
+      "bow",
+      "crown",
+      "bandana",
+      "glasses",
+      "flower"
+    ]
+  },
+  "personality": {
+    "walkSpeed": 80,
+    "runSpeed": 240,
+    "energy": 0.6,
+    "sleepiness": 0.15,
+    "rest": [
+      1,
+      3
+    ],
+    "nagSeconds": 35,
+    "patience": 0.7
+  },
+  "phrases": {
+    "carry": [
+      "{task}"
+    ],
+    "drop": [
+      "*drops bone* ...{task}?",
+      "{name} sits. {name} waits. {task}."
+    ],
+    "yell": [
+      "AWOOOOO! {task}!",
+      "{name} HOWLS: {task}!!"
+    ],
+    "whine": [
+      "*dramatic husky noises* {task}...",
+      "Awoo... you forgot {task}."
+    ],
+    "happy": [
+      "AWOO! Good human!",
+      "Zoomies time!"
+    ],
+    "bury": [
+      "Fine. *buries bone in the snow*"
+    ]
+  },
+  "sound": "Hero"
+}

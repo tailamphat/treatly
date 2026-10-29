@@ -440,12 +440,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         petWindow.ignoresMouseEvents = brain.activity != .held && !hit.contains(NSEvent.mouseLocation)
     }
 
-    /// Leaves a poop behind the pet for 10 to 15 seconds.
+    /// Leaves a poop behind the pet for 10 to 15 seconds, unless poop is off.
     private func dropPoop(now: Date) {
-        let size = PoopView.size
+        guard let art = PoopView.art(for: settings.poopStyle) else { return }
+        let size = PoopView.size(for: art)
         let behind = (petView.art?.pointSize.width ?? 80) * 0.4
         let x = brain.facing == .right ? brain.x - behind : brain.x + behind
-        let view = PoopView(frame: NSRect(origin: .zero, size: size))
+        let view = PoopView(art: art)
         let window = OverlayWindow(size: size)
         window.contentView = view
         window.ignoresMouseEvents = true

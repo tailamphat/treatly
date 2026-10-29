@@ -76,6 +76,10 @@ DOGS = {
         "b": "#E7B45C", "s": "#C48F3E", "w": "#F6D79A", "line": "#4A2E12",
         "ears": "floppy", "tail": "plume", "marks": ["muzzle"],
     },
+    "husky": {
+        "b": "#7A8494", "s": "#5C6574", "w": "#F4F6FA", "i": "#6EC1F5", "line": "#1E2430",
+        "ears": "pointy", "tail": "curl", "marks": ["muzzle", "chest", "belly", "socks", "mask"],
+    },
     "chihuahua": {
         "b": "#D9A672", "s": "#B5824F", "w": "#F7E6CF", "line": "#3E2616",
         "ears": "big", "tail": "thin", "marks": ["muzzle", "chest"], "small": True,
@@ -141,6 +145,9 @@ def head(g, spec, cat, hx, hy, mouth=False, blink=False, look_up=False):
     if "muzzle" in marks:
         g.rect(hx + 5, hy + 6, hx + 9 if cat else hx + 10, hy + 8, "w", round_=1)
         g.px([(hx + 7, hy + 5), (hx + 8, hy + 5), (hx + 9, hy + 5)] if not cat else [(hx + 8, hy + 5)], "w")
+    if "mask" in marks:
+        g.rect(hx + 5, hy + 2, hx + 9, hy + 5, "w", round_=1)
+        g.px([(hx + 6, hy + 1)], "w")
     if "brows" in marks:
         g.px([(hx + 6, hy + 2)], "w")
     if "stripes" in marks:
@@ -155,7 +162,7 @@ def head(g, spec, cat, hx, hy, mouth=False, blink=False, look_up=False):
         ey -= 1
     if blink:
         g.px([(ex - 1, ey + 1), (ex, ey + 1)], "e")
-    elif cat:
+    elif cat or "i" in spec:
         g.px([(ex, ey)], "i")
         g.px([(ex, ey + 1)], "e")
     else:
@@ -264,6 +271,80 @@ def quad(spec, cat, pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=
     g.rect(21, G, 25, G, sock or "w" if "muzzle" in marks else "b")
     anchors = head(g, spec, cat, 15, G - 8, blink=True)
     return g, anchors
+
+
+# ---------------------------------------------------------------- Sheep
+#
+# A fluffy cloud of wool with a dark face and legs.
+
+SHEEP = {"b": "#F7F3EA", "s": "#DCD4C4", "h": "#FFFFFF", "f": "#3E3946", "F": "#2C2833",
+         "W": "#FFFFFF", "e": "#1A1418", "p": "#F29BAE", "c": "#E07A8E", "k": "#5A1E22", "line": "#4A4250"}
+
+
+def wool(g, x0, y0, x1, y1):
+    """A rounded wool blob with bumps along the top and back."""
+    g.rect(x0, y0, x1, y1, "b", round_=2)
+    for x in range(x0 + 1, x1 - 1, 3):
+        g.px([(x, y0 - 1), (x + 1, y0 - 1)], "b")
+    for y in range(y0 + 2, y1 - 1, 3):
+        g.px([(x0 - 1, y)], "b")
+    g.rect(x0 + 2, y1, x1 - 2, y1, "s")
+    g.px([(x0 + 2, y0), (x0 + 3, y0), (x0 + 1, y0 + 1)], "h")
+
+
+def sheep_head(g, hx, hy, mouth=False, blink=False):
+    """Dark face, 7x7 from (hx, hy), with a wool cap and a floppy ear."""
+    g.rect(hx - 2, hy + 2, hx - 1, hy + 3, "F")
+    g.rect(hx, hy, hx + 6, hy + 6, "f", round_=2)
+    g.px([(hx + 1, hy - 1), (hx + 2, hy - 1), (hx + 4, hy - 1), (hx, hy), (hx + 1, hy), (hx + 2, hy), (hx + 3, hy), (hx + 4, hy)], "b")
+    if blink:
+        g.px([(hx + 3, hy + 3), (hx + 4, hy + 3)], "W")
+    else:
+        g.px([(hx + 3, hy + 2), (hx + 4, hy + 2), (hx + 3, hy + 3)], "W")
+        g.px([(hx + 4, hy + 3)], "e")
+    g.px([(hx + 2, hy + 5)], "c")
+    if mouth:
+        g.px([(hx + 5, hy + 5), (hx + 6, hy + 5)], "k")
+        g.px([(hx + 5, hy + 6)], "p")
+    else:
+        g.px([(hx + 6, hy + 5)], "p")
+    # Anchors are shifted so items centre on the smaller head.
+    return {"head": (hx - 2, hy, 7), "eye": (hx + 4, hy + 2), "neck": (hx - 1, hy + 6)}
+
+
+def sheep(pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=0, paw=False, breathe=0):
+    g = Grid(W, H)
+    if pose == "stand":
+        by = G - 10 + bob
+        for lx in (9, 15):
+            g.rect(lx, by + 4, lx + 1, G, "F")
+        wool(g, 5, by, 20, by + 5)
+        g.px([(3, by + 2), (3, by + 3)], "b")
+        for lx, d in ((6, step), (17, -step)):
+            g.rect(lx, by + 5, lx + 1, G - 1, "f")
+            g.px([(lx + d, G), (lx + 1 + d, G)], "f")
+        return g, sheep_head(g, 19, by - 4, mouth=mouth, blink=blink)
+    if pose == "sit":
+        wool(g, 6, G - 8, 18, G)
+        g.rect(15, G - 1, 16, G, "F")
+        if paw:
+            g.rect(19, G - 4, 20, G - 3, "f")
+        else:
+            g.rect(18, G - 2, 19, G, "f")
+        return g, sheep_head(g, 16 + (1 if tilt else 0), G - 14 + tilt, mouth=mouth, blink=blink)
+    wool(g, 5, G - 5 - breathe, 20, G)
+    g.px([(21, G), (22, G)], "f")
+    return g, sheep_head(g, 18, G - 7, blink=True)
+
+
+def poses_sheep():
+    walk = [sheep(step=s, bob=b) for s, b in ((1, 0), (0, -1), (-1, 0), (0, -1))]
+    idle = [sheep(), sheep(), sheep(blink=True), sheep(bob=1)]
+    sit = [sheep("sit")]
+    bark = [sheep("sit", mouth=True), sheep("sit")]
+    beg = [sheep("sit", tilt=1, paw=True), sheep("sit", tilt=1)]
+    sleep = [sheep("sleep"), sheep("sleep", breathe=1)]
+    return [idle, walk, sit, bark, beg, sleep]
 
 
 # ---------------------------------------------------------------- Kong
@@ -418,6 +499,19 @@ def fish():
     ], {"b": "#7FB6E0", "s": "#4F86B8", "h": "#CFE6F5", "e": "#1E1410"}, "#1E3550")
 
 
+def clover():
+    return text_sprite([
+        "...gg......",
+        "..ghgg.....",
+        "..gggg.gg..",
+        "gg.gG.ghgg.",
+        "ghggGGgggg.",
+        "ggggGgg....",
+        ".gg..s.....",
+        "......s....",
+    ], {"g": "#6CBF4A", "G": "#4C9A34", "h": "#A8E27E", "s": "#4C9A34"}, "#1F4A1A")
+
+
 def banana():
     return text_sprite([
         "k.............",
@@ -429,25 +523,52 @@ def banana():
     ], {"y": "#FFD84A", "h": "#FFF0A0", "s": "#E0A820", "k": "#6B4A1E"}, "#5A3A10")
 
 
-def poop():
-    """A soft three-tier swirl with a happy face, like the bowls."""
-    return text_sprite([
-        "........hb.......",
-        ".......hbbs......",
-        "......hbbbbs.....",
-        ".....hbbbbbbs....",
-        "......oooooo.....",
-        "....hbbbbbbbbs...",
-        "...hbbbbbbbbbbs..",
-        "..hbbbbbbbbbbbbs.",
-        "...oooooooooooo..",
-        ".hbbbbbbbbbbbbbs.",
-        "hbbbewbbbbbewbbbs",
-        "hbbbeebbbbbeebbbs",
-        "bbppbbkbkbkbbppbs",
-        "bsbbbbbkbkbbbbbss",
-        ".sssssssssssssss.",
-    ], {"h": "#B98256", "b": "#946038", "s": "#714628", "e": "#2A1A1A", "w": "#FFFFFF", "k": "#2A1A1A", "p": "#F79AB0", "o": "#3E2414"}, "#3E2414")
+POOP_ROWS = [
+    "........hb.......",
+    ".......hbbs......",
+    "......hbbbbs.....",
+    ".....hbbbbbbs....",
+    "......oooooo.....",
+    "....hbbbbbbbbs...",
+    "...hbbbbbbbbbbs..",
+    "..hbbbbbbbbbbbbs.",
+    "...oooooooooooo..",
+    ".hbbbbbbbbbbbbbs.",
+    "hbbbewbbbbbewbbbs",
+    "hbbbeebbbbbeebbbs",
+    "bbppbbkbkbkbbppbs",
+    "bsbbbbbkbkbbbbbss",
+    ".sssssssssssssss.",
+]
+POOP_FACE = {"e": "#2A1A1A", "w": "#FFFFFF", "k": "#2A1A1A", "p": "#F79AB0"}
+POOP_STYLES = ["cute", "classic", "golden", "rainbow"]
+
+
+def poop(style="cute"):
+    """Three tiers split by dark lines; most styles have a happy face."""
+    rows = list(POOP_ROWS)
+    pal = {"h": "#B98256", "b": "#946038", "s": "#714628", "o": "#3E2414", **POOP_FACE}
+    line = "#3E2414"
+    if style == "classic":
+        rows = [r.translate(str.maketrans("ewkp", "bbbb")) for r in rows]
+    elif style == "golden":
+        pal.update({"h": "#FFF0A0", "b": "#F7C842", "s": "#D49A1E", "o": "#8A5A10"})
+        line = "#6A4208"
+        # Sparkles.
+        rows = [r for r in rows]
+        rows[1] = "..x...." + rows[1][7:]
+        rows[6] = rows[6][:15] + "x."
+        pal["x"] = "#FFFFFF"
+    elif style == "rainbow":
+        tiers = [("147", range(0, 4)), ("258", range(5, 8)), ("369", range(9, 15))]
+        for chars, span in tiers:
+            for i in span:
+                rows[i] = rows[i].translate(str.maketrans("hbs", chars))
+        pal.update({"1": "#FF9CC2", "4": "#FFD0E2", "7": "#E06A98",
+                    "2": "#FFE37A", "5": "#FFF3BE", "8": "#E0B83A",
+                    "3": "#8CC8FF", "6": "#CDE6FF", "9": "#5A98E0", "o": "#7A5A8A"})
+        line = "#5A3E6A"
+    return text_sprite(rows, pal, line)
 
 
 # ---------------------------------------------------------------- Bowls
@@ -455,45 +576,56 @@ def poop():
 # Two layers so treats sit inside: the back (far rim and the cream inside)
 # and the front (near lip and the body with a paw print).
 
-BOWL_W, BOWL_H = 28, 20
+BOWL_W, BOWL_H = 34, 19
 BOWLS = {
-    "appleReminders": {"R": "#FFD3A6", "b": "#FFB074", "s": "#EF8C4E", "h": "#FFE9D2", "line": "#6A3416"},
-    "googleTasks": {"R": "#BCDCFF", "b": "#84B9F6", "s": "#5A94E0", "h": "#E3F1FF", "line": "#1F3462"},
+    "appleReminders": {"R": "#FFB36B", "h": "#FFE2BF", "b": "#F08A3A", "s": "#CC6A24", "S": "#A0501A",
+                       "B": "#FFA055", "P": "#6A2E0E", "line": "#4A1E08"},
+    "googleTasks": {"R": "#6FA8FF", "h": "#CFE3FF", "b": "#3D78E0", "s": "#2C5BB8", "S": "#1F4590",
+                    "B": "#5A93F0", "P": "#17306A", "line": "#0F1E44"},
 }
-BOWL_INSIDE = {"d": "#FFF3E0", "D": "#E8D2B0", "e": "#2A1A1A", "p": "#F79AB0", "k": "#2A1A1A"}
+KIBBLE = {"1": "#B9773A", "2": "#8E5424", "3": "#D99A55", "4": "#6E3E18"}
 
 
 def bowl(colors):
-    """A cat-face bowl: ears on the back rim, a little face and feet."""
-    pal = dict(colors, **BOWL_INSIDE)
+    """A plastic pet bowl heaped with kibble: flared base, paw print on the side."""
+    pal = dict(colors, **KIBBLE)
     back = Grid(BOWL_W, BOWL_H)
-    # Ears behind the rim.
-    for tip, rows in ((5, [(5, 5), (5, 6), (5, 7), (4, 8)]), (22, [(22, 22), (21, 22), (20, 22), (19, 23)])):
-        for y, (x0, x1) in enumerate(rows, start=1):
-            back.rect(x0, y, x1, y, "b")
-    back.px([(6, 3), (21, 3)], "p")
-    back.rect(6, 4, 21, 4, "R")
-    back.rect(3, 5, 24, 5, "R")
-    back.rect(2, 6, 25, 6, "R")
-    back.rect(1, 7, 26, 8, "R")
-    back.rect(7, 5, 20, 5, "D")
-    back.rect(4, 6, 23, 6, "D")
-    back.rect(3, 7, 24, 8, "d")
+    back.rect(6, 5, 27, 5, "R")
+    back.rect(4, 6, 29, 6, "R")
+    back.rect(3, 7, 30, 8, "R")
+    # A dome of kibble above the rim: round pieces with a lit top-left.
+    for y, (x0, x1) in enumerate([(13, 20), (10, 23), (8, 25), (6, 27), (5, 28), (5, 28), (5, 28), (5, 28)], start=1):
+        for x in range(x0, x1 + 1):
+            back.px([(x, y)], "1")
+    for y in range(1, 9):
+        for x in range(4, 30):
+            if back.get(x, y) != "1":
+                continue
+            cx, cy = (x + (y // 2) % 2 * 2) % 4, y % 2
+            if cx == 3:
+                back.px([(x, y)], "2")
+            elif cx == 0 and cy == 1:
+                back.px([(x, y)], "3")
+            elif cx == 2 and cy == 0 and y > 4:
+                back.px([(x, y)], "4")
 
     front = Grid(BOWL_W, BOWL_H)
-    front.rect(1, 9, 26, 9, "R")
-    front.rect(4, 9, 7, 9, "h")
-    for y, (x0, x1) in enumerate([(1, 26), (1, 26), (2, 25), (2, 25), (3, 24), (4, 23), (6, 21)], start=10):
-        front.rect(x0, y, x1, y, "s" if y == 16 else "b")
-        front.px([(x1 - 1, y), (x1, y)], "s")
-    front.px([(3, 11), (3, 12)], "h")
-    # Face: eyes with a shine, blush, a "w" mouth.
-    front.px([(10, 11), (10, 12), (17, 11), (17, 12)], "e")
-    front.px([(8, 13), (9, 13), (18, 13), (19, 13)], "p")
-    front.px([(12, 13), (13, 14), (14, 13), (15, 14), (16, 13)], "k")
-    # Little feet.
-    front.rect(6, 17, 8, 17, "s")
-    front.rect(19, 17, 21, 17, "s")
+    front.rect(2, 9, 31, 9, "R")
+    front.rect(6, 9, 12, 9, "h")
+    front.rect(24, 9, 26, 9, "h")
+    for y, (x0, x1, role) in enumerate([(2, 31, "b"), (2, 31, "b"), (1, 32, "b"), (1, 32, "s"), (1, 32, "s")], start=10):
+        front.rect(x0, y, x1, y, role)
+        front.px([(x1 - 1, y), (x1, y)], "S")
+    front.px([(4, 10), (4, 11), (5, 10), (4, 12)], "h")
+    # Flared base.
+    front.rect(0, 15, 33, 15, "B")
+    front.rect(0, 16, 33, 16, "s")
+    front.px([(3, 15), (4, 15), (5, 15)], "h")
+    front.px([(32, 15), (33, 15), (32, 16), (33, 16)], "S")
+    # Paw print.
+    front.px([(14, 11), (16, 10), (18, 10), (20, 11)], "P")
+    front.rect(15, 12, 19, 13, "P", round_=1)
+    front.px([(17, 14)], "P")
     return back.render(pal, colors["line"]), front.render(pal, colors["line"])
 
 
@@ -564,6 +696,7 @@ def main():
         out[pet_id] = build(poses_quad(spec, False), palette_for(spec), spec["line"], W, H) + ((W, H), [29, 15])
     for pet_id, spec in CATS.items():
         out[pet_id] = build(poses_quad(spec, True), palette_for(spec), spec["line"], W, H) + ((W, H), [27, 17])
+    out["sheep"] = build(poses_sheep(), SHEEP, SHEEP["line"], W, H) + ((W, H), [26, 15])
     out["kong"] = build(poses_kong(), KONG, KONG["line"], KW, KH) + ((KW, KH), [34, 15])
 
     for pet_id, (pet, wears, (w, h), mouth) in out.items():
@@ -574,8 +707,8 @@ def main():
         update_pack(pet_id, w, h, mouth)
         print("wrote", pet_id)
 
-    extras = {"Resources/Art/poop.png": poop()}
-    for pet_id, treat in (("shiba", bone), ("golden", bone), ("chihuahua", bone),
+    extras = {f"Resources/Art/poop-{style}.png": poop(style) for style in POOP_STYLES}
+    for pet_id, treat in (("shiba", bone), ("golden", bone), ("chihuahua", bone), ("husky", bone), ("sheep", clover),
                           ("orange-tabby", fish), ("black-cat", fish), ("kong", banana)):
         extras[f"Pets/{pet_id}/treat.png"] = treat()
     for path, rows in extras.items():
@@ -602,7 +735,7 @@ def main():
                 over = [line[0:w] for line in wears[item][0:h]]
                 row.append([[o or p for p, o in zip(pl, ol)] for pl, ol in zip(frame, over)])
             tiles.append(row)
-        tiles.append(out_bowls + [poop(), bone(), fish(), banana()])
+        tiles.append(out_bowls + [poop(style) for style in POOP_STYLES] + [bone(), fish(), banana(), clover()])
         tw = max(len(r[0][0]) for r in tiles)
         th = max(len(r[0]) for r in tiles)
         cols = max(len(r) for r in tiles)

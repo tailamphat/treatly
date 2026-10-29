@@ -60,6 +60,7 @@ struct SettingsView: View {
                 if !app.wardrobe.isEmpty {
                     section("Wardrobe") { wardrobeGrid }
                 }
+                section("Poop") { poopGrid }
                 footer
             }
             .padding(.horizontal, 20)
@@ -302,6 +303,50 @@ struct SettingsView: View {
                         PetPreview(pack: app.pack, wearing: item)
                             .frame(height: 34)
                         Text(item.map(Wardrobe.name(for:)) ?? "Nothing")
+                            .font(.caption2.weight(selected ? .bold : .regular))
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.primary.opacity(selected ? 0.12 : 0.04))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(selected ? Color.accentColor : .clear, lineWidth: 1.5)
+                    )
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    // MARK: Poop
+
+    private var poopGrid: some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 5), spacing: 8) {
+            ForEach(PoopStyle.allCases, id: \.self) { style in
+                let selected = style == app.settings.poopStyle
+                Button {
+                    model.run { $0.settings.poopStyle = style }
+                } label: {
+                    VStack(spacing: 4) {
+                        Group {
+                            if let art = PoopView.art(for: style) {
+                                Image(decorative: art.image, scale: 1)
+                                    .interpolation(.none)
+                                    .resizable()
+                                    .scaledToFit()
+                            } else {
+                                Image(systemName: "nosign")
+                                    .font(.system(size: 18))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .frame(height: 28)
+                        Text(style.name)
                             .font(.caption2.weight(selected ? .bold : .regular))
                             .lineLimit(1)
                     }

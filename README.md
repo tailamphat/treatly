@@ -8,9 +8,11 @@ Your pet (a dog, a cat, King Kong...) roams the bottom of your screen. Each task
 |---|---|---|
 | Shiba Inu | bone | sassy, dramatic screamer |
 | Golden Retriever | bone | patient, hopeful |
+| Husky | bone | loud, energetic, howls about everything |
 | Chihuahua | bone | tiny, yappy, runs everywhere |
 | Orange Tabby | fish | chaotic, random zoomies |
 | Black Cat | fish | sleepy, silent and mysterious |
+| Sheep | clover | slow, sleepy, bleats politely |
 | King Kong | banana | KONG SMASH |
 
 ## Build and run
@@ -29,6 +31,7 @@ The app lives in the menu bar (paw icon). It needs a real `.app` bundle for the 
 - **Click the pet**: Done (it eats the treat and completes the task), Snooze 10 min / 1 hour (it buries the treat), Next treat.
 - **Drag the pet** anywhere; it falls back to the ground.
 - **Click a bowl** to see that source's tasks and pick which one the pet should go after.
+- **Poop**: after eating, the pet leaves a poop for 10 to 15 seconds. Pick Cute, Classic, Golden or Rainbow in Settings, or turn it off.
 - **Wardrobe**: dress the pet in a party hat, bow, crown, bandana, sunglasses or a flower (Settings or the menu).
 - **Menu bar**: choose the pet, rename it, pick lists, set how fast nagging escalates, turn on sound.
 

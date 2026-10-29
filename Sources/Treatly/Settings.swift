@@ -32,6 +32,11 @@ final class Settings {
         defaults.set(all, forKey: "wearing")
     }
 
+    var poopStyle: PoopStyle {
+        get { PoopStyle(stored: defaults.string(forKey: "poopStyle")) }
+        set { defaults.set(newValue.rawValue, forKey: "poopStyle") }
+    }
+
     /// Off by default: yelling is a speech bubble unless you opt in.
     var soundOn: Bool {
         get { defaults.bool(forKey: "soundOn") }

@@ -97,7 +97,7 @@ do {
     let result = PetPackLoader.load(from: [repo.appendingPathComponent("Pets")])
     check(result.errors.isEmpty, "bundled packs load cleanly: \(result.errors)")
     let ids = Set(result.packs.map(\.id))
-    check(ids == ["shiba", "golden", "chihuahua", "orange-tabby", "black-cat", "kong"], "all six bundled packs present, got \(ids)")
+    check(ids == ["shiba", "golden", "husky", "chihuahua", "orange-tabby", "black-cat", "sheep", "kong"], "all eight bundled packs present, got \(ids)")
     for pack in result.packs {
         let folder = pack.folder!
         if let image = pack.treat.image {
@@ -228,6 +228,19 @@ do {
     var lazy = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, energy: 0, sleepiness: 0, rest: 0...0.1))
     for _ in 0..<3 { lazy.update(dt: 0.1, level: .calm, bounds: 0...1000, focusX: 500, random: &rng) }
     check(lazy.activity == .walking, "a calm pet walks when it wanders")
+}
+
+// MARK: Poop
+
+check(PoopStyle(stored: nil) == .cute && PoopStyle(stored: "nope") == .cute, "poop style defaults to cute")
+check(PoopStyle(stored: "rainbow") == .rainbow, "stored poop style is read back")
+check(PoopStyle.off.artName == nil && PoopStyle.golden.artName == "poop-golden", "poop art names")
+do {
+    let repo = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    for style in PoopStyle.allCases {
+        guard let name = style.artName else { continue }
+        check(FileManager.default.fileExists(atPath: repo.appendingPathComponent("Resources/Art/\(name).png").path), "\(name).png exists")
+    }
 }
 
 // MARK: Wardrobe
