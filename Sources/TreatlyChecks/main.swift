@@ -210,6 +210,11 @@ do {
     check(nagger.nagging, "after the break it nags again")
     check(PetBrain(x: 0, y: 0, temperament: Temperament(walkSpeed: 1, patience: 2)).breakDuration(at: .whining) == 60, "patience stretches the breaks")
 
+    // Placing moves it without changing what it is doing.
+    var placed = PetBrain(x: 0, y: 0, temperament: Temperament(walkSpeed: 50))
+    placed.place(x: 2000, y: 300)
+    check(placed.x == 2000 && placed.y == 300 && placed.activity == .idle, "place moves the pet and keeps its activity")
+
     // Personalities differ.
     var zoomy = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, energy: 1, sleepiness: 0, rest: 0...0.1))
     for _ in 0..<3 { zoomy.update(dt: 0.1, level: .calm, bounds: 0...1000, focusX: 500, random: &rng) }

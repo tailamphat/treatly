@@ -239,6 +239,13 @@ public struct PetBrain {
         self.y = y
     }
 
+    /// Moves it without changing what it is doing, e.g. back onto a display.
+    public mutating func place(x: Double, y: Double) {
+        self.x = x
+        self.y = y
+        wanderTarget = nil
+    }
+
     public mutating func putDown() {
         guard activity == .held else { return }
         rest(for: 0.8)

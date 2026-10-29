@@ -268,7 +268,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         settingsPanel = panel
         panel.model.poke()
         let size = panel.frame.size
-        let ground = Ground.current()
+        let ground = Ground.containing(point)
         let origin = NSPoint(x: point.x - size.width / 2, y: point.y + 20)
         panel.setFrameOrigin(ground.clamp(origin, size: size))
         NSApp.activate(ignoringOtherApps: true)
@@ -312,10 +312,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         for bowl in bowls {
             let entry = bowlWindows[bowl.source] ?? makeBowlWindow(for: bowl.source)
             entry.view.treatCount = bowl.treatCount
-            // Dragged bowls stay where they were put; others start on the ground.
+            // Dragged bowls stay where they were put, on whichever display;
+            // others start on the ground of the menu bar display.
             let size = entry.view.bounds.size
             let origin = settings.bowlPosition(for: bowl.source) ?? NSPoint(x: bowl.x - size.width / 2, y: ground.y)
-            entry.window.setFrameOrigin(ground.clamp(origin, size: size))
+            let home = Ground.containing(NSPoint(x: origin.x + size.width / 2, y: origin.y + size.height / 2))
+            entry.window.setFrameOrigin(home.clamp(origin, size: size))
             entry.window.orderFrontRegardless()
         }
         // Keep the pet in front of its bowls.
@@ -338,7 +340,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let now = Date()
         let dt = min(now.timeIntervalSince(lastTick), 0.1)
         lastTick = now
-        let ground = Ground.current()
+        // The pet lives on whichever display it is on. If that display went
+        // away, it moves to the nearest one.
+        let ground = Ground.containing(NSPoint(x: brain.x, y: brain.y + 1))
+        if !ground.contains(NSPoint(x: brain.x, y: brain.y)) {
+            let walk = ground.walkBounds
+            brain.place(x: min(max(brain.x, walk.lowerBound), walk.upperBound), y: min(max(brain.y, ground.y), ground.maxY - PetView.size.height))
+        }
 
         let next = pickCurrent(now: now)
         if next?.id != current?.id {
@@ -403,7 +411,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let window = OverlayWindow(size: size)
         window.contentView = view
         window.ignoresMouseEvents = true
-        window.setFrameOrigin(Ground.current().clamp(NSPoint(x: x - size.width / 2, y: brain.y + PetView.groundPad - 2), size: size))
+        let spot = NSPoint(x: x - size.width / 2, y: brain.y + PetView.groundPad - 2)
+        window.setFrameOrigin(Ground.containing(NSPoint(x: brain.x, y: brain.y + 1)).clamp(spot, size: size))
         window.orderFrontRegardless()
         petWindow.orderFrontRegardless()
         poops.append((window, view, now.addingTimeInterval(.random(in: 10...15))))
@@ -485,9 +494,10 @@ extension AppDelegate: PetViewDelegate {
         brain.pickUp()
     }
 
-    /// The pet stays wherever it is dropped; it doesn't fall back to the ground.
+    /// The pet stays wherever it is dropped, on any display; it doesn't fall
+    /// back to the ground.
     func petDragged(to screenPoint: NSPoint) {
-        let ground = Ground.current()
+        let ground = Ground.containing(screenPoint)
         let x = min(max(screenPoint.x, ground.walkBounds.lowerBound), ground.walkBounds.upperBound)
         let y = min(max(screenPoint.y - 30, ground.y), ground.maxY - PetView.size.height)
         brain.drag(toX: x, y: y)
@@ -510,7 +520,7 @@ extension AppDelegate: BowlViewDelegate {
 
     func bowlDragged(_ view: BowlView, to origin: NSPoint) {
         guard let window = view.window else { return }
-        window.setFrameOrigin(Ground.current().clamp(origin, size: window.frame.size))
+        window.setFrameOrigin(Ground.containing(NSEvent.mouseLocation).clamp(origin, size: window.frame.size))
     }
 
     func bowlDropped(_ view: BowlView) {
