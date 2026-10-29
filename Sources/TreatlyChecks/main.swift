@@ -120,6 +120,13 @@ check(String(data: OAuth.formBody([("a", "1 2"), ("b", "x/y")]), encoding: .utf8
 check(GoogleTasksDate.components(fromDue: "2026-10-29T00:00:00.000Z") == DateComponents(year: 2026, month: 10, day: 29), "Google due keeps only the date")
 check(GoogleTasksDate.components(fromDue: nil) == nil, "no Google due date")
 
+// MARK: Pack file safety
+
+check(PetPack.isPlainFileName("sheet.png"), "plain file name allowed")
+check(!PetPack.isPlainFileName("../../secret.png"), "parent paths rejected")
+check(!PetPack.isPlainFileName("/etc/x.png"), "absolute paths rejected")
+check(!PetPack.isPlainFileName(".hidden.png"), "hidden files rejected")
+
 // MARK: SpriteSheet
 
 do {

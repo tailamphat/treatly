@@ -86,7 +86,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Demo mode: another process can post this to press "Done".
         if ProcessInfo.processInfo.environment["TREATLY_DEMO"] != nil {
             DistributedNotificationCenter.default().addObserver(forName: .init("io.github.treatly.demo.done"), object: nil, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated { self?.completeCurrent() }
+                // Only ever fake tasks: any local process can post this.
+                MainActor.assumeIsolated {
+                    guard let self, self.current?.sourceID.hasPrefix("demo") == true else { return }
+                    self.completeCurrent()
+                }
             }
             DistributedNotificationCenter.default().addObserver(forName: .init("io.github.treatly.demo.settings"), object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated { self?.openSettings(near: NSPoint(x: 900, y: 200)) }

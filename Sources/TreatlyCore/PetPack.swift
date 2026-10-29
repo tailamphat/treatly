@@ -53,6 +53,10 @@ public struct PetPack: Codable, Equatable, Identifiable, Sendable {
 
     public func validate() throws {
         guard sheet != nil || sprite != nil else { throw SpriteError(description: "\(id) needs a 'sheet' or a 'sprite'") }
+        // Packs come from strangers; keep their files inside the pack folder.
+        for file in [sheet?.image, treat.image].compactMap({ $0 }) where !Self.isPlainFileName(file) {
+            throw SpriteError(description: "\(id) image '\(file)' must be a file name inside the pack folder")
+        }
         guard treat.image != nil || treat.sprite != nil else { throw SpriteError(description: "\(id) treat needs an 'image' or a 'sprite'") }
         do { try sheet?.validate() } catch { throw SpriteError(description: "\(id) sheet: \(error)") }
         do { try sprite?.validate() } catch { throw SpriteError(description: "\(id) sprite: \(error)") }
@@ -61,6 +65,13 @@ public struct PetPack: Codable, Equatable, Identifiable, Sendable {
         for (key, list) in [("carry", p.carry), ("drop", p.drop), ("yell", p.yell), ("whine", p.whine), ("happy", p.happy), ("bury", p.bury)] where list.isEmpty {
             throw SpriteError(description: "\(id) has no '\(key)' phrases")
         }
+    }
+}
+
+extension PetPack {
+    /// A bare file name: no folders, no "..", not hidden.
+    public static func isPlainFileName(_ name: String) -> Bool {
+        !name.isEmpty && !name.contains("/") && !name.contains("\\") && !name.hasPrefix(".")
     }
 }
 

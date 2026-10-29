@@ -41,7 +41,7 @@ final class GoogleTasksSource: TaskSource {
         let selected = selectedListIDs()
         var items: [TaskItem] = []
         for list in lists where selected.isEmpty || selected.contains(list.id) {
-            let tasks: [GoogleTask] = try await getAll("\(base)/lists/\(list.id)/tasks?showCompleted=false&showHidden=false&maxResults=100")
+            let tasks: [GoogleTask] = try await getAll("\(base)/lists/\(Self.pathComponent(list.id))/tasks?showCompleted=false&showHidden=false&maxResults=100")
             for task in tasks where task.status != "completed" {
                 let title = task.title?.trimmingCharacters(in: .whitespaces) ?? ""
                 guard !title.isEmpty else { continue }
@@ -59,7 +59,8 @@ final class GoogleTasksSource: TaskSource {
     func complete(_ task: TaskItem) async throws {
         let ids = task.sourceID.split(separator: "|", maxSplits: 1).map(String.init)
         guard ids.count == 2 else { return }
-        var request = try await authorized(URL(string: "\(base)/lists/\(ids[0])/tasks/\(ids[1])")!)
+        guard let url = URL(string: "\(base)/lists/\(Self.pathComponent(ids[0]))/tasks/\(Self.pathComponent(ids[1]))") else { return }
+        var request = try await authorized(url)
         request.httpMethod = "PATCH"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = Data(#"{"status":"completed"}"#.utf8)
@@ -69,6 +70,13 @@ final class GoogleTasksSource: TaskSource {
     /// Google Tasks only stores a due date, not a time, so a 10 minute snooze
     /// can't be synced. The local hide is enough.
     func snooze(_ task: TaskItem, until: Date) async throws {}
+
+    /// Ids come from Google, but never let one change the URL's shape.
+    private static func pathComponent(_ id: String) -> String {
+        var allowed = CharacterSet.alphanumerics
+        allowed.insert(charactersIn: "-_")
+        return id.addingPercentEncoding(withAllowedCharacters: allowed) ?? ""
+    }
 
     private func getAll<Item: Decodable>(_ url: String) async throws -> [Item] {
         var all: [Item] = []
