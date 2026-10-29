@@ -1,0 +1,80 @@
+{
+  "id": "golden",
+  "name": "Golden Retriever",
+  "species": "dog",
+  "defaultName": "Sunny",
+  "credit": "Treatly contributors, MIT (scripts/art/generate.py)",
+  "treat": {
+    "name": "bone",
+    "image": "treat.png"
+  },
+  "sheet": {
+    "image": "sheet.png",
+    "frameWidth": 44,
+    "frameHeight": 34,
+    "scale": 2,
+    "footPadding": 1,
+    "mouth": [
+      42,
+      14
+    ],
+    "animations": {
+      "idle": {
+        "row": 0,
+        "count": 4,
+        "fps": 2
+      },
+      "walk": {
+        "row": 1,
+        "count": 4,
+        "fps": 8
+      },
+      "sit": {
+        "row": 2,
+        "count": 1
+      },
+      "bark": {
+        "row": 3,
+        "count": 2,
+        "fps": 5
+      },
+      "beg": {
+        "row": 4,
+        "count": 2,
+        "fps": 1.5
+      },
+      "sleep": {
+        "row": 5,
+        "count": 2,
+        "fps": 0.5
+      }
+    }
+  },
+  "personality": {
+    "walkSpeed": 55,
+    "sleepiness": 0.2
+  },
+  "phrases": {
+    "carry": [
+      "{task}"
+    ],
+    "drop": [
+      "*wag wag* {task}? Please?"
+    ],
+    "yell": [
+      "Woof! Woof! {task}!",
+      "{name} really wants {task}!"
+    ],
+    "whine": [
+      "*puppy eyes* {task}...?"
+    ],
+    "happy": [
+      "Best human ever!",
+      "Good job! Good job!"
+    ],
+    "bury": [
+      "Okay! I'll keep it safe!"
+    ]
+  },
+  "sound": "Pop"
+}

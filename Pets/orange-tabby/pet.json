@@ -1,0 +1,80 @@
+{
+  "id": "orange-tabby",
+  "name": "Orange Tabby",
+  "species": "cat",
+  "defaultName": "Cheeto",
+  "credit": "Treatly contributors, MIT (scripts/art/generate.py)",
+  "treat": {
+    "name": "fish",
+    "image": "treat.png"
+  },
+  "sheet": {
+    "image": "sheet.png",
+    "frameWidth": 44,
+    "frameHeight": 34,
+    "scale": 2,
+    "footPadding": 1,
+    "mouth": [
+      40,
+      14
+    ],
+    "animations": {
+      "idle": {
+        "row": 0,
+        "count": 4,
+        "fps": 2
+      },
+      "walk": {
+        "row": 1,
+        "count": 4,
+        "fps": 8
+      },
+      "sit": {
+        "row": 2,
+        "count": 1
+      },
+      "bark": {
+        "row": 3,
+        "count": 2,
+        "fps": 5
+      },
+      "beg": {
+        "row": 4,
+        "count": 2,
+        "fps": 1.5
+      },
+      "sleep": {
+        "row": 5,
+        "count": 2,
+        "fps": 0.5
+      }
+    }
+  },
+  "personality": {
+    "walkSpeed": 80,
+    "sleepiness": 0.4
+  },
+  "phrases": {
+    "carry": [
+      "{task}"
+    ],
+    "drop": [
+      "*stares* {task}."
+    ],
+    "yell": [
+      "MRRAOW! {task}!",
+      "*knocks your stuff over* {task}."
+    ],
+    "whine": [
+      "*sits on keyboard* {task}"
+    ],
+    "happy": [
+      "*nom nom* acceptable.",
+      "Fish secured."
+    ],
+    "bury": [
+      "*hides fish under the Dock*"
+    ]
+  },
+  "sound": "Purr"
+}

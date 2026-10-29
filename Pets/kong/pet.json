@@ -1,0 +1,76 @@
+{
+  "id": "kong",
+  "name": "King Kong",
+  "species": "ape",
+  "defaultName": "Kong",
+  "credit": "Treatly contributors, MIT (scripts/art/generate.py)",
+  "treat": {
+    "name": "banana",
+    "image": "treat.png"
+  },
+  "sheet": {
+    "image": "sheet.png",
+    "frameWidth": 52,
+    "frameHeight": 42,
+    "scale": 2,
+    "footPadding": 3,
+    "mouth": [
+      45,
+      21
+    ],
+    "animations": {
+      "idle": {
+        "row": 0,
+        "count": 4,
+        "fps": 3
+      },
+      "walk": {
+        "row": 1,
+        "count": 4,
+        "fps": 7
+      },
+      "bark": {
+        "row": 2,
+        "count": 2,
+        "fps": 6
+      },
+      "sit": {
+        "row": 3,
+        "count": 1
+      },
+      "sleep": {
+        "row": 4,
+        "count": 2,
+        "fps": 1
+      }
+    }
+  },
+  "personality": {
+    "walkSpeed": 45,
+    "sleepiness": 0.3
+  },
+  "phrases": {
+    "carry": [
+      "{task}"
+    ],
+    "drop": [
+      "Kong bring banana. {task}."
+    ],
+    "yell": [
+      "KONG SMASH {task}!",
+      "*chest pound* {task}!!"
+    ],
+    "whine": [
+      "Kong sad. {task} not done."
+    ],
+    "happy": [
+      "BANANA GOOD!",
+      "*happy chest pound*"
+    ],
+    "bury": [
+      "Kong save banana for later."
+    ]
+  },
+  "sound": "Basso",
+  "container": "tree"
+}
