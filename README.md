@@ -15,12 +15,21 @@ Your pet (a dog, a cat, King Kong...) roams the bottom of your screen. Each task
 | Sheep | clover | slow, sleepy, bleats politely |
 | King Kong | banana | KONG SMASH |
 
+## Install
+
+```sh
+brew install --cask tailamphat/tap/treatly
+```
+
+Or download `Treatly-<version>.zip` from [Releases](https://github.com/tailamphat/desktop-pet/releases), unzip and move Treatly to Applications. Requires macOS 14 (Sonoma) or later. Releases aren't notarized yet: the first time, open System Settings > Privacy & Security and click **Open Anyway**.
+
 ## Build and run
 
 Requires macOS 14+ and the Swift toolchain (Command Line Tools are enough).
 
 ```sh
 ./scripts/bundle.sh --open     # builds build/Treatly.app and launches it
+./scripts/release.sh           # universal release zip + Homebrew cask (docs/releasing.md)
 swift run TreatlyChecks        # runs the core logic checks
 ```
 

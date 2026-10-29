@@ -807,6 +807,77 @@ def tree(source):
     return g.render(pal, "#22401A")
 
 
+# ---------------------------------------------------------------- App icon
+
+ICON_SIZES = [16, 32, 128, 256, 512]
+
+
+def _downsample(rows, size):
+    """Area-average down to `size` (alpha-weighted), for the tiny icon sizes."""
+    k = len(rows) / size
+    out = []
+    for y in range(size):
+        line = []
+        for x in range(size):
+            acc = [0.0, 0.0, 0.0, 0.0]
+            n = 0
+            for yy in range(int(y * k), int((y + 1) * k)):
+                for xx in range(int(x * k), int((x + 1) * k)):
+                    p = rows[yy][xx]
+                    n += 1
+                    if p:
+                        a = p[3] / 255
+                        acc[0] += p[0] * a
+                        acc[1] += p[1] * a
+                        acc[2] += p[2] * a
+                        acc[3] += a
+            if acc[3] == 0:
+                line.append(None)
+            else:
+                line.append(tuple(round(acc[i] / acc[3]) for i in range(3)) + (round(255 * acc[3] / n),))
+        out.append(line)
+    return out
+
+
+def icon(size):
+    """The Shiba on a rounded warm tile, macOS icon proportions."""
+    if size < 128:
+        return _downsample(icon(256), size)
+    spec = DOGS["shiba"]
+    g, _ = quad(spec, False)
+    pet = g.render(palette_for(spec), spec["line"])
+    # Crop to the sprite's pixels.
+    rows = [y for y, r in enumerate(pet) if any(r)]
+    cols = [x for x in range(len(pet[0])) if any(r[x] for r in pet)]
+    pet = [r[cols[0]:cols[-1] + 1] for r in pet[rows[0]:rows[-1] + 1]]
+    ph, pw = len(pet), len(pet[0])
+
+    margin = size * 100 // 1024          # Apple's grid leaves ~10% around the tile
+    tile = size - 2 * margin
+    radius = tile * 0.225
+    top, bottom = hex_rgba("#FFE7C2"), hex_rgba("#FFC98A")
+    out = [[None] * size for _ in range(size)]
+    for y in range(margin, margin + tile):
+        t = (y - margin) / max(1, tile - 1)
+        c = tuple(round(top[i] * (1 - t) + bottom[i] * t) for i in range(3)) + (255,)
+        for x in range(margin, margin + tile):
+            dx = max(margin + radius - x - 0.5, 0, x + 0.5 - (margin + tile - radius))
+            dy = max(margin + radius - y - 0.5, 0, y + 0.5 - (margin + tile - radius))
+            if dx * dx + dy * dy <= radius * radius:
+                out[y][x] = c
+    # Whole-pixel scale so the art stays crisp.
+    k = max(1, int(tile * 0.78) // pw)
+    ox = (size - pw * k) // 2
+    oy = (size - ph * k) // 2 + tile // 20
+    for y in range(ph):
+        for x in range(pw):
+            p = pet[y][x]
+            if p:
+                for yy in range(oy + y * k, oy + (y + 1) * k):
+                    out[yy][ox + x * k:ox + (x + 1) * k] = [p] * k
+    return out
+
+
 # ---------------------------------------------------------------- Sheets
 
 def poses_quad(spec, cat):
@@ -904,6 +975,14 @@ def main():
             write_png(os.path.join(ROOT, f"Resources/Art/bowl-{style}-{source}.png"), front)
             out_bowls.append([[f or b for b, f in zip(bl, fl)] for bl, fl in zip(back, front)])
         print("wrote bowl", style)
+
+    # App icon: an .iconset for iconutil (run by scripts/bundle.sh).
+    iconset = os.path.join(ROOT, "build", "AppIcon.iconset")
+    os.makedirs(iconset, exist_ok=True)
+    for n in ICON_SIZES:
+        write_png(os.path.join(iconset, f"icon_{n}x{n}.png"), icon(n))
+        write_png(os.path.join(iconset, f"icon_{n}x{n}@2x.png"), icon(n * 2))
+    print("wrote build/AppIcon.iconset")
 
     if "--preview" in sys.argv:
         bg = (44, 44, 50, 255)
