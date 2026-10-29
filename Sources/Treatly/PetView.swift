@@ -52,7 +52,7 @@ final class PetView: NSView {
 
         // Sheets animate themselves; a single still frame gets faked motion.
         switch s.activity {
-        case .walking where !art.isAnimated:
+        case .walking where !art.isAnimated, .running where !art.isAnimated:
             petRect.origin.y += Int(s.time * 8) % 2 == 0 ? 0 : 2
         case .sleeping where !art.isAnimated:
             petRect.size.height *= 0.85

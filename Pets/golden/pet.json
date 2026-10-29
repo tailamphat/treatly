@@ -47,12 +47,25 @@
         "row": 5,
         "count": 2,
         "fps": 0.5
+      },
+      "run": {
+        "row": 1,
+        "count": 4,
+        "fps": 14
       }
     }
   },
   "personality": {
     "walkSpeed": 55,
-    "sleepiness": 0.2
+    "runSpeed": 130,
+    "energy": 0.15,
+    "sleepiness": 0.2,
+    "rest": [
+      2,
+      5
+    ],
+    "nagSeconds": 15,
+    "patience": 1.4
   },
   "phrases": {
     "carry": [

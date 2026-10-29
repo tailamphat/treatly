@@ -4,6 +4,7 @@
   "species": "ape",
   "defaultName": "Kong",
   "credit": "Treatly contributors, MIT (scripts/art/generate.py)",
+  "container": "tree",
   "treat": {
     "name": "banana",
     "image": "treat.png"
@@ -42,12 +43,25 @@
         "row": 4,
         "count": 2,
         "fps": 1
+      },
+      "run": {
+        "row": 1,
+        "count": 4,
+        "fps": 11
       }
     }
   },
   "personality": {
     "walkSpeed": 45,
-    "sleepiness": 0.3
+    "runSpeed": 110,
+    "energy": 0.1,
+    "sleepiness": 0.3,
+    "rest": [
+      3,
+      6
+    ],
+    "nagSeconds": 25,
+    "patience": 1.0
   },
   "phrases": {
     "carry": [
@@ -71,6 +85,5 @@
       "Kong save banana for later."
     ]
   },
-  "sound": "Basso",
-  "container": "tree"
+  "sound": "Basso"
 }

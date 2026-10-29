@@ -26,7 +26,7 @@ An open-source macOS desktop pet that nags you about your todos. Tasks are treat
 
 **Current task**: overdue first (most overdue first), then higher priority, then earliest due date, then title. Clicking a task in a bowl pins it. Snoozed and skipped tasks are hidden until their time is up.
 
-**Escalation** (every *step*, default 10 min, starting at the due date or when the task became current):
+**Escalation** (every *step*, default 10 min, starting at the due date or when the task became current). From level 2 on it nags in bursts (`nagSeconds`, per pet) with roaming breaks of 60/45/30 s (scaled by the pet's `patience`) in between:
 
 1. Carrying - trots around with the treat, flashes the task title now and then
 2. Dropping - walks to the middle of the screen, drops the treat, sits

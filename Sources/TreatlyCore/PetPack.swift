@@ -34,11 +34,29 @@ public struct PetPack: Codable, Equatable, Identifiable, Sendable {
         public var sprite: PixelSprite?
     }
 
+    /// How the animal behaves. Only `walkSpeed` and `sleepiness` are required.
     public struct Personality: Codable, Equatable, Sendable {
         /// Points per second.
         public var walkSpeed: Double
-        /// Chance (0...1) of napping when it has nothing to do.
+        /// Chance (0...1) of napping when it stops.
         public var sleepiness: Double
+        /// Points per second when running. Defaults to 2.2x walking.
+        public var runSpeed: Double?
+        /// Chance (0...1) that a stroll becomes a run. Defaults to 0.15.
+        public var energy: Double?
+        /// [min, max] seconds it stands around between moves. Defaults to [1.5, 4.5].
+        public var rest: [Double]?
+        /// Seconds per nagging burst. Defaults to 20.
+        public var nagSeconds: Double?
+        /// Scales the breaks between bursts; above 1 is more patient. Defaults to 1.
+        public var patience: Double?
+
+        public var temperament: Temperament {
+            let r = rest ?? []
+            let restRange = r.count == 2 && r[0] <= r[1] ? r[0]...r[1] : 1.5...4.5
+            return Temperament(walkSpeed: walkSpeed, runSpeed: runSpeed, energy: energy ?? 0.15, sleepiness: sleepiness,
+                               rest: restRange, nagDuration: nagSeconds ?? 20, patience: patience ?? 1)
+        }
     }
 
     /// Templates may use {task} and {name}.

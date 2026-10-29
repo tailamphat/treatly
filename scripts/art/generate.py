@@ -33,6 +33,7 @@ MATERIALS = {
     "ink": ("#111014", "#111014", "#111014", "#111014"),
     "mouth": ("#5A2A2A", "#3E1A1C", "#2A1012", "#111014"),
     "tongue": ("#F48A9A", "#F48A9A", "#F48A9A", "#111014"),
+    "earIn": ("#F2A0AE", "#E88898", "#C86C7C", "#111014"),
     "poop": ("#A87446", "#7E5230", "#5C3A20", "#2A190C"),
     # Same colors under a second name, so the outline pass draws a line
     # between stacked tiers.
@@ -318,6 +319,13 @@ BREEDS = {
         "collar": ("#62D4CC", "#2FB0A8", "#1E8A84", "#0C3A38"),
         "ears": "floppy", "tail": "plume", "marks": False,
     },
+    "chihuahua": {
+        "fur": ("#F6D3A6", "#DEB07C", "#BC8C58", "#4A2E14"),
+        "furD": ("#C99A64", "#B08250", "#8E663C", "#3A2410"),
+        "mark": ("#FFF6E8", "#F8E8D0", "#E2CCAA", "#5A4630"),
+        "collar": ("#FF8AC8", "#F25AA8", "#C23A84", "#4A0E30"),
+        "ears": "big", "tail": "thin", "marks": True,
+    },
 }
 
 
@@ -353,7 +361,7 @@ def dog(breed, pose="stand", swing=0, bob=0, mouth=False, tilt=0):
         c.ellipse(hx + 5, hy + 2, 3.4, 2.3, m("mark") if b["marks"] else m("fur"))
         if b["marks"]:
             c.ellipse(hx + 2, hy + 3, 2.6, 1.7, m("mark"))
-        if b["ears"] == "pointy":
+        if b["ears"] in ("pointy", "big"):
             c.triangle((hx - 3, hy - 3), (hx - 1, hy - 8), (hx + 1.5, hy - 3.5), m("fur"))
         else:
             c.ellipse(hx - 2.5, hy + 1.5, 2.2, 3.8, m("furD"))
@@ -371,6 +379,10 @@ def dog(breed, pose="stand", swing=0, bob=0, mouth=False, tilt=0):
         c.line((tx + 2, ty + 2), (tx - 2, ty - 3), 3.6, m("fur"))
         c.line((tx - 2, ty - 3), (tx + 2, ty - 6), 3.6, m("fur"))
         c.line((tx + 2, ty - 6), (tx + 4, ty - 3), 3, m("mark") if b["marks"] else m("fur"))
+    elif b["tail"] == "thin":
+        tx, ty = (11, 21) if sit else (10, 17 + by)
+        c.line((tx + 1, ty + 1), (tx - 3, ty - 3), 2.2, m("fur"))
+        c.line((tx - 3, ty - 3), (tx - 1, ty - 7), 2.2, m("fur"))
     else:
         tx, ty = (11, 22) if sit else (10, 18 + by)
         c.line((tx + 1, ty), (tx - 6, ty - 3), 4, m("fur"))
@@ -413,6 +425,8 @@ def dog(breed, pose="stand", swing=0, bob=0, mouth=False, tilt=0):
     # Back ear, head, snout, front ear.
     if b["ears"] == "pointy":
         c.triangle((hx - 4.5, hy - 2), (hx - 3, hy - 8), (hx - 0.5, hy - 3), m("furD"))
+    elif b["ears"] == "big":
+        c.triangle((hx - 6, hy - 1), (hx - 7, hy - 10), (hx - 1, hy - 3), m("furD"))
     c.ellipse(hx, hy, 5.5, 5, m("fur"))
     c.ellipse(hx + 5.5, hy + 2, 3.6, 2.6 if not mouth else 2.2, m("mark") if b["marks"] else m("fur"))
     if b["marks"]:
@@ -420,6 +434,9 @@ def dog(breed, pose="stand", swing=0, bob=0, mouth=False, tilt=0):
     if b["ears"] == "pointy":
         c.triangle((hx - 3, hy - 3), (hx - 1, hy - 9), (hx + 1.5, hy - 3.5), m("fur"))
         c.pixels([(hx - 1, hy - 5), (hx - 1, hy - 6)], "mouth")
+    elif b["ears"] == "big":
+        c.triangle((hx - 4, hy - 2), (hx - 3, hy - 12), (hx + 2, hy - 3.5), m("fur"))
+        c.pixels([(hx - 2, hy - 6), (hx - 2, hy - 7), (hx - 1, hy - 5), (hx - 2, hy - 8)], "earIn")
     else:
         c.ellipse(hx - 2.5, hy + 1.5, 2.4, 4.4, m("furD"))
 
@@ -800,6 +817,8 @@ def main():
         "Pets/shiba/treat.png": bone(),
         "Pets/shiba/sheet.png": dog_sheet("shiba"),
         "Pets/golden/sheet.png": dog_sheet("golden"),
+        "Pets/chihuahua/sheet.png": dog_sheet("chihuahua"),
+        "Pets/chihuahua/treat.png": bone(),
         "Pets/orange-tabby/sheet.png": cat_sheet("orange-tabby"),
         "Pets/black-cat/sheet.png": cat_sheet("black-cat"),
         "Pets/golden/treat.png": bone(),

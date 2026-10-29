@@ -57,7 +57,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         for source in sources { source.onChange = { [weak self] in self?.refresh() } }
 
         let ground = Ground.current()
-        brain = PetBrain(x: (ground.minX + ground.maxX) / 2, y: ground.y, walkSpeed: pack.personality.walkSpeed, sleepiness: pack.personality.sleepiness)
+        brain = PetBrain(x: (ground.minX + ground.maxX) / 2, y: ground.y, temperament: pack.personality.temperament)
 
         petView = PetView(frame: NSRect(origin: .zero, size: PetView.size))
         petView.delegate = self
@@ -119,8 +119,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func applyPack() {
         petView.art = PetArt(pack: pack)
-        brain.walkSpeed = pack.personality.walkSpeed
-        brain.sleepiness = pack.personality.sleepiness
+        brain.temperament = pack.personality.temperament
         bubbleKey = ""
         // Each pet brings its own containers (bowls, banana trees...).
         for (_, bowl) in bowlWindows { bowl.window.orderOut(nil) }
@@ -471,7 +470,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .whining: list = p.whine
         case .sleeping: list = ["z z z"]
         case .held: list = ["Wheee!"]
-        case .idle, .walking:
+        case .idle, .walking, .running:
             // While carrying, flash the task now and then.
             let showing = brain.carriesTreat && Int(now.timeIntervalSince(becameCurrentAt)) % 30 < 5
             list = showing ? p.carry : nil

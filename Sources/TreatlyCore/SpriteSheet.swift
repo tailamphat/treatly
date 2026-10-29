@@ -69,6 +69,7 @@ public struct SpriteSheet: Codable, Equatable, Sendable {
         switch activity {
         case .idle: return ["idle"]
         case .walking: return ["walk", "idle"]
+        case .running: return ["run", "walk", "idle"]
         case .sleeping: return ["sleep", "lie", "sit", "idle"]
         case .sitting: return ["sit", "idle"]
         case .yelling: return ["bark", "sit", "idle"]

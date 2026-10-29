@@ -2,14 +2,15 @@
 
 A desktop pet for macOS that turns your todos into treats and nags you until you finish them.
 
-Your pet (a dog, a cat, King Kong...) roams the bottom of your screen. Each task from **Apple Reminders** or **Google Tasks** is a treat in that source's bowl. The pet fetches the most urgent one and carries it around. Ignore it and the pet escalates: it drops the treat in front of you, then yells, then whines. Mark the task done and it eats the treat.
+Your pet (a dog, a cat, King Kong...) roams the bottom of your screen. Each task from **Apple Reminders** or **Google Tasks** is a treat in that source's bowl. The pet fetches the most urgent one and carries it around. Ignore it and the pet escalates: it drops the treat in front of you, then yells, then whines. Nagging comes in bursts with roaming breaks in between, and every animal has its own walk speed, energy, sleepiness and patience. Mark the task done and it eats the treat.
 
 | Pet | Treat | Personality |
 |---|---|---|
 | Shiba Inu | bone | sassy, dramatic screamer |
 | Golden Retriever | bone | patient, hopeful |
-| Orange Tabby | fish | chaotic |
-| Black Cat | fish | silent and mysterious |
+| Chihuahua | bone | tiny, yappy, runs everywhere |
+| Orange Tabby | fish | chaotic, random zoomies |
+| Black Cat | fish | sleepy, silent and mysterious |
 | King Kong | banana | KONG SMASH |
 
 ## Build and run

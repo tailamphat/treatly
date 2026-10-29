@@ -1,0 +1,95 @@
+{
+  "id": "chihuahua",
+  "name": "Chihuahua",
+  "species": "dog",
+  "defaultName": "Chili",
+  "credit": "Treatly contributors, MIT (scripts/art/generate.py)",
+  "treat": {
+    "name": "bone",
+    "image": "treat.png"
+  },
+  "sheet": {
+    "image": "sheet.png",
+    "frameWidth": 44,
+    "frameHeight": 34,
+    "scale": 1.5,
+    "footPadding": 1,
+    "mouth": [
+      42,
+      14
+    ],
+    "animations": {
+      "idle": {
+        "row": 0,
+        "count": 4,
+        "fps": 2
+      },
+      "walk": {
+        "row": 1,
+        "count": 4,
+        "fps": 8
+      },
+      "sit": {
+        "row": 2,
+        "count": 1
+      },
+      "bark": {
+        "row": 3,
+        "count": 2,
+        "fps": 5
+      },
+      "beg": {
+        "row": 4,
+        "count": 2,
+        "fps": 1.5
+      },
+      "sleep": {
+        "row": 5,
+        "count": 2,
+        "fps": 0.5
+      },
+      "run": {
+        "row": 1,
+        "count": 4,
+        "fps": 18
+      }
+    }
+  },
+  "personality": {
+    "walkSpeed": 90,
+    "runSpeed": 260,
+    "energy": 0.75,
+    "sleepiness": 0.08,
+    "rest": [
+      0.4,
+      1.5
+    ],
+    "nagSeconds": 25,
+    "patience": 0.5
+  },
+  "phrases": {
+    "carry": [
+      "{task}!"
+    ],
+    "drop": [
+      "*vibrates* {task}! {task}!",
+      "{name} found your {task}!"
+    ],
+    "yell": [
+      "YIP YIP YIP! {task}!",
+      "{name} will NOT stop: {task}!"
+    ],
+    "whine": [
+      "*trembling* {task}...",
+      "{name} is too small to do {task} for you"
+    ],
+    "happy": [
+      "ZOOMIES!",
+      "*runs in circles*"
+    ],
+    "bury": [
+      "*hides it under a blanket*"
+    ]
+  },
+  "sound": "Tink"
+}
