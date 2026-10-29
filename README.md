@@ -31,6 +31,7 @@ The app lives in the menu bar (paw icon). It needs a real `.app` bundle for the 
 - **Click the pet**: Done (it eats the treat and completes the task), Snooze 10 min / 1 hour (it buries the treat), Next treat.
 - **Drag the pet** anywhere; it falls back to the ground.
 - **Click a bowl** to see that source's tasks and pick which one the pet should go after.
+- **Bowl**: pick Classic, Steel, Ceramic, Puppy or Country Tub in Settings or the menu.
 - **Poop**: after eating, the pet leaves a poop for 10 to 15 seconds. Pick Cute, Classic, Golden or Rainbow in Settings, or turn it off.
 - **Wardrobe**: dress the pet in a party hat, bow, crown, bandana, sunglasses or a flower (Settings or the menu).
 - **Menu bar**: choose the pet, rename it, pick lists, set how fast nagging escalates, turn on sound.

@@ -243,6 +243,22 @@ do {
     }
 }
 
+// MARK: Bowl styles
+
+check(BowlStyle(stored: nil) == .classic && BowlStyle(stored: "nope") == .classic, "bowl style defaults to classic")
+check(BowlStyle(stored: "tub") == .tub, "stored bowl style is read back")
+do {
+    let repo = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    for style in BowlStyle.allCases {
+        for source in [TaskSourceKind.appleReminders, .googleTasks] {
+            let names = style.artNames(for: source)
+            for name in [names.back, names.front] {
+                check(FileManager.default.fileExists(atPath: repo.appendingPathComponent("Resources/Art/\(name).png").path), "\(name).png exists")
+            }
+        }
+    }
+}
+
 // MARK: Wardrobe
 
 do {

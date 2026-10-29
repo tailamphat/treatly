@@ -60,6 +60,9 @@ struct SettingsView: View {
                 if !app.wardrobe.isEmpty {
                     section("Wardrobe") { wardrobeGrid }
                 }
+                if ContainerStyle(pack: app.pack) == .bowl {
+                    section("Bowl") { bowlGrid }
+                }
                 section("Poop") { poopGrid }
                 footer
             }
@@ -323,6 +326,41 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: Bowl
+
+    private var bowlGrid: some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 5), spacing: 8) {
+            ForEach(BowlStyle.allCases, id: \.self) { style in
+                let selected = style == app.settings.bowlStyle
+                Button {
+                    model.run { $0.setBowlStyle(style) }
+                } label: {
+                    VStack(spacing: 4) {
+                        BowlPreview(style: style)
+                            .frame(height: 24)
+                        Text(style.name)
+                            .font(.caption2.weight(selected ? .bold : .regular))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.primary.opacity(selected ? 0.12 : 0.04))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(selected ? Color.accentColor : .clear, lineWidth: 1.5)
+                    )
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help(style.name)
+            }
+        }
+    }
+
     // MARK: Poop
 
     private var poopGrid: some View {
@@ -385,6 +423,25 @@ struct SettingsView: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
             content()
+        }
+    }
+}
+
+/// A bowl style as the Reminders bowl looks, back and front layers stacked.
+struct BowlPreview: View {
+    let style: BowlStyle
+
+    var body: some View {
+        let names = style.artNames(for: .appleReminders)
+        ZStack {
+            ForEach([names.back, names.front], id: \.self) { name in
+                if let art = BowlView.art(name) {
+                    Image(decorative: art.image, scale: 1)
+                        .interpolation(.none)
+                        .resizable()
+                        .scaledToFit()
+                }
+            }
         }
     }
 }

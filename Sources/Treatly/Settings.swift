@@ -32,6 +32,11 @@ final class Settings {
         defaults.set(all, forKey: "wearing")
     }
 
+    var bowlStyle: BowlStyle {
+        get { BowlStyle(stored: defaults.string(forKey: "bowlStyle")) }
+        set { defaults.set(newValue.rawValue, forKey: "bowlStyle") }
+    }
+
     var poopStyle: PoopStyle {
         get { PoopStyle(stored: defaults.string(forKey: "poopStyle")) }
         set { defaults.set(newValue.rawValue, forKey: "poopStyle") }

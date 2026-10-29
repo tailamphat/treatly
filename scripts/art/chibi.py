@@ -576,17 +576,21 @@ def poop(style="cute"):
 # Two layers so treats sit inside: the back (far rim and the cream inside)
 # and the front (near lip and the body with a paw print).
 
-BOWL_W, BOWL_H = 32, 21
-BOWLS = {
-    "appleReminders": {"R": "#FFBD7A", "H": "#FFE6C8", "I": "#C0621F", "b": "#F08A3A", "h": "#FFC089",
-                       "S": "#C2621F", "s": "#A0501A", "line": "#4A1E08"},
-    "googleTasks": {"R": "#7FB2FF", "H": "#D6E8FF", "I": "#2C5BB8", "b": "#3D78E0", "h": "#8DB8FF",
-                    "S": "#2A57A8", "s": "#23498F", "line": "#0F1E44"},
+# Five designs share one shape: a round bowl seen from a little above, with
+# the opening on top so treats can sit inside. Keep in sync with BowlStyle.
+
+BOWL_W, BOWL_H = 26, 17
+BOWL_CX = 13
+RIM = (5.0, 11.5, 4.5)      # outer rim ellipse: cy, rx, ry
+OPENING = (5.3, 9.3, 3.2)   # the hole
+BOWL_STYLES = ["classic", "steel", "ceramic", "puppy", "tub"]
+SOURCES = {
+    "appleReminders": {"m": "#F08A3A", "M": "#C2621F", "L": "#FFBD7A", "Lh": "#FFE6C8", "line": "#4A1E08"},
+    "googleTasks": {"m": "#3D78E0", "M": "#2A57A8", "L": "#7FB2FF", "Lh": "#D6E8FF", "line": "#0F1E44"},
 }
-KIBBLE = {"1": "#B9773A", "2": "#8E5424", "3": "#D99A55", "w": "#FFFFFF"}
-BOWL_CX = 16
-RIM = (6.0, 14.5, 5.5)      # outer rim ellipse: cy, rx, ry
-OPENING = (6.3, 11.8, 4.0)  # the hole
+KIBBLE = {"1": "#B9773A", "2": "#8E5424", "3": "#D99A55"}
+HAY = {"1": "#F2D27A", "2": "#D9B254", "3": "#FFE89A"}
+FACE = {"w": "#FFFFFF", "e": "#2A1A1A", "p": "#F79AB0", "k": "#2A1A1A"}
 
 
 def _in(x, y, ellipse):
@@ -594,47 +598,92 @@ def _in(x, y, ellipse):
     return ((x + 0.5 - BOWL_CX) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2 <= 1
 
 
-def bowl(colors):
-    """A dog bowl seen from a little above: rim, dark inside wall, kibble at
-    the bottom, a body flaring out to the base and a white paw print."""
-    pal = dict(colors, **KIBBLE)
+def dish():
+    """The shared shape. Roles: R rim, H rim shine, I inside wall, b body,
+    h body shine, S right shade, s base, 1-3 food."""
     back = Grid(BOWL_W, BOWL_H)
     front = Grid(BOWL_W, BOWL_H)
     for y in range(BOWL_H):
         for x in range(BOWL_W):
             if _in(x, y, OPENING):
-                if y + 0.5 < OPENING[0] - 0.8:
+                if y + 0.5 < OPENING[0] - 0.6:
                     back.px([(x, y)], "I")
                 else:
                     n = ((x * 73856093) ^ (y * 19349663)) % 7
                     back.px([(x, y)], "3" if n == 0 else "2" if n in (1, 2) else "1")
             elif _in(x, y, RIM):
-                lit = x < BOWL_CX - 4 and y <= RIM[0]
-                back.px([(x, y)], "H" if lit and y <= 3 else "R")
+                back.px([(x, y)], "H" if x < BOWL_CX - 3 and y <= 2 else "R")
                 if y + 0.5 >= RIM[0]:
                     front.px([(x, y)], "R")
             elif y + 0.5 > RIM[0]:
-                # Body: flares out a little toward a rounded base.
-                hw = RIM[1] + (y - RIM[0]) * 0.16
+                hw = RIM[1] + (y - RIM[0]) * 0.14
                 dx = x + 0.5 - BOWL_CX
                 if abs(dx) > hw:
                     continue
-                bottom = 16 + 2 * max(0.0, 1 - (dx / hw) ** 2) ** 0.5
+                bottom = 12 + 2 * max(0.0, 1 - (dx / hw) ** 2) ** 0.5
                 if y > bottom:
                     continue
                 if y > bottom - 1.5:
                     role = "s"
-                elif dx > hw - 3:
+                elif dx > hw - 2.5:
                     role = "S"
-                elif -hw + 2 <= dx < -hw + 3:
+                elif -hw + 1.5 <= dx < -hw + 2.5:
                     role = "h"
                 else:
                     role = "b"
                 front.px([(x, y)], role)
-    # Paw print on the front.
-    front.px([(13, 14), (15, 13), (17, 13), (19, 14)], "w")
-    front.rect(14, 15, 18, 16, "w", round_=1)
-    return back.render(pal, colors["line"]), front.render(pal, colors["line"])
+    return back, front
+
+
+def _body(front):
+    return [(x, y) for y in range(BOWL_H) for x in range(BOWL_W) if front.get(x, y) in ("b", "h", "S")]
+
+
+def bowl(style, source):
+    c = SOURCES[source]
+    back, front = dish()
+    pal = dict(KIBBLE, **FACE)
+    line = c["line"]
+    if style == "classic":
+        # Plastic in the source colour with a white paw print.
+        pal.update({"R": c["L"], "H": c["Lh"], "I": c["M"], "b": c["m"], "h": c["L"], "S": c["M"], "s": c["M"]})
+        front.px([(10, 10), (12, 9), (14, 9), (16, 10)], "w")
+        front.rect(11, 11, 15, 12, "w", round_=1)
+    elif style == "steel":
+        # Shiny stainless steel on a rubber base in the source colour.
+        pal.update({"R": "#E8ECF2", "H": "#FFFFFF", "I": "#8A94A4", "b": "#C4CCD8", "h": "#F4F7FB",
+                    "S": "#9AA4B4", "s": c["m"], "x": "#FFFFFF"})
+        line = "#3A4250"
+        front.px([(5, 9), (5, 10), (6, 10), (6, 11), (19, 9), (20, 10)], "x")
+    elif style == "ceramic":
+        # Cream ceramic with a coloured rim and a bone on the side.
+        pal.update({"R": c["m"], "H": c["L"], "I": "#D8C8B0", "b": "#F6EEDF", "h": "#FFFFFF",
+                    "S": "#DCCDB6", "s": "#C8B89E", "m": c["m"]})
+        line = "#5A4A38"
+        front.px([(9, 10), (9, 12), (17, 10), (17, 12)], "m")
+        front.rect(9, 11, 17, 11, "m")
+        front.px([(8, 10), (8, 12), (18, 10), (18, 12)], "m")
+    elif style == "puppy":
+        # A puppy face with floppy ears hanging over the sides.
+        pal.update({"R": c["L"], "H": c["Lh"], "I": c["M"], "b": c["m"], "h": c["L"], "S": c["M"], "s": c["M"], "E": c["M"]})
+        front.px([(10, 9), (10, 10), (15, 9), (15, 10)], "e")
+        front.px([(8, 11), (17, 11)], "p")
+        front.px([(12, 11), (13, 11)], "e")
+        front.px([(11, 12), (12, 13), (13, 13), (14, 12)], "k")
+        for x0 in (0, 23):
+            front.rect(x0, 5, x0 + 2, 10, "E", round_=1)
+            front.px([(x0 + 1, 11)], "E")
+    elif style == "tub":
+        # A countryside wooden tub full of hay, banded in the source colour.
+        pal.update({"R": "#C98E52", "H": "#E3B07A", "I": "#6E431E", "b": "#B0733C", "h": "#E3B07A",
+                    "S": "#8C5A2C", "s": "#6E431E", "P": "#7A4A22", "m": c["m"], "M": c["M"]})
+        pal.update(HAY)
+        line = "#3E2412"
+        body = _body(front)
+        front.px([(x, y) for x, y in body if x in (6, 10, 14, 18)], "P")
+        front.px([(x, y) for x, y in body if y in (9, 12)], "m")
+        front.px([(x, y) for x, y in body if y in (9, 12) and x >= 21], "M")
+    return back.render(pal, line), front.render(pal, line)
 
 
 # ---------------------------------------------------------------- Sheets
@@ -723,12 +772,13 @@ def main():
         write_png(os.path.join(ROOT, path), rows)
         print("wrote", path)
 
-    for source, colors in BOWLS.items():
-        back, front = bowl(colors)
-        write_png(os.path.join(ROOT, f"Resources/Art/bowl-{source}-back.png"), back)
-        write_png(os.path.join(ROOT, f"Resources/Art/bowl-{source}.png"), front)
-        out_bowls.append([[f or b for b, f in zip(bl, fl)] for bl, fl in zip(back, front)])
-        print("wrote bowl", source)
+    for style in BOWL_STYLES:
+        for source in SOURCES:
+            back, front = bowl(style, source)
+            write_png(os.path.join(ROOT, f"Resources/Art/bowl-{style}-{source}-back.png"), back)
+            write_png(os.path.join(ROOT, f"Resources/Art/bowl-{style}-{source}.png"), front)
+            out_bowls.append([[f or b for b, f in zip(bl, fl)] for bl, fl in zip(back, front)])
+        print("wrote bowl", style)
 
     if "--preview" in sys.argv:
         bg = (44, 44, 50, 255)

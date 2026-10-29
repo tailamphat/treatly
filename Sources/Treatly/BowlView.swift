@@ -22,7 +22,7 @@ enum ContainerStyle: String {
 
     var viewSize: NSSize {
         switch self {
-        case .bowl: return NSSize(width: 92, height: 60)
+        case .bowl: return NSSize(width: 72, height: 46)
         case .tree: return NSSize(width: 104, height: 136)
         }
     }
@@ -42,18 +42,18 @@ final class BowlView: NSView {
         }
     }
 
-    /// Bowls are drawn at the pets' scale.
-    private var scale: CGFloat { style == .bowl ? 2.5 : 2 }
+    private let scale: CGFloat = 2
     private let back: SpriteImage?
     private let front: SpriteImage?
 
-    init(source: TaskSourceKind, style: ContainerStyle) {
+    init(source: TaskSourceKind, style: ContainerStyle, bowlStyle: BowlStyle) {
         self.source = source
         self.style = style
         switch style {
         case .bowl:
-            back = Self.art("bowl-\(source.rawValue)-back")
-            front = Self.art("bowl-\(source.rawValue)")
+            let names = bowlStyle.artNames(for: source)
+            back = Self.art(names.back)
+            front = Self.art(names.front)
         case .tree:
             back = Self.art("tree-\(source.rawValue)")
             front = nil
@@ -65,7 +65,7 @@ final class BowlView: NSView {
     required init?(coder: NSCoder) { fatalError("not used") }
 
     /// Container art lives in the app bundle's Resources/Art.
-    private static func art(_ name: String) -> SpriteImage? {
+    static func art(_ name: String) -> SpriteImage? {
         Bundle.main.resourceURL.flatMap { SpriteImage(contentsOf: $0.appendingPathComponent("Art/\(name).png")) }
     }
 
@@ -93,8 +93,8 @@ final class BowlView: NSView {
             switch style {
             case .bowl:
                 // Treats pile up inside; the front rim covers their bottoms.
-                let pile: [(CGFloat, CGFloat, Bool)] = [(12, 7, false), (20, 7, true), (16, 6, false), (9, 7.5, true), (23, 7.5, false)]
-                let t = NSSize(width: CGFloat(treat.width) * 1.2, height: CGFloat(treat.height) * 1.2)
+                let pile: [(CGFloat, CGFloat, Bool)] = [(10, 5.5, false), (16, 5.5, true), (13, 4.5, false), (7, 6, true), (19, 6, false)]
+                let t = NSSize(width: CGFloat(treat.width), height: CGFloat(treat.height))
                 for (x, y, flip) in pile.prefix(min(treatCount, pile.count)) {
                     let c = point(x, y)
                     treat.draw(in: NSRect(x: c.x - t.width / 2, y: c.y - t.height / 2, width: t.width, height: t.height), flipped: flip)

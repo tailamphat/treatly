@@ -117,15 +117,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .appendingPathComponent("Treatly/Pets")
     }
 
+    func setBowlStyle(_ style: BowlStyle) {
+        settings.bowlStyle = style
+        rebuildBowls()
+    }
+
+    private func rebuildBowls() {
+        for (_, bowl) in bowlWindows { bowl.window.orderOut(nil) }
+        bowlWindows = [:]
+        layoutBowls()
+    }
+
     private func applyPack() {
         petView.art = PetArt(pack: pack)
         petView.wearing = wearing
         brain.temperament = pack.personality.temperament
         bubbleKey = ""
         // Each pet brings its own containers (bowls, banana trees...).
-        for (_, bowl) in bowlWindows { bowl.window.orderOut(nil) }
-        bowlWindows = [:]
-        layoutBowls()
+        rebuildBowls()
     }
 
     var petName: String { settings.petName(for: pack) }
@@ -370,7 +379,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func makeBowlWindow(for source: TaskSourceKind) -> (window: OverlayWindow, view: BowlView) {
-        let view = BowlView(source: source, style: ContainerStyle(pack: pack))
+        let view = BowlView(source: source, style: ContainerStyle(pack: pack), bowlStyle: settings.bowlStyle)
         view.delegate = self
         view.treat = petView.art?.treat
         let window = OverlayWindow(size: view.bounds.size)

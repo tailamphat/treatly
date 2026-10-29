@@ -58,6 +58,13 @@ final class StatusMenu: NSObject, NSMenuDelegate {
             }
             menu.addItem(submenu("Wardrobe", wardrobe))
         }
+        let bowls = NSMenu()
+        for style in BowlStyle.allCases {
+            let item = app.actionItem(style.name) { $0.setBowlStyle(style) }
+            item.state = settings.bowlStyle == style ? .on : .off
+            bowls.addItem(item)
+        }
+        menu.addItem(submenu("Bowl", bowls))
         menu.addItem(app.actionItem("Rename \(app.petName)…") { $0.renamePet() })
         menu.addItem(.separator())
 
