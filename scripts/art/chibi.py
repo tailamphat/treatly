@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Treatly's pets as tiny chibi pixel sprites, their wardrobe and the bowls.
+"""All of Treatly's pixel art: the pets as tiny chibi sprites, their wardrobe,
+the bowls, the banana trees, the treats and the poop. No dependencies.
 
 Every pixel is placed by hand on a small grid (about 24 pixels wide): a big
 head, a boxy body, stubby legs, flat colours with one shade, one-pixel eyes,
@@ -8,15 +9,59 @@ and a 1px dark outline added around the silhouette at the end.
 Wardrobe items are drawn on overlay sheets with the same layout as the pet's
 sheet, anchored to where the head is in each frame.
 
-    python3 scripts/art/chibi.py            # writes Pets/*/sheet.png and wear-*.png
+    python3 scripts/art/chibi.py            # writes Pets/ and Resources/Art/
     python3 scripts/art/chibi.py --preview  # also writes build/chibi-preview.png
 """
 import json
+import math
 import os
+import struct
 import sys
+import zlib
 
-sys.path.insert(0, os.path.dirname(__file__))
-from generate import ROOT, hex_rgba, sheet, upscale, write_png  # noqa: E402
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+
+def hex_rgba(h):
+    h = h.lstrip("#")
+    return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4)) + (255,)
+
+
+
+def write_png(path, rows):
+    h, w = len(rows), len(rows[0])
+    raw = b"".join(b"\x00" + b"".join(bytes(p or (0, 0, 0, 0)) for p in row) for row in rows)
+
+    def chunk(kind, data):
+        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
+
+    png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 6, 0, 0, 0))
+    png += chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b"")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "wb") as f:
+        f.write(png)
+
+
+
+def sheet(rows_of_frames):
+    """Stacks frames: one list of frames per sheet row."""
+    fh, fw = len(rows_of_frames[0][0]), len(rows_of_frames[0][0][0])
+    cols = max(len(r) for r in rows_of_frames)
+    out = [[None] * (fw * cols) for _ in range(fh * len(rows_of_frames))]
+    for ry, frames in enumerate(rows_of_frames):
+        for cx, frame in enumerate(frames):
+            for y in range(fh):
+                for x in range(fw):
+                    out[ry * fh + y][cx * fw + x] = frame[y][x]
+    return out
+
+
+
+def upscale(rows, k):
+    return [[p for p in row for _ in range(k)] for row in rows for _ in range(k)]
+
+
+
 
 W, H = 32, 26
 G = 23  # bottom row of the feet; row 24 is outline, row 25 stays empty
@@ -686,6 +731,83 @@ def bowl(style, source):
     return back.render(pal, line), front.render(pal, line)
 
 
+# ---------------------------------------------------------------- Banana tree
+#
+# King Kong's version of a bowl: a little palm, bananas hang under the crown.
+
+TREE_W, TREE_H = 38, 46
+TREE_CROWN = (19, 14)
+TREE = {"t": "#B07A44", "T": "#8C5A2C", "r": "#6E431E", "u": "#D9A066",
+        "g": "#62C04E", "G": "#3E9132", "l": "#A4E47E",
+        "q": "#3F9A3A", "Q": "#2A7028", "L": "#6CC452",
+        "d": "#9A6A3E", "D": "#7A4E2A", "y": "#F7C842", "w": "#FFFFFF"}
+
+
+def _bez(p0, p1, p2, t):
+    return tuple((1 - t) ** 2 * a + 2 * (1 - t) * t * b + t * t * c for a, b, c in zip(p0, p1, p2))
+
+
+def _frond(g, control, end, role, thick=4.2):
+    """A leaf along a curve: narrow at the crown, wide in the middle, pointed
+    tip, with a midrib. Returns the midrib pixels."""
+    rib = []
+    for i in range(61):
+        t = i / 60
+        x, y = _bez(TREE_CROWN, control, end, t)
+        r = thick * (0.35 + 0.65 * math.sin(math.pi * min(1.0, t * 1.05))) / 2
+        for py in range(int(y - r - 1), int(y + r + 2)):
+            for px in range(int(x - r - 1), int(x + r + 2)):
+                if (px + 0.5 - x) ** 2 + (py + 0.5 - y) ** 2 <= r * r + 0.15:
+                    g.px([(px, py)], role)
+        if 0.2 < t < 0.85:
+            rib.append((int(x), int(y)))
+    return rib
+
+
+def tree(source):
+    c = SOURCES[source]
+    g = Grid(TREE_W, TREE_H)
+    # Ground mound with grass and a flower.
+    g.rect(9, 42, 28, 43, "d", round_=1)
+    g.rect(12, 41, 25, 41, "d")
+    g.rect(13, 43, 28, 43, "D")
+    g.px([(11, 41), (12, 40), (14, 40), (23, 40), (25, 40), (26, 41), (10, 42), (27, 42)], "g")
+    g.px([(9, 40), (8, 41), (10, 41), (9, 42)], "w")
+    g.px([(9, 41)], "y")
+    # Trunk: leans a little, rings every few rows, lit on the left.
+    for y in range(TREE_CROWN[1] + 2, 42):
+        f = (y - TREE_CROWN[1]) / (42 - TREE_CROWN[1])
+        cx = TREE_CROWN[0] - 3 * f * f + 1.5 * f
+        half = 1.5 + 1.2 * f
+        x0, x1 = round(cx - half), round(cx + half)
+        g.rect(x0, y, x1, y, "r" if y % 3 == 0 else "t")
+        if y % 3:
+            g.px([(x0, y)], "u")
+            g.px([(x1, y)], "T")
+    # Ribbon in the source's colour.
+    for y in (31, 32):
+        for x in range(TREE_W):
+            if g.get(x, y) in ("t", "u", "T", "r"):
+                g.px([(x, y)], "m" if y == 31 else "M")
+    g.px([(21, 33), (22, 34), (20, 33)], "m")
+    # Fronds: darker ones at the back, brighter drooping ones in front,
+    # each with a midrib so the leaves read separately.
+    ribs = []
+    for control, end, role in (((11, 0), (3, 9), "q"), ((27, 0), (35, 9), "q"), ((19, 0), (20, 1), "q"),
+                               ((8, 6), (2, 21), "g"), ((30, 6), (36, 21), "g"), ((14, 3), (9, 4), "g"), ((24, 3), (29, 4), "g")):
+        ribs.append((_frond(g, control, end, role), role))
+    for base, light, shade in (("g", "l", "G"), ("q", "L", "Q")):
+        leaf = [(x, y) for y in range(TREE_H) for x in range(TREE_W) if g.get(x, y) == base]
+        g.px([(x, y) for x, y in leaf if g.get(x, y - 1) not in (base, light)], light)
+        g.px([(x, y) for x, y in leaf if g.get(x, y + 1) is None], shade)
+    for rib, role in ribs:
+        g.px([p for p in rib if g.get(*p) in (role, "l" if role == "g" else "L")], "G" if role == "g" else "Q")
+    # A couple of coconuts where the fronds meet.
+    g.px([(17, 15), (18, 15), (20, 15), (21, 15), (17, 16), (21, 16)], "r")
+    pal = dict(TREE, m=c["m"], M=c["M"])
+    return g.render(pal, "#22401A")
+
+
 # ---------------------------------------------------------------- Sheets
 
 def poses_quad(spec, cat):
@@ -771,6 +893,10 @@ def main():
     for path, rows in extras.items():
         write_png(os.path.join(ROOT, path), rows)
         print("wrote", path)
+
+    for source in SOURCES:
+        write_png(os.path.join(ROOT, f"Resources/Art/tree-{source}.png"), tree(source))
+    print("wrote trees")
 
     for style in BOWL_STYLES:
         for source in SOURCES:

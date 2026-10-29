@@ -23,7 +23,7 @@ enum ContainerStyle: String {
     var viewSize: NSSize {
         switch self {
         case .bowl: return NSSize(width: 72, height: 46)
-        case .tree: return NSSize(width: 104, height: 136)
+        case .tree: return NSSize(width: 90, height: 100)
         }
     }
 }
@@ -101,7 +101,7 @@ final class BowlView: NSView {
                 }
             case .tree:
                 // Hanging bunch under the crown.
-                let hangs: [(CGFloat, CGFloat)] = [(21, 21), (28, 21), (24, 24), (18, 25), (31, 25), (25, 28)]
+                let hangs: [(CGFloat, CGFloat)] = [(15, 17), (23, 17), (19, 19), (13, 20), (25, 20), (19, 22)]
                 let t = NSSize(width: CGFloat(treat.width), height: CGFloat(treat.height))
                 for (i, (x, y)) in hangs.prefix(min(treatCount, hangs.count)).enumerated() {
                     let c = point(x, y)
@@ -110,7 +110,7 @@ final class BowlView: NSView {
             }
         }
         front?.draw(in: art)
-        drawBadge(at: NSPoint(x: art.maxX - 6, y: style == .bowl ? art.maxY - 2 : point(0, 46).y))
+        drawBadge(at: NSPoint(x: art.maxX - 6, y: style == .bowl ? art.maxY - 2 : point(0, 6).y))
     }
 
     private func drawBadge(at center: NSPoint) {
