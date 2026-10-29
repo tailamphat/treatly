@@ -424,7 +424,7 @@ def animations():
     }
 
 
-def update_pack(pet_id, w, h, mouth, scale=3):
+def update_pack(pet_id, w, h, mouth, scale=2.5):
     """Points pet.json at the new sheet and lists the wardrobe."""
     path = os.path.join(ROOT, "Pets", pet_id, "pet.json")
     with open(path) as f:

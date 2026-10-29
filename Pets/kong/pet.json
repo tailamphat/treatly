@@ -13,7 +13,7 @@
     "image": "sheet.png",
     "frameWidth": 38,
     "frameHeight": 30,
-    "scale": 3,
+    "scale": 2.5,
     "footPadding": 1,
     "mouth": [
       34,
