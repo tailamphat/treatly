@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Treatly's pets as tiny chibi pixel sprites, plus their wardrobe.
+"""Treatly's pets as tiny chibi pixel sprites, their wardrobe and the bowls.
 
 Every pixel is placed by hand on a small grid (about 24 pixels wide): a big
 head, a boxy body, stubby legs, flat colours with one shade, one-pixel eyes,
@@ -382,6 +382,111 @@ def wear(item, anchors, w, h):
     return g
 
 
+# ---------------------------------------------------------------- Treats and poop
+#
+# Text pixel grids; the outline is added around them like the pets.
+
+def text_sprite(rows, pal, line):
+    width = max(len(r) for r in rows)
+    g = Grid(width + 2, len(rows) + 2)
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch != ".":
+                g.px([(x + 1, y + 1)], ch)
+    return g.render(pal, line)
+
+
+def bone():
+    return text_sprite([
+        ".hh.........hh.",
+        "hhbb.......hbbs",
+        ".hbbbbbbbbbbbs.",
+        ".bbbbbbbbbbbbs.",
+        "hbbs.......bbbs",
+        ".ss.........ss.",
+    ], {"h": "#FFFFFF", "b": "#F3E6CC", "s": "#D2BE98"}, "#6B5536")
+
+
+def fish():
+    return text_sprite([
+        "ss....bbbb.....",
+        "sbs.bbbbbbbb...",
+        ".sbbbbbbbbebb..",
+        ".sbbbbbbbbbbbb.",
+        "sbs.hhhhhhhhh..",
+        "ss....hhhh.....",
+    ], {"b": "#7FB6E0", "s": "#4F86B8", "h": "#CFE6F5", "e": "#1E1410"}, "#1E3550")
+
+
+def banana():
+    return text_sprite([
+        "k.............",
+        ".yy.........yk",
+        ".hyy.......yy.",
+        "..hyyy...yyys.",
+        "...hyyyyyyys..",
+        "....sssssss...",
+    ], {"y": "#FFD84A", "h": "#FFF0A0", "s": "#E0A820", "k": "#6B4A1E"}, "#5A3A10")
+
+
+def poop():
+    """A cute three-tier swirl with a face."""
+    return text_sprite([
+        ".......hb......",
+        "......hbbs.....",
+        ".....hbbbbs....",
+        ".....bbbbbs....",
+        "......sssss....",
+        "....hbbbbbbbs..",
+        "...hbbbbbbbbbs.",
+        "...bbbbbbbbbbs.",
+        "....sssssssss..",
+        "..hbbbbbbbbbbbs",
+        ".hbbbbbbbbbbbbs",
+        ".bbbewbbbbewbbs",
+        ".bbbeebbbbeebbs",
+        ".bpbbbbkkbbbpbs",
+        "..sssssssssss..",
+    ], {"h": "#B07A4E", "b": "#8A5A34", "s": "#6A4224", "e": "#1E1410", "w": "#FFFFFF", "k": "#4A2414", "p": "#D98A7A"}, "#3A2212")
+
+
+# ---------------------------------------------------------------- Bowls
+#
+# Two layers so treats sit inside: the back (far rim and the cream inside)
+# and the front (near lip and the body with a paw print).
+
+BOWL_W, BOWL_H = 28, 16
+BOWLS = {
+    "appleReminders": {"R": "#FFC98A", "b": "#F7A04E", "s": "#D97B32", "h": "#FFE3BE", "line": "#5A2C12"},
+    "googleTasks": {"R": "#A9D2FF", "b": "#5E9FEC", "s": "#3F7BCB", "h": "#D8EBFF", "line": "#1C2F5A"},
+}
+BOWL_INSIDE = {"d": "#F6E9D2", "D": "#DCC6A2", "w": "#FFFFFF"}
+
+
+def bowl(colors):
+    pal = dict(colors, **BOWL_INSIDE)
+    back = Grid(BOWL_W, BOWL_H)
+    back.rect(6, 1, 21, 1, "R")
+    back.rect(3, 2, 24, 2, "R")
+    back.rect(2, 3, 25, 3, "R")
+    back.rect(1, 4, 26, 5, "R")
+    back.rect(7, 2, 20, 2, "D")
+    back.rect(4, 3, 23, 3, "D")
+    back.rect(3, 4, 24, 5, "d")
+
+    front = Grid(BOWL_W, BOWL_H)
+    front.rect(1, 6, 26, 6, "R")
+    front.rect(4, 6, 7, 6, "h")
+    for y, (x0, x1) in enumerate([(1, 26), (1, 26), (2, 25), (2, 25), (3, 24), (4, 23), (6, 21)], start=7):
+        front.rect(x0, y, x1, y, "s" if y == 13 else "b")
+        front.px([(x1 - 1, y), (x1, y)], "s")
+    front.px([(3, 8), (3, 9), (4, 10)], "h")
+    # Paw print.
+    front.px([(11, 9), (13, 8), (14, 8), (16, 9)], "w")
+    front.rect(12, 10, 15, 12, "w", round_=1)
+    return back.render(pal, colors["line"]), front.render(pal, colors["line"])
+
+
 # ---------------------------------------------------------------- Sheets
 
 def poses_quad(spec, cat):
@@ -444,6 +549,7 @@ def update_pack(pet_id, w, h, mouth, scale=2.5):
 
 def main():
     out = {}
+    out_bowls = []
     for pet_id, spec in DOGS.items():
         out[pet_id] = build(poses_quad(spec, False), palette_for(spec), spec["line"], W, H) + ((W, H), [29, 15])
     for pet_id, spec in CATS.items():
@@ -458,6 +564,21 @@ def main():
         update_pack(pet_id, w, h, mouth)
         print("wrote", pet_id)
 
+    extras = {"Resources/Art/poop.png": poop()}
+    for pet_id, treat in (("shiba", bone), ("golden", bone), ("chihuahua", bone),
+                          ("orange-tabby", fish), ("black-cat", fish), ("kong", banana)):
+        extras[f"Pets/{pet_id}/treat.png"] = treat()
+    for path, rows in extras.items():
+        write_png(os.path.join(ROOT, path), rows)
+        print("wrote", path)
+
+    for source, colors in BOWLS.items():
+        back, front = bowl(colors)
+        write_png(os.path.join(ROOT, f"Resources/Art/bowl-{source}-back.png"), back)
+        write_png(os.path.join(ROOT, f"Resources/Art/bowl-{source}.png"), front)
+        out_bowls.append([[f or b for b, f in zip(bl, fl)] for bl, fl in zip(back, front)])
+        print("wrote bowl", source)
+
     if "--preview" in sys.argv:
         bg = (44, 44, 50, 255)
         tiles = []
@@ -471,9 +592,10 @@ def main():
                 over = [line[0:w] for line in wears[item][0:h]]
                 row.append([[o or p for p, o in zip(pl, ol)] for pl, ol in zip(frame, over)])
             tiles.append(row)
+        tiles.append(out_bowls + [poop(), bone(), fish(), banana()])
         tw = max(len(r[0][0]) for r in tiles)
         th = max(len(r[0]) for r in tiles)
-        cols = len(tiles[0])
+        cols = max(len(r) for r in tiles)
         canvas = [[bg] * (cols * (tw + 2)) for _ in range(len(tiles) * (th + 2))]
         for ry, row in enumerate(tiles):
             for cx, tile in enumerate(row):

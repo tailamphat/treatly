@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Generates Treatly's bowls, banana trees, treats and poop as PNGs.
+"""Generates King Kong's banana trees as PNGs.
 
-The pets themselves come from chibi.py.
+The pets, wardrobe, bowls, treats and poop come from chibi.py.
 
 Shapes are drawn as solid parts; a lighting pass adds a top-left highlight and
 bottom-right shade per material, and an outline pass adds a dark edge around
@@ -247,171 +247,7 @@ def sheet(rows_of_frames):
     return out
 
 
-# ---------------------------------------------------------------- Treats
-
-def bone():
-    c = Canvas(18, 10)
-    for cx in (3, 15):
-        c.ellipse(cx, 3, 2.6, 2.4, "bone")
-        c.ellipse(cx, 7, 2.6, 2.4, "bone")
-    c.rect(3, 3, 15, 6, "bone")
-    return c.render()
-
-
-def fish():
-    c = Canvas(18, 10)
-    c.triangle((0.5, 0.5), (0.5, 9.5), (6, 5), "fish")
-    c.ellipse(10, 5, 6.5, 3.6, "fish")
-    c.ellipse(10.5, 6.6, 4.5, 1.6, "fishBelly")
-    c.pixels([(13, 3)], "ink")
-    return c.render()
-
-
-def banana():
-    c = Canvas(18, 10)
-    pts = [(2 + 13 * t, 3 + 4.5 * math.sin(math.pi * t)) for t in [i / 12 for i in range(13)]]
-    for a, b in zip(pts, pts[1:]):
-        c.line(a, b, 3.6, "banana")
-    c.line((15.5, 3.5), (16.5, 1.5), 1.6, "stem")
-    c.pixels([(1, 2), (2, 3)], "stem")
-    return c.render()
-
-
-def poop():
-    """The classic three-tier swirl."""
-    c = Canvas(16, 13)
-    c.ellipse(8, 10, 7, 2.6, "poop")
-    c.ellipse(8, 7, 5.2, 2.3, "poop2")
-    c.ellipse(8.5, 4.3, 3.4, 2, "poop")
-    c.line((9.5, 3), (11, 1), 1.8, "poop2")
-    out = c.render()
-    shine = hex_rgba("#D6A472")
-    for x, y in ((4, 9), (5, 6), (7, 3)):
-        out[y][x] = shine
-    return out
-
-
-# ---------------------------------------------------------------- Bowls
-#
-# A round ceramic pet bowl, shaded like a cylinder lit from the upper left.
-# It comes in two layers so treats can sit inside: the back (far rim and the
-# cream interior) and the front (near rim lip, body, paw decal).
-
-BW, BH = 40, 22
-BCX = 20
-RIM_CY, RIM_RX, RIM_RY = 6.0, 19.0, 5.0
-IN_CY, IN_RX, IN_RY = 6.4, 15.6, 3.3
-BASE_Y = 19
-
-RAMPS = {
-    "orange": ["#5E2A0B", "#9E4A16", "#D06A24", "#EE8A3A", "#FFB264", "#FFE2BC"],
-    "blue": ["#0F2552", "#1C4594", "#2C66CC", "#4686EE", "#80B0FF", "#D6E6FF"],
-}
-INTERIOR = ["#C9B697", "#E2D3B8", "#F4EADA", "#FFF8EC"]
-
-
-def _inside(x, y, cy, rx, ry):
-    dx, dy = (x + 0.5 - BCX) / rx, (y + 0.5 - cy) / ry
-    return dx * dx + dy * dy <= 1
-
-
-def _half_width(y):
-    """Body half-width at row y: wide under the rim, tapering to the base."""
-    t = (y + 0.5 - RIM_CY) / (BASE_Y + 1 - RIM_CY)
-    return RIM_RX - 0.6 - 4.5 * t * t
-
-
-def _in_body(x, y):
-    if y + 0.5 < RIM_CY or y > BASE_Y + 1:
-        return False
-    hw = _half_width(y)
-    if y >= BASE_Y:  # rounded foot
-        hw -= (y - BASE_Y + 1) * 1.5
-    return abs(x + 0.5 - BCX) <= hw
-
-
-def _cyl(ramp, x, lift=0):
-    """Cylinder shading across the bowl: bright left of center, dark edges."""
-    u = (x + 0.5 - BCX) / RIM_RX
-    light = 1 - min(1, abs(u + 0.3) / 1.05) ** 1.6
-    i = 1 + round(light * 3) + lift
-    return ramp[max(0, min(len(ramp) - 2, i))]
-
-
-def _blend(rgba, hex_color, amount):
-    other = hex_rgba(hex_color)
-    return tuple(round(a * (1 - amount) + b * amount) for a, b in zip(rgba[:3], other[:3])) + (255,)
-
-
-def bowl_layers(color):
-    ramp = RAMPS[color]
-    back = [[None] * BW for _ in range(BH)]
-    front = [[None] * BW for _ in range(BH)]
-    solid = [[False] * BW for _ in range(BH)]
-
-    for y in range(BH):
-        for x in range(BW):
-            rim = _inside(x, y, RIM_CY, RIM_RX, RIM_RY)
-            hole = _inside(x, y, IN_CY, IN_RX, IN_RY)
-            near_half = y + 0.5 >= RIM_CY
-            if rim and hole:
-                # Cream interior; the far wall is shadowed by the rim.
-                depth = (y + 0.5 - (IN_CY - IN_RY)) / (2 * IN_RY)
-                shade = 0 if depth < 0.25 else 1 if depth < 0.45 else 2 if depth < 0.8 else 1
-                if (x + 0.5 - BCX) / IN_RX < -0.55 and 0.3 < depth < 0.8:
-                    shade = 3
-                back[y][x] = hex_rgba(INTERIOR[shade])
-                solid[y][x] = True
-            elif rim:
-                # The rim ring: the near half is the bright lip.
-                c = hex_rgba(_cyl(ramp, x, lift=1))
-                if not _inside(x, y - 1, RIM_CY, RIM_RX, RIM_RY) and (x + 0.5 - BCX) < 4:
-                    c = hex_rgba(ramp[5])
-                elif _inside(x, y - 1, IN_CY, IN_RX, IN_RY) or _inside(x, y + 1, IN_CY, IN_RX, IN_RY):
-                    c = hex_rgba(ramp[2])  # thin edge where the lip meets the inside
-                (front if near_half else back)[y][x] = c
-                solid[y][x] = True
-            elif _in_body(x, y):
-                c = hex_rgba(_cyl(ramp, x))
-                if y >= BASE_Y - 1:
-                    c = hex_rgba(ramp[1])
-                elif y <= RIM_CY + RIM_RY:
-                    c = _blend(c, ramp[0], 0.18)  # shadow under the lip
-                # Glossy streak on the left.
-                u = (x + 0.5 - BCX) / RIM_RX
-                if -0.62 < u < -0.5 and RIM_CY + RIM_RY + 1 <= y <= BASE_Y - 3:
-                    c = hex_rgba(ramp[5])
-                front[y][x] = c
-                solid[y][x] = True
-
-    # Paw print decal in the middle of the body.
-    paw = {(19, 14), (20, 14), (21, 14), (18, 15), (19, 15), (20, 15), (21, 15), (22, 15), (19, 16), (20, 16), (21, 16),
-           (17, 12), (19, 11), (21, 11), (23, 12)}
-    for x, y in paw:
-        if front[y][x]:
-            front[y][x] = _blend(front[y][x], "#FFFFFF", 0.6)
-
-    # Outline around the whole silhouette, split between the layers.
-    line = hex_rgba(ramp[0])
-    for y in range(BH):
-        for x in range(BW):
-            if solid[y][x]:
-                continue
-            if any(0 <= nx < BW and 0 <= ny < BH and solid[ny][nx] for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1))):
-                (front if y + 0.5 >= RIM_CY else back)[y][x] = line
-    return back, front
-
-
-def bowl_front(color):
-    return bowl_layers(color)[1]
-
-
-def bowl_preview(color):
-    back, front = bowl_layers(color)
-    return [[f or b for b, f in zip(br, fr)] for br, fr in zip(back, front)]
-
-
-# ---------------------------------------------------------------- Banana tree
+# ---------------------------------------------------------------- Banana trees
 #
 # King Kong's version of a bowl: a palm with the banana bunch hanging under
 # the crown (the app draws one banana per task) and a signpost in the
@@ -472,17 +308,6 @@ def upscale(rows, k):
 
 def main():
     out = {
-        "Pets/kong/treat.png": banana(),
-        "Pets/shiba/treat.png": bone(),
-        "Pets/chihuahua/treat.png": bone(),
-        "Pets/golden/treat.png": bone(),
-        "Pets/orange-tabby/treat.png": fish(),
-        "Pets/black-cat/treat.png": fish(),
-        "Resources/Art/bowl-appleReminders-back.png": bowl_layers("orange")[0],
-        "Resources/Art/bowl-appleReminders.png": bowl_front("orange"),
-        "Resources/Art/bowl-googleTasks-back.png": bowl_layers("blue")[0],
-        "Resources/Art/bowl-googleTasks.png": bowl_front("blue"),
-        "Resources/Art/poop.png": poop(),
         "Resources/Art/tree-appleReminders.png": tree("orange"),
         "Resources/Art/tree-googleTasks.png": tree("blue"),
     }
@@ -492,14 +317,7 @@ def main():
 
     if "--preview" in sys.argv:
         bg = (236, 236, 240, 255)
-        t = tree("orange")
-        for hx, hy in TREE_HANGS:
-            b = [row[::2] for row in banana()[::2]]
-            for y, row in enumerate(b):
-                for x, p in enumerate(row):
-                    if p and 0 <= hy - 2 + y < TH and 0 <= hx - 4 + x < TW:
-                        t[hy - 2 + y][hx - 4 + x] = p
-        items = [poop(), t, bowl_preview("orange"), bowl_preview("blue"), bone(), fish(), banana()]
+        items = [tree("orange"), tree("blue")]
         width = max(len(i[0]) for i in items)
         rows = []
         for item in items:

@@ -42,8 +42,8 @@ final class BowlView: NSView {
         }
     }
 
-    /// Bowls are drawn smaller than trees so they sit at a pet's scale.
-    private var scale: CGFloat { style == .bowl ? 1.5 : 2 }
+    /// Bowls are drawn at the pets' scale.
+    private var scale: CGFloat { style == .bowl ? 2.5 : 2 }
     private let back: SpriteImage?
     private let front: SpriteImage?
 
@@ -93,7 +93,7 @@ final class BowlView: NSView {
             switch style {
             case .bowl:
                 // Treats pile up inside; the front rim covers their bottoms.
-                let pile: [(CGFloat, CGFloat, Bool)] = [(15, 7.5, false), (25, 7.5, true), (20, 5.5, false), (12, 5, true), (28, 5, false)]
+                let pile: [(CGFloat, CGFloat, Bool)] = [(10, 4.5, false), (18, 4.5, true), (14, 3.5, false), (7, 3.5, true), (21, 3.5, false)]
                 let t = NSSize(width: CGFloat(treat.width) * 1.2, height: CGFloat(treat.height) * 1.2)
                 for (x, y, flip) in pile.prefix(min(treatCount, pile.count)) {
                     let c = point(x, y)
