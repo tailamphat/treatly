@@ -49,10 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             selectedListIDs: { [settings] in settings.selectedLists(for: .appleReminders) },
             isEnabled: { [settings] in settings.remindersEnabled }
         )
-        let auth = GoogleAuth { [settings] in
-            guard let id = settings.googleClientID, let secret = settings.googleClientSecret else { return nil }
-            return (id, secret)
-        }
+        let auth = GoogleAuth { [settings] in settings.googleClient }
         google = GoogleTasksSource(auth: auth) { [settings] in settings.selectedLists(for: .googleTasks) }
         for source in sources { source.onChange = { [weak self] in self?.refresh() } }
 
@@ -246,8 +243,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: Google
 
+    /// Opens Google's sign-in page in the browser. Only builds without a
+    /// built-in client ask for the user's own first.
     func connectGoogle() {
-        if settings.googleClientID == nil || settings.googleClientSecret == nil {
+        if settings.googleClient == nil {
             guard promptForGoogleClient() else { return }
         }
         Task {
@@ -266,12 +265,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         layoutBowls()
     }
 
-    /// Asks for the user's own OAuth "Desktop app" client. Returns false if cancelled.
+    /// Advanced: asks for the user's own OAuth "Desktop app" client. Returns false if cancelled.
     @discardableResult
     func promptForGoogleClient() -> Bool {
         let alert = NSAlert()
-        alert.messageText = "Google OAuth client"
-        alert.informativeText = "Treatly uses your own Google Cloud OAuth client (type: Desktop app) with the Google Tasks API enabled. See docs/google-tasks.md."
+        alert.messageText = "Use your own Google OAuth client"
+        alert.informativeText = settings.builtInGoogleClient == nil
+            ? "This build of Treatly has no built-in Google sign-in. Add a Google Cloud OAuth client (type: Desktop app) with the Google Tasks API enabled. See docs/google-tasks.md."
+            : "Optional. Treatly signs in with its own client by default. Add a Google Cloud OAuth client (type: Desktop app) to use yours instead. See docs/google-tasks.md."
         let id = NSTextField(frame: NSRect(x: 0, y: 30, width: 320, height: 24))
         id.placeholderString = "Client ID"
         id.stringValue = settings.googleClientID ?? ""
@@ -290,7 +291,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard !clientID.isEmpty, !clientSecret.isEmpty else { return false }
         settings.googleClientID = clientID
         settings.googleClientSecret = clientSecret
+        // A token from another client won't refresh with this one.
+        disconnectGoogle()
         return true
+    }
+
+    /// Forgets the user's own client and goes back to the built-in one.
+    func useBuiltInGoogleClient() {
+        settings.googleClientID = nil
+        settings.googleClientSecret = nil
+        disconnectGoogle()
     }
 
     func setPetName(_ name: String) {

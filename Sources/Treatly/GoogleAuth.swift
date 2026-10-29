@@ -10,18 +10,18 @@ struct GoogleAuthError: LocalizedError {
 
 /// Google sign-in for a desktop app: opens the browser, catches the redirect
 /// on a 127.0.0.1 loopback port, and keeps the refresh token in the Keychain.
-/// The OAuth client (a "Desktop app" client from Google Cloud Console) is
-/// supplied by the user, so no credentials ship in the repo.
+/// The OAuth client is built into release builds (see docs/google-tasks.md),
+/// or the user can bring their own. No credentials live in the repo.
 @MainActor
 final class GoogleAuth {
     private static let refreshTokenAccount = "google-refresh-token"
     private static let scope = "https://www.googleapis.com/auth/tasks"
 
-    private let credentials: () -> (id: String, secret: String)?
+    private let credentials: () -> GoogleClient?
     private var accessToken: String?
     private var accessTokenExpiry = Date.distantPast
 
-    init(credentials: @escaping () -> (id: String, secret: String)?) {
+    init(credentials: @escaping () -> GoogleClient?) {
         self.credentials = credentials
     }
 
@@ -34,7 +34,7 @@ final class GoogleAuth {
     }
 
     func signIn() async throws {
-        guard let client = credentials() else { throw GoogleAuthError("Add a Google OAuth client ID first.") }
+        guard let client = credentials() else { throw GoogleAuthError("This build has no Google sign-in. Use your own OAuth client from the Google Tasks menu.") }
         let receiver = try LoopbackReceiver()
         defer { receiver.stop() }
         let port = try await receiver.start()

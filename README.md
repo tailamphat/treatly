@@ -36,7 +36,7 @@ The app lives in the menu bar (paw icon). It needs a real `.app` bundle for the 
 - **Wardrobe**: dress the pet in a party hat, bow, crown, bandana, sunglasses or a flower (Settings or the menu).
 - **Menu bar**: choose the pet, rename it, pick lists, set how fast nagging escalates, turn on sound.
 
-Google Tasks needs a one-time setup with your own OAuth client: see [docs/google-tasks.md](docs/google-tasks.md).
+Google Tasks: click **Sign in** and log in with Google in your browser. Building the app with built-in sign-in, or using your own OAuth client, is covered in [docs/google-tasks.md](docs/google-tasks.md).
 
 ## Art
 

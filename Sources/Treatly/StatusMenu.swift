@@ -125,9 +125,13 @@ final class StatusMenu: NSObject, NSMenuDelegate {
             menu.addItem(app.actionItem("Disconnect") { $0.disconnectGoogle() })
             addLists(of: app.google, to: menu)
         } else {
-            menu.addItem(app.actionItem("Connect Google Tasks…") { $0.connectGoogle() })
+            menu.addItem(app.actionItem("Sign in with Google…") { $0.connectGoogle() })
         }
-        menu.addItem(app.actionItem("Set OAuth Client…") { $0.promptForGoogleClient() })
+        menu.addItem(.separator())
+        menu.addItem(app.actionItem("Use Your Own OAuth Client…") { $0.promptForGoogleClient() })
+        if app.settings.hasCustomGoogleClient, app.settings.builtInGoogleClient != nil {
+            menu.addItem(app.actionItem("Use Built-in Sign-in") { $0.useBuiltInGoogleClient() })
+        }
         return menu
     }
 

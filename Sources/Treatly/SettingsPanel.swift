@@ -184,7 +184,7 @@ struct SettingsView: View {
                 if app.google.isConnected {
                     Button("Disconnect") { model.run { $0.disconnectGoogle() } }
                 } else {
-                    Button("Connect") { model.run { $0.connectGoogle() } }
+                    Button("Sign in") { model.run { $0.connectGoogle() } }
                 }
             }
         }

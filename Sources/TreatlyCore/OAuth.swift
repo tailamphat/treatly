@@ -52,3 +52,23 @@ public enum GoogleTasksDate {
         return DateComponents(year: parts[0], month: parts[1], day: parts[2])
     }
 }
+
+/// An OAuth "Desktop app" client. For installed apps Google does not treat
+/// the secret as confidential; PKCE protects the sign-in.
+public struct GoogleClient: Equatable, Sendable {
+    public var id: String
+    public var secret: String
+
+    public init?(id: String?, secret: String?) {
+        let id = id?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let secret = secret?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !id.isEmpty, !secret.isEmpty else { return nil }
+        self.id = id
+        self.secret = secret
+    }
+
+    /// The user's own client wins; otherwise the one built into the app.
+    public static func resolve(custom: GoogleClient?, builtIn: GoogleClient?) -> GoogleClient? {
+        custom ?? builtIn
+    }
+}

@@ -67,6 +67,22 @@ final class Settings {
         defaults.set(Array(ids), forKey: "lists.\(source.rawValue)")
     }
 
+    /// The client to sign in with: the user's own if set, else the built-in one.
+    var googleClient: GoogleClient? {
+        GoogleClient.resolve(custom: GoogleClient(id: googleClientID, secret: googleClientSecret), builtIn: builtInGoogleClient)
+    }
+
+    /// Added to Info.plist by scripts/bundle.sh for release builds.
+    var builtInGoogleClient: GoogleClient? {
+        GoogleClient(
+            id: Bundle.main.object(forInfoDictionaryKey: "TreatlyGoogleClientID") as? String,
+            secret: Bundle.main.object(forInfoDictionaryKey: "TreatlyGoogleClientSecret") as? String
+        )
+    }
+
+    /// True when the user brought their own client.
+    var hasCustomGoogleClient: Bool { GoogleClient(id: googleClientID, secret: googleClientSecret) != nil }
+
     var googleClientID: String? {
         get { defaults.string(forKey: "googleClientID") }
         set { defaults.set(newValue, forKey: "googleClientID") }

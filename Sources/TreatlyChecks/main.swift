@@ -230,6 +230,18 @@ do {
     check(lazy.activity == .walking, "a calm pet walks when it wanders")
 }
 
+// MARK: Google client
+
+do {
+    let mine = GoogleClient(id: " mine.apps.googleusercontent.com ", secret: "s1")
+    let builtIn = GoogleClient(id: "app.apps.googleusercontent.com", secret: "s2")
+    check(mine?.id == "mine.apps.googleusercontent.com", "client id is trimmed")
+    check(GoogleClient(id: "x", secret: "") == nil && GoogleClient(id: nil, secret: "s") == nil, "incomplete client is nil")
+    check(GoogleClient.resolve(custom: mine, builtIn: builtIn) == mine, "own client wins")
+    check(GoogleClient.resolve(custom: nil, builtIn: builtIn) == builtIn, "built-in client is the default")
+    check(GoogleClient.resolve(custom: nil, builtIn: nil) == nil, "no client at all")
+}
+
 // MARK: Poop
 
 check(PoopStyle(stored: nil) == .cute && PoopStyle(stored: "nope") == .cute, "poop style defaults to cute")
