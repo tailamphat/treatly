@@ -430,24 +430,24 @@ def banana():
 
 
 def poop():
-    """A cute three-tier swirl with a face."""
+    """A soft three-tier swirl with a happy face, like the bowls."""
     return text_sprite([
-        ".......hb......",
-        "......hbbs.....",
-        ".....hbbbbs....",
-        ".....bbbbbs....",
-        "......sssss....",
-        "....hbbbbbbbs..",
-        "...hbbbbbbbbbs.",
-        "...bbbbbbbbbbs.",
-        "....sssssssss..",
-        "..hbbbbbbbbbbbs",
-        ".hbbbbbbbbbbbbs",
-        ".bbbewbbbbewbbs",
-        ".bbbeebbbbeebbs",
-        ".bpbbbbkkbbbpbs",
-        "..sssssssssss..",
-    ], {"h": "#B07A4E", "b": "#8A5A34", "s": "#6A4224", "e": "#1E1410", "w": "#FFFFFF", "k": "#4A2414", "p": "#D98A7A"}, "#3A2212")
+        "........hb.......",
+        ".......hbbs......",
+        "......hbbbbs.....",
+        ".....hbbbbbbs....",
+        "......oooooo.....",
+        "....hbbbbbbbbs...",
+        "...hbbbbbbbbbbs..",
+        "..hbbbbbbbbbbbbs.",
+        "...oooooooooooo..",
+        ".hbbbbbbbbbbbbbs.",
+        "hbbbewbbbbbewbbbs",
+        "hbbbeebbbbbeebbbs",
+        "bbppbbkbkbkbbppbs",
+        "bsbbbbbkbkbbbbbss",
+        ".sssssssssssssss.",
+    ], {"h": "#B98256", "b": "#946038", "s": "#714628", "e": "#2A1A1A", "w": "#FFFFFF", "k": "#2A1A1A", "p": "#F79AB0", "o": "#3E2414"}, "#3E2414")
 
 
 # ---------------------------------------------------------------- Bowls
