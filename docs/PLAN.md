@@ -5,7 +5,7 @@
 An open-source macOS desktop pet that nags you about your todos. Tasks are treats; the pet wants to eat them.
 
 - The pet roams the bottom of the screen (above the Dock) on the menu bar display.
-- Each connected task source has a **bowl** on the ground: Apple Reminders (orange, left) and Google Tasks (blue, right). Bowls show how many treats they hold.
+- Each task source has a **bowl** on the ground. Version 1 has one: Apple Reminders. The bowl shows how many treats it holds.
 - The pet walks to the right bowl, takes out the current treat, and carries it around.
 - Finishing a task means the pet eats the treat. Snoozing means it buries it.
 
@@ -16,7 +16,7 @@ An open-source macOS desktop pet that nags you about your todos. Tasks are treat
 | Platform | macOS 14+, Swift + AppKit (native transparent overlay windows, EventKit) |
 | Distribution | Open source, MIT |
 | Name | Treatly |
-| Task sources | Apple Reminders (EventKit) and Google Tasks (REST + OAuth loopback/PKCE, user-supplied client) |
+| Task sources | Version 1: Apple Reminders (EventKit). Google Tasks was prototyped and removed until sign-in can work without any credentials (see git history) |
 | Art | Placeholder pixel art as text sprites in JSON packs |
 | Sound | Opt-in, macOS system sounds |
 | Pets (MVP) | Shiba Inu, Golden Retriever, Orange Tabby, Black Cat, King Kong |
@@ -39,22 +39,21 @@ Overdue treats are stinky (green cloud). Treat size follows priority.
 
 **Sync**
 
-| | Apple Reminders | Google Tasks |
-|---|---|---|
-| Done | marks completed | marks completed |
-| Snooze | moves due date + hides locally | hides locally (Google stores dates only) |
-| Updates | EventKit change notifications + 60 s poll | 60 s poll |
-| Priority | `!`/`!!`/`!!!` | none |
+| | Apple Reminders |
+|---|---|
+| Done | marks completed |
+| Snooze | moves due date + hides locally |
+| Updates | EventKit change notifications + 60 s poll |
+| Priority | `!`/`!!`/`!!!` |
 
 Note: EventKit does not expose the Reminders "flagged" state, so priority is used instead.
 
 ## MVP status (done)
 
-- [x] Core logic with checks: selector, escalation, pet brain, bowls, packs, OAuth helpers
+- [x] Core logic with checks: selector, escalation, pet brain, bowls, packs
 - [x] Overlay pet window, pixel sprite renderer, speech bubbles, procedural animations
 - [x] Bowls per source with treat counts and task menus
 - [x] Apple Reminders source with list picking
-- [x] Google Tasks source with OAuth sign-in and list picking (not yet tested against a real account)
 - [x] Menu bar: pet picker, rename, lists, nag speed, sound, pets folder
 - [x] Pet packs loaded from the app bundle and `~/Library/Application Support/Treatly/Pets`
 
@@ -67,5 +66,5 @@ Note: EventKit does not expose the Reminders "flagged" state, so priority is use
 5. More pets: Corgi, Husky, Pug, Siamese, Persian, Tuxedo, Dragon; coat colour variants
 6. Multiple pets at once, each guarding a different source or list
 7. Launch at login, signed and notarized releases, Homebrew cask
-8. More sources: Markdown `TODO.md`, Todoist, Things, GitHub issues
+8. More sources: Google Tasks (back once sign-in needs no credentials), Markdown `TODO.md`, Todoist, Things, GitHub issues
 9. Swift Testing suite once building with Xcode

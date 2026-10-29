@@ -1,7 +1,7 @@
 import AppKit
 import TreatlyCore
 
-/// User preferences. The Google client secret lives in the Keychain.
+/// User preferences.
 @MainActor
 final class Settings {
     private let defaults = UserDefaults.standard
@@ -65,34 +65,6 @@ final class Settings {
 
     func setSelectedLists(_ ids: Set<String>, for source: TaskSourceKind) {
         defaults.set(Array(ids), forKey: "lists.\(source.rawValue)")
-    }
-
-    /// The client to sign in with: the user's own if set, else the built-in one.
-    var googleClient: GoogleClient? {
-        GoogleClient.resolve(custom: GoogleClient(id: googleClientID, secret: googleClientSecret), builtIn: builtInGoogleClient)
-    }
-
-    /// Added to Info.plist by scripts/bundle.sh for release builds.
-    var builtInGoogleClient: GoogleClient? {
-        GoogleClient(
-            id: Bundle.main.object(forInfoDictionaryKey: "TreatlyGoogleClientID") as? String,
-            secret: Bundle.main.object(forInfoDictionaryKey: "TreatlyGoogleClientSecret") as? String
-        )
-    }
-
-    /// True when the user brought their own client.
-    var hasCustomGoogleClient: Bool { GoogleClient(id: googleClientID, secret: googleClientSecret) != nil }
-
-    var googleClientID: String? {
-        get { defaults.string(forKey: "googleClientID") }
-        set { defaults.set(newValue, forKey: "googleClientID") }
-    }
-
-    var googleClientSecret: String? {
-        get { Keychain.read("google-client-secret") }
-        set {
-            if let newValue { Keychain.write(newValue, for: "google-client-secret") } else { Keychain.delete("google-client-secret") }
-        }
     }
 
     /// Where the user dragged each source's bowl (window origin), if they did.

@@ -1,9 +1,9 @@
 import Foundation
 
 /// Where a task came from. Ids are only unique within one source.
+/// Version 1 has Apple Reminders only; more sources can be added here.
 public enum TaskSourceKind: String, Codable, Sendable, CaseIterable {
     case appleReminders
-    case googleTasks
 }
 
 public enum Priority: Int, Comparable, Codable, Sendable {

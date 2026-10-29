@@ -631,7 +631,6 @@ OPENING = (5.3, 9.3, 3.2)   # the hole
 BOWL_STYLES = ["classic", "steel", "ceramic", "puppy", "tub"]
 SOURCES = {
     "appleReminders": {"m": "#F08A3A", "M": "#C2621F", "L": "#FFBD7A", "Lh": "#FFE6C8", "line": "#4A1E08"},
-    "googleTasks": {"m": "#3D78E0", "M": "#2A57A8", "L": "#7FB2FF", "Lh": "#D6E8FF", "line": "#0F1E44"},
 }
 KIBBLE = {"1": "#B9773A", "2": "#8E5424", "3": "#D99A55"}
 HAY = {"1": "#F2D27A", "2": "#D9B254", "3": "#FFE89A"}

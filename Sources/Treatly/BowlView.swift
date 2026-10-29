@@ -72,7 +72,6 @@ final class BowlView: NSView {
     private var badgeColor: NSColor {
         switch source {
         case .appleReminders: return NSColor(calibratedRed: 0.93, green: 0.48, blue: 0.13, alpha: 1)
-        case .googleTasks: return NSColor(calibratedRed: 0.17, green: 0.4, blue: 0.8, alpha: 1)
         }
     }
 

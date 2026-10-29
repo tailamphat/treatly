@@ -69,7 +69,6 @@ final class StatusMenu: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
 
         menu.addItem(submenu(TaskSourceKind.appleReminders.displayName, remindersMenu()))
-        menu.addItem(submenu(TaskSourceKind.googleTasks.displayName, googleMenu()))
 
         let nag = NSMenu()
         for minutes in [5, 10, 20, 30] {
@@ -116,22 +115,6 @@ final class StatusMenu: NSObject, NSMenuDelegate {
         enabled.state = app.settings.remindersEnabled ? .on : .off
         menu.addItem(enabled)
         addLists(of: source, to: menu)
-        return menu
-    }
-
-    private func googleMenu() -> NSMenu {
-        let menu = NSMenu()
-        if app.google.isConnected {
-            menu.addItem(app.actionItem("Disconnect") { $0.disconnectGoogle() })
-            addLists(of: app.google, to: menu)
-        } else {
-            menu.addItem(app.actionItem("Sign in with Google…") { $0.connectGoogle() })
-        }
-        menu.addItem(.separator())
-        menu.addItem(app.actionItem("Use Your Own OAuth Client…") { $0.promptForGoogleClient() })
-        if app.settings.hasCustomGoogleClient, app.settings.builtInGoogleClient != nil {
-            menu.addItem(app.actionItem("Use Built-in Sign-in") { $0.useBuiltInGoogleClient() })
-        }
         return menu
     }
 

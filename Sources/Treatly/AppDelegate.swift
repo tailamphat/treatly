@@ -8,8 +8,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var pack: PetPack!
 
     private(set) var reminders: RemindersSource!
-    private(set) var google: GoogleTasksSource!
-    var sources: [TaskSource] { [reminders, google] }
+    var sources: [TaskSource] { [reminders] }
 
     /// Every incomplete task from every connected source.
     private(set) var tasks: [TaskItem] = []
@@ -49,8 +48,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             selectedListIDs: { [settings] in settings.selectedLists(for: .appleReminders) },
             isEnabled: { [settings] in settings.remindersEnabled }
         )
-        let auth = GoogleAuth { [settings] in settings.googleClient }
-        google = GoogleTasksSource(auth: auth) { [settings] in settings.selectedLists(for: .googleTasks) }
         for source in sources { source.onChange = { [weak self] in self?.refresh() } }
 
         let ground = Ground.current()
@@ -68,7 +65,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Timer.scheduledTimer(withTimeInterval: 1.0 / 30, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.tick() }
         }
-        // Google Tasks has no push; Reminders also gets a periodic catch-up.
+        // Reminders pushes changes; this is a periodic catch-up.
         Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.refresh() }
         }
@@ -182,8 +179,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         TaskItem(source: .appleReminders, sourceID: "demo1", title: "Write the report", dueDate: Date().addingTimeInterval(-1500), priority: .high),
         TaskItem(source: .appleReminders, sourceID: "demo2", title: "Call the dentist"),
         TaskItem(source: .appleReminders, sourceID: "demo3", title: "Water the plants"),
-        TaskItem(source: .googleTasks, sourceID: "demo4", title: "Review PR"),
-        TaskItem(source: .googleTasks, sourceID: "demo5", title: "Book flights"),
+        TaskItem(source: .appleReminders, sourceID: "demo4", title: "Review PR"),
     ]
 
     private func pickCurrent(now: Date) -> TaskItem? {
@@ -239,68 +235,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func source(for task: TaskItem) -> TaskSource? {
         sources.first { $0.kind == task.source }
-    }
-
-    // MARK: Google
-
-    /// Opens Google's sign-in page in the browser. Only builds without a
-    /// built-in client ask for the user's own first.
-    func connectGoogle() {
-        if settings.googleClient == nil {
-            guard promptForGoogleClient() else { return }
-        }
-        Task {
-            do {
-                try await google.auth.signIn()
-                refresh()
-            } catch {
-                show(error)
-            }
-        }
-    }
-
-    func disconnectGoogle() {
-        google.auth.signOut()
-        tasks.removeAll { $0.source == .googleTasks }
-        layoutBowls()
-    }
-
-    /// Advanced: asks for the user's own OAuth "Desktop app" client. Returns false if cancelled.
-    @discardableResult
-    func promptForGoogleClient() -> Bool {
-        let alert = NSAlert()
-        alert.messageText = "Use your own Google OAuth client"
-        alert.informativeText = settings.builtInGoogleClient == nil
-            ? "This build of Treatly has no built-in Google sign-in. Add a Google Cloud OAuth client (type: Desktop app) with the Google Tasks API enabled. See docs/google-tasks.md."
-            : "Optional. Treatly signs in with its own client by default. Add a Google Cloud OAuth client (type: Desktop app) to use yours instead. See docs/google-tasks.md."
-        let id = NSTextField(frame: NSRect(x: 0, y: 30, width: 320, height: 24))
-        id.placeholderString = "Client ID"
-        id.stringValue = settings.googleClientID ?? ""
-        let secret = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 320, height: 24))
-        secret.placeholderString = "Client secret"
-        let stack = NSView(frame: NSRect(x: 0, y: 0, width: 320, height: 54))
-        stack.addSubview(id)
-        stack.addSubview(secret)
-        alert.accessoryView = stack
-        alert.addButton(withTitle: "Save")
-        alert.addButton(withTitle: "Cancel")
-        NSApp.activate(ignoringOtherApps: true)
-        guard alert.runModal() == .alertFirstButtonReturn else { return false }
-        let clientID = id.stringValue.trimmingCharacters(in: .whitespaces)
-        let clientSecret = secret.stringValue.trimmingCharacters(in: .whitespaces)
-        guard !clientID.isEmpty, !clientSecret.isEmpty else { return false }
-        settings.googleClientID = clientID
-        settings.googleClientSecret = clientSecret
-        // A token from another client won't refresh with this one.
-        disconnectGoogle()
-        return true
-    }
-
-    /// Forgets the user's own client and goes back to the built-in one.
-    func useBuiltInGoogleClient() {
-        settings.googleClientID = nil
-        settings.googleClientSecret = nil
-        disconnectGoogle()
     }
 
     func setPetName(_ name: String) {

@@ -53,7 +53,7 @@ do {
     let expired = ["appleReminders:snoozed": now.addingTimeInterval(-1)]
     check(TaskSelector.current(from: tasks, now: now, hiddenUntil: expired)?.sourceID == "snoozed", "tasks come back when hiding expires")
 }
-check(task("x", source: .googleTasks).id != task("x").id, "ids are unique across sources")
+check(task("x").id == "appleReminders:x", "ids carry their source")
 
 // MARK: EscalationPolicy
 
@@ -109,17 +109,6 @@ do {
     }
 }
 
-// MARK: OAuth and Google Tasks
-
-// RFC 7636 appendix B test vector.
-check(OAuth.challenge(for: "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk") == "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM", "PKCE S256 challenge")
-check(OAuth.makeVerifier().count >= 43, "PKCE verifier is at least 43 chars")
-check(OAuth.callbackParameters(requestLine: "GET /?code=4%2Fabc&state=xyz HTTP/1.1") == ["code": "4/abc", "state": "xyz"], "callback query parsed and decoded")
-check(OAuth.callbackParameters(requestLine: "POST / HTTP/1.1") == nil, "non-GET callback ignored")
-check(String(data: OAuth.formBody([("a", "1 2"), ("b", "x/y")]), encoding: .utf8) == "a=1%202&b=x%2Fy", "form body is percent-encoded")
-check(GoogleTasksDate.components(fromDue: "2026-10-29T00:00:00.000Z") == DateComponents(year: 2026, month: 10, day: 29), "Google due keeps only the date")
-check(GoogleTasksDate.components(fromDue: nil) == nil, "no Google due date")
-
 // MARK: Pack file safety
 
 check(PetPack.isPlainFileName("sheet.png"), "plain file name allowed")
@@ -154,12 +143,12 @@ do {
 // MARK: Bowls
 
 do {
-    let tasks = [task("a"), task("b"), task("g", source: .googleTasks)]
-    let both = BowlLayout.bowls(for: [.googleTasks, .appleReminders], tasks: tasks, bounds: 0...1000)
-    check(both.map(\.source) == [.appleReminders, .googleTasks], "Reminders bowl on the left, Google on the right")
-    check(both.map(\.x) == [60, 940], "bowls inset from the ends")
-    check(both.map(\.treatCount) == [2, 1], "bowls count their own source's treats")
-    check(BowlLayout.bowls(for: [.googleTasks], tasks: tasks, bounds: 0...1000).map(\.x) == [60], "a single bowl sits on the left")
+    let tasks = [task("a"), task("b")]
+    let bowls = BowlLayout.bowls(for: [.appleReminders], tasks: tasks, bounds: 0...1000)
+    check(bowls.map(\.source) == [.appleReminders], "one bowl for Reminders")
+    check(bowls.map(\.x) == [60], "a single bowl sits on the left, inset from the end")
+    check(bowls.map(\.treatCount) == [2], "the bowl counts its treats")
+    check(BowlLayout.bowls(for: [], tasks: tasks, bounds: 0...1000).isEmpty, "no sources, no bowls")
 }
 
 // MARK: PetBrain
@@ -230,18 +219,6 @@ do {
     check(lazy.activity == .walking, "a calm pet walks when it wanders")
 }
 
-// MARK: Google client
-
-do {
-    let mine = GoogleClient(id: " mine.apps.googleusercontent.com ", secret: "s1")
-    let builtIn = GoogleClient(id: "app.apps.googleusercontent.com", secret: "s2")
-    check(mine?.id == "mine.apps.googleusercontent.com", "client id is trimmed")
-    check(GoogleClient(id: "x", secret: "") == nil && GoogleClient(id: nil, secret: "s") == nil, "incomplete client is nil")
-    check(GoogleClient.resolve(custom: mine, builtIn: builtIn) == mine, "own client wins")
-    check(GoogleClient.resolve(custom: nil, builtIn: builtIn) == builtIn, "built-in client is the default")
-    check(GoogleClient.resolve(custom: nil, builtIn: nil) == nil, "no client at all")
-}
-
 // MARK: Poop
 
 check(PoopStyle(stored: nil) == .cute && PoopStyle(stored: "nope") == .cute, "poop style defaults to cute")
@@ -262,7 +239,7 @@ check(BowlStyle(stored: "tub") == .tub, "stored bowl style is read back")
 do {
     let repo = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
     for style in BowlStyle.allCases {
-        for source in [TaskSourceKind.appleReminders, .googleTasks] {
+        for source in TaskSourceKind.allCases {
             let names = style.artNames(for: source)
             for name in [names.back, names.front] {
                 check(FileManager.default.fileExists(atPath: repo.appendingPathComponent("Resources/Art/\(name).png").path), "\(name).png exists")

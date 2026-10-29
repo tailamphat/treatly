@@ -180,13 +180,6 @@ struct SettingsView: View {
                     .labelsHidden()
                 }
             }
-            bowlRow(app.google, color: .blue) {
-                if app.google.isConnected {
-                    Button("Disconnect") { model.run { $0.disconnectGoogle() } }
-                } else {
-                    Button("Sign in") { model.run { $0.connectGoogle() } }
-                }
-            }
         }
     }
 

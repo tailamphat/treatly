@@ -22,14 +22,12 @@ extension TaskSourceKind {
     var displayName: String {
         switch self {
         case .appleReminders: return "Apple Reminders"
-        case .googleTasks: return "Google Tasks"
         }
     }
 
     var shortName: String {
         switch self {
         case .appleReminders: return "Reminders"
-        case .googleTasks: return "Google"
         }
     }
 }
