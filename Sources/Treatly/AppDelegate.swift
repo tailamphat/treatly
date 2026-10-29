@@ -119,6 +119,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func applyPack() {
         petView.art = PetArt(pack: pack)
+        petView.wearing = wearing
         brain.temperament = pack.personality.temperament
         bubbleKey = ""
         // Each pet brings its own containers (bowls, banana trees...).
@@ -128,6 +129,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     var petName: String { settings.petName(for: pack) }
+
+    var wearing: String? { settings.wearing(for: pack) }
+
+    /// Wardrobe items the current pet has art for.
+    var wardrobe: [String] { petView.art?.wardrobe ?? [] }
+
+    func setWearing(_ item: String?) {
+        settings.setWearing(item, for: pack)
+        petView.wearing = item
+    }
 
     func selectPack(_ newPack: PetPack) {
         pack = newPack

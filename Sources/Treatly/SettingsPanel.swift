@@ -57,6 +57,9 @@ struct SettingsView: View {
                 section("Bowls") { bowls }
                 section("Behaviour") { behaviour }
                 section("Pets") { petGrid }
+                if !app.wardrobe.isEmpty {
+                    section("Wardrobe") { wardrobeGrid }
+                }
                 footer
             }
             .padding(.horizontal, 20)
@@ -70,7 +73,7 @@ struct SettingsView: View {
 
     private var header: some View {
         HStack(spacing: 14) {
-            PetPreview(pack: app.pack)
+            PetPreview(pack: app.pack, wearing: app.wearing)
                 .frame(width: 64, height: 52)
             VStack(alignment: .leading, spacing: 3) {
                 TextField("Name", text: Binding(get: { app.petName }, set: { name in model.run { $0.setPetName(name) } }))
@@ -285,6 +288,40 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: Wardrobe
+
+    private var wardrobeGrid: some View {
+        let items: [String?] = [nil] + app.wardrobe.map { $0 }
+        return LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 4), spacing: 8) {
+            ForEach(items, id: \.self) { item in
+                let selected = item == app.wearing
+                Button {
+                    model.run { $0.setWearing(item) }
+                } label: {
+                    VStack(spacing: 4) {
+                        PetPreview(pack: app.pack, wearing: item)
+                            .frame(height: 34)
+                        Text(item.map(Wardrobe.name(for:)) ?? "Nothing")
+                            .font(.caption2.weight(selected ? .bold : .regular))
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.primary.opacity(selected ? 0.12 : 0.04))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(selected ? Color.accentColor : .clear, lineWidth: 1.5)
+                    )
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
     // MARK: Footer
 
     private var footer: some View {
@@ -307,19 +344,30 @@ struct SettingsView: View {
     }
 }
 
-/// The pet's first idle frame, crisp and scaled to fit.
+/// The pet's first idle frame, crisp and scaled to fit, optionally dressed up.
 struct PetPreview: View {
     let pack: PetPack
+    var wearing: String?
 
     var body: some View {
-        if let image = PetArt(pack: pack)?.image(for: .idle, elapsed: 0)?.image {
-            Image(decorative: image, scale: 1)
-                .interpolation(.none)
-                .resizable()
-                .scaledToFit()
+        let art = PetArt(pack: pack)
+        if let image = art?.image(for: .idle, elapsed: 0)?.image {
+            ZStack {
+                pixels(image)
+                if let overlay = art?.overlay(wearing, for: .idle, elapsed: 0)?.image {
+                    pixels(overlay)
+                }
+            }
         } else {
             Image(systemName: "pawprint.fill")
                 .foregroundStyle(.secondary)
         }
+    }
+
+    private func pixels(_ image: CGImage) -> some View {
+        Image(decorative: image, scale: 1)
+            .interpolation(.none)
+            .resizable()
+            .scaledToFit()
     }
 }

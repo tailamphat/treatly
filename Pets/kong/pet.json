@@ -3,7 +3,7 @@
   "name": "King Kong",
   "species": "ape",
   "defaultName": "Kong",
-  "credit": "Treatly contributors, MIT (scripts/art/generate.py)",
+  "credit": "Treatly contributors, MIT (scripts/art/chibi.py)",
   "container": "tree",
   "treat": {
     "name": "banana",
@@ -11,45 +11,58 @@
   },
   "sheet": {
     "image": "sheet.png",
-    "frameWidth": 52,
-    "frameHeight": 42,
-    "scale": 2,
-    "footPadding": 3,
+    "frameWidth": 38,
+    "frameHeight": 30,
+    "scale": 3,
+    "footPadding": 1,
     "mouth": [
-      45,
-      21
+      34,
+      15
     ],
     "animations": {
       "idle": {
         "row": 0,
         "count": 4,
-        "fps": 3
+        "fps": 2
       },
       "walk": {
         "row": 1,
         "count": 4,
-        "fps": 7
-      },
-      "bark": {
-        "row": 2,
-        "count": 2,
-        "fps": 6
-      },
-      "sit": {
-        "row": 3,
-        "count": 1
-      },
-      "sleep": {
-        "row": 4,
-        "count": 2,
-        "fps": 1
+        "fps": 8
       },
       "run": {
         "row": 1,
         "count": 4,
-        "fps": 11
+        "fps": 14
+      },
+      "sit": {
+        "row": 2,
+        "count": 1
+      },
+      "bark": {
+        "row": 3,
+        "count": 2,
+        "fps": 5
+      },
+      "beg": {
+        "row": 4,
+        "count": 2,
+        "fps": 1.5
+      },
+      "sleep": {
+        "row": 5,
+        "count": 2,
+        "fps": 0.6
       }
-    }
+    },
+    "wardrobe": [
+      "party-hat",
+      "bow",
+      "crown",
+      "bandana",
+      "glasses",
+      "flower"
+    ]
   },
   "personality": {
     "walkSpeed": 45,

@@ -33,6 +33,8 @@ final class PetView: NSView {
 
     weak var delegate: PetViewDelegate?
     var art: PetArt? { didSet { needsDisplay = true } }
+    /// Wardrobe item to draw over the pet, if any.
+    var wearing: String? { didSet { needsDisplay = true } }
     var frameState = PetFrame() { didSet { needsDisplay = true } }
 
     /// The part of the view that should take mouse clicks, in view coordinates.
@@ -68,6 +70,7 @@ final class PetView: NSView {
         let flipped = (s.facing == .left) != art.facesLeft
         let alpha: CGFloat = s.activity == .whining && !art.isAnimated ? 0.85 : 1
         pet.draw(in: petRect, flipped: flipped, alpha: alpha)
+        art.overlay(wearing, for: s.activity, elapsed: s.activityElapsed)?.draw(in: petRect, flipped: flipped, alpha: alpha)
         var hit = petRect
 
         if let treat = art.treat {

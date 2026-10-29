@@ -73,6 +73,8 @@ struct PetArt {
 
     private let sheet: SpriteSheet?
     private let frames: [String: [SpriteImage]]
+    /// Wardrobe overlays: item -> animation -> frames, laid out like the sheet.
+    private let wear: [String: [String: [SpriteImage]]]
     private let still: SpriteImage?
 
     init?(pack: PetPack) {
@@ -85,13 +87,23 @@ struct PetArt {
 
         if let sheet = pack.sheet, let folder, let image = SpriteImage(contentsOf: folder.appendingPathComponent(sheet.image)) {
             let size = (sheet.frameWidth, sheet.frameHeight)
-            var frames: [String: [SpriteImage]] = [:]
-            for (name, animation) in sheet.animations {
-                let start = animation.start ?? 0
-                frames[name] = (start..<start + animation.count).compactMap { image.frame(col: $0, row: animation.row, size: size) }
+            func cut(_ image: SpriteImage) -> [String: [SpriteImage]] {
+                var frames: [String: [SpriteImage]] = [:]
+                for (name, animation) in sheet.animations {
+                    let start = animation.start ?? 0
+                    frames[name] = (start..<start + animation.count).compactMap { image.frame(col: $0, row: animation.row, size: size) }
+                }
+                return frames
+            }
+            var wear: [String: [String: [SpriteImage]]] = [:]
+            for item in Wardrobe.items(in: sheet) {
+                if let overlay = SpriteImage(contentsOf: folder.appendingPathComponent(Wardrobe.fileName(for: item))) {
+                    wear[item] = cut(overlay)
+                }
             }
             self.sheet = sheet
-            self.frames = frames
+            self.frames = cut(image)
+            self.wear = wear
             still = nil
             scale = CGFloat(sheet.scale ?? 2)
             frameSize = size
@@ -103,6 +115,7 @@ struct PetArt {
         } else if let sprite = pack.sprite, let image = SpriteImage(sprite) {
             sheet = nil
             frames = [:]
+            wear = [:]
             still = image
             scale = 4
             frameSize = (image.width, image.height)
@@ -120,6 +133,17 @@ struct PetArt {
     func image(for activity: Activity, elapsed: TimeInterval) -> SpriteImage? {
         if let still { return still }
         guard let sheet else { return nil }
+        let (name, animation) = sheet.animation(for: activity)
+        guard let list = frames[name], !list.isEmpty else { return nil }
+        return list[min(animation.frame(at: elapsed), list.count - 1)]
+    }
+
+    /// Items this pet has art for, in display order.
+    var wardrobe: [String] { Wardrobe.items(in: sheet).filter { wear[$0] != nil } }
+
+    /// The overlay for `item` matching `image(for:elapsed:)`.
+    func overlay(_ item: String?, for activity: Activity, elapsed: TimeInterval) -> SpriteImage? {
+        guard let item, let sheet, let frames = wear[item] else { return nil }
         let (name, animation) = sheet.animation(for: activity)
         guard let list = frames[name], !list.isEmpty else { return nil }
         return list[min(animation.frame(at: elapsed), list.count - 1)]

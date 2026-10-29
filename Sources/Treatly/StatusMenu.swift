@@ -46,6 +46,18 @@ final class StatusMenu: NSObject, NSMenuDelegate {
             pets.addItem(item)
         }
         menu.addItem(submenu("Pet", pets))
+        if !app.wardrobe.isEmpty {
+            let wardrobe = NSMenu()
+            let none = app.actionItem("Nothing") { $0.setWearing(nil) }
+            none.state = app.wearing == nil ? .on : .off
+            wardrobe.addItem(none)
+            for id in app.wardrobe {
+                let item = app.actionItem(Wardrobe.name(for: id)) { $0.setWearing(id) }
+                item.state = app.wearing == id ? .on : .off
+                wardrobe.addItem(item)
+            }
+            menu.addItem(submenu("Wardrobe", wardrobe))
+        }
         menu.addItem(app.actionItem("Rename \(app.petName)…") { $0.renamePet() })
         menu.addItem(.separator())
 

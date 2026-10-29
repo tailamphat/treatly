@@ -230,5 +230,20 @@ do {
     check(lazy.activity == .walking, "a calm pet walks when it wanders")
 }
 
+// MARK: Wardrobe
+
+do {
+    check(Wardrobe.isValidID("party-hat") && !Wardrobe.isValidID("../hat") && !Wardrobe.isValidID("Hat") && !Wardrobe.isValidID(""), "wardrobe ids are simple")
+    check(Wardrobe.fileName(for: "bow") == "wear-bow.png", "wardrobe file name")
+    check(Wardrobe.name(for: "glasses") == "Sunglasses" && Wardrobe.name(for: "top-hat") == "Top Hat", "wardrobe display names")
+    let idle = ["idle": SpriteSheet.Animation(row: 0, count: 1)]
+    let sheet = SpriteSheet(image: "s.png", frameWidth: 8, frameHeight: 8, animations: idle, wardrobe: ["top-hat", "crown", "bow"])
+    check(Wardrobe.items(in: sheet) == ["bow", "crown", "top-hat"], "wardrobe in catalogue order, extras last")
+    check((try? sheet.validate()) != nil, "valid wardrobe accepted")
+    let bad = SpriteSheet(image: "s.png", frameWidth: 8, frameHeight: 8, animations: idle, wardrobe: ["../../x"])
+    check((try? bad.validate()) == nil, "path-like wardrobe id rejected")
+    check(Wardrobe.items(in: nil).isEmpty, "no sheet, no wardrobe")
+}
+
 print("\(passed) passed, \(failures) failed")
 exit(failures == 0 ? 0 : 1)

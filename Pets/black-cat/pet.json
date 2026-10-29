@@ -3,20 +3,20 @@
   "name": "Black Cat",
   "species": "cat",
   "defaultName": "Salem",
-  "credit": "Treatly contributors, MIT (scripts/art/generate.py)",
+  "credit": "Treatly contributors, MIT (scripts/art/chibi.py)",
   "treat": {
     "name": "fish",
     "image": "treat.png"
   },
   "sheet": {
     "image": "sheet.png",
-    "frameWidth": 44,
-    "frameHeight": 34,
-    "scale": 2,
+    "frameWidth": 32,
+    "frameHeight": 26,
+    "scale": 3,
     "footPadding": 1,
     "mouth": [
-      40,
-      14
+      27,
+      17
     ],
     "animations": {
       "idle": {
@@ -28,6 +28,11 @@
         "row": 1,
         "count": 4,
         "fps": 8
+      },
+      "run": {
+        "row": 1,
+        "count": 4,
+        "fps": 14
       },
       "sit": {
         "row": 2,
@@ -46,14 +51,17 @@
       "sleep": {
         "row": 5,
         "count": 2,
-        "fps": 0.5
-      },
-      "run": {
-        "row": 1,
-        "count": 4,
-        "fps": 14
+        "fps": 0.6
       }
-    }
+    },
+    "wardrobe": [
+      "party-hat",
+      "bow",
+      "crown",
+      "bandana",
+      "glasses",
+      "flower"
+    ]
   },
   "personality": {
     "walkSpeed": 55,

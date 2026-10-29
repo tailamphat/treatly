@@ -17,8 +17,11 @@ public struct SpriteSheet: Codable, Equatable, Sendable {
     /// right-facing frame. Defaults to near the front top.
     public var mouth: [Double]?
     public var animations: [String: Animation]
+    /// Wardrobe items this pack has overlays for. Item `x` is drawn from
+    /// `wear-x.png`, laid out like the sheet.
+    public var wardrobe: [String]?
 
-    public init(image: String, frameWidth: Int, frameHeight: Int, scale: Double? = nil, facing: String? = nil, footPadding: Int? = nil, mouth: [Double]? = nil, animations: [String: Animation]) {
+    public init(image: String, frameWidth: Int, frameHeight: Int, scale: Double? = nil, facing: String? = nil, footPadding: Int? = nil, mouth: [Double]? = nil, animations: [String: Animation], wardrobe: [String]? = nil) {
         self.image = image
         self.frameWidth = frameWidth
         self.frameHeight = frameHeight
@@ -27,6 +30,7 @@ public struct SpriteSheet: Codable, Equatable, Sendable {
         self.footPadding = footPadding
         self.mouth = mouth
         self.animations = animations
+        self.wardrobe = wardrobe
     }
 
     public struct Animation: Codable, Equatable, Sendable {
@@ -60,6 +64,9 @@ public struct SpriteSheet: Codable, Equatable, Sendable {
         guard animations["idle"] != nil else { throw SpriteError(description: "an 'idle' animation is required") }
         for (name, animation) in animations where animation.count < 1 || animation.row < 0 || (animation.start ?? 0) < 0 {
             throw SpriteError(description: "animation '\(name)' has an invalid row, start or count")
+        }
+        for item in wardrobe ?? [] where !Wardrobe.isValidID(item) {
+            throw SpriteError(description: "wardrobe item '\(item)' must be lowercase letters, digits and dashes")
         }
     }
 

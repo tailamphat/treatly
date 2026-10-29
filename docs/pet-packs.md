@@ -45,6 +45,7 @@ A pet pack is a folder containing `pet.json`. Built-in packs are in `Pets/`; you
 - Frames are a grid; each animation is a run of `count` frames on `row`, starting at column `start` (default 0). `once: true` holds the last frame.
 - Only `idle` is required. Missing animations fall back: run -> walk -> idle, walk -> idle, bark -> sit -> idle, sleep -> lie -> sit -> idle, beg -> lie -> sit -> idle, eat -> sit, dig -> sit, held -> idle.
 - `scale` is points per sheet pixel (default 2). `facing` is `"right"` (default) or `"left"`. `footPadding` is blank rows under the feet. `mouth` is where the treat is held, in frame pixels from the top-left of a right-facing frame.
+- `wardrobe` (optional) lists items the pet can wear, such as `["party-hat", "bow"]`. Each item `x` is an overlay `wear-x.png` with exactly the same layout as the sheet, drawn on top of the pet. Ids are lowercase letters, digits and dashes. Built-in names: `party-hat`, `bow`, `crown`, `bandana`, `glasses`, `flower`; any other id is shown title-cased.
 - `treat.image` is a PNG in the pack folder.
 - `container` is `"bowl"` (default) or `"tree"` (banana trees, used by King Kong).
 - `credit` names the artist and license.
