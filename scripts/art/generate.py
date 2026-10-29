@@ -26,6 +26,8 @@ def hex_rgba(h):
 MATERIALS = {
     "fur": ("#625F6B", "#47454F", "#312F37", "#141316"),
     "furD": ("#3B3A42", "#2F2E35", "#242328", "#111013"),
+    # Kong's near arm: fur colors under another name so it gets its own outline.
+    "arm": ("#625F6B", "#47454F", "#312F37", "#141316"),
     "skin": ("#94817A", "#735F57", "#56463F", "#1C1513"),
     "chest": ("#6E6974", "#58545E", "#45414B", "#141316"),
     "brow": ("#26252B", "#1E1D22", "#1E1D22", "#0E0D10"),
@@ -119,13 +121,41 @@ class Canvas:
             self._put(x, y, material, True)
 
     def render(self, outline=True):
-        """Returns rows of RGBA tuples (None = transparent)."""
+        """Returns rows of RGBA tuples (None = transparent).
+
+        Each part is shaded as a rounded form lit from the upper left: the
+        normal comes from the gradient of the part's blurred coverage, so
+        ellipses read as balls and lines as tubes. Outlines use the material's
+        line color, lightened on the lit (top and left) side.
+        """
         w, h = self.w, self.h
         mat, part = self.mat, self.part
 
         def m(x, y):
             return mat[y][x] if 0 <= x < w and 0 <= y < h else None
 
+        # Coverage of each pixel's material, box-blurred (radius 2). Shading
+        # a whole material region at once keeps a body made of several
+        # ellipses smooth instead of lumpy.
+        r = 2
+        bounds = {}
+        for y in range(h):
+            for x in range(w):
+                k = mat[y][x]
+                if k is None:
+                    continue
+                t, bt = bounds.get(k, (y, y))
+                bounds[k] = (min(t, y), max(bt, y))
+
+        def coverage(x, y, k):
+            total = 0
+            for yy in range(y - r, y + r + 1):
+                for xx in range(x - r, x + r + 1):
+                    if 0 <= xx < w and 0 <= yy < h and mat[yy][xx] == k:
+                        total += 1
+            return total / ((2 * r + 1) ** 2)
+
+        lx, ly = -0.55, -0.83  # toward the light: up and to the left
         out = [[None] * w for _ in range(h)]
         for y in range(h):
             for x in range(w):
@@ -136,29 +166,42 @@ class Canvas:
                 if self.flat[y][x]:
                     out[y][x] = hex_rgba(base)
                     continue
-                # Line between overlapping parts: this pixel sits behind a
-                # different material drawn later.
-                behind = False
-                for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
-                    if 0 <= nx < w and 0 <= ny < h and mat[ny][nx] not in (None, k) and part[ny][nx] > part[y][x] and not self.flat[ny][nx]:
-                        behind = True
+                behind = any(
+                    0 <= nx < w and 0 <= ny < h and mat[ny][nx] not in (None, k) and part[ny][nx] > part[y][x] and not self.flat[ny][nx]
+                    for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1))
+                )
                 if behind and outline:
-                    out[y][x] = hex_rgba(line)
-                elif m(x, y - 1) != k or m(x - 1, y) != k and m(x, y - 2) != k:
+                    out[y][x] = _mix(line, shade, 0.25)
+                    continue
+                gx = coverage(x + 1, y, k) - coverage(x - 1, y, k)
+                gy = coverage(x, y + 1, k) - coverage(x, y - 1, k)
+                lit = -(gx * lx + gy * ly)  # outward normal . light
+                top, bottom = bounds[k]
+                ty = (y - top) / max(1, bottom - top)
+                i = 2.6 * lit - 0.28 * (ty - 0.35)
+                if i >= 0.5 and lit > 0.15:
+                    out[y][x] = _mix(light, "#FFFFFF", 0.35)
+                elif i >= 0.16:
                     out[y][x] = hex_rgba(light)
-                elif m(x, y + 1) != k or m(x + 1, y) != k or m(x, y + 2) != k:
-                    out[y][x] = hex_rgba(shade)
-                else:
+                elif i >= -0.1:
                     out[y][x] = hex_rgba(base)
+                elif i >= -0.32:
+                    out[y][x] = _mix(base, shade, 0.55)
+                else:
+                    out[y][x] = hex_rgba(shade)
         if outline:
             edge = [[None] * w for _ in range(h)]
             for y in range(h):
                 for x in range(w):
                     if mat[y][x] is not None:
                         continue
-                    for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
-                        if m(nx, ny) is not None:
-                            edge[y][x] = hex_rgba(MATERIALS[m(nx, ny)][3])
+                    # Inside neighbor below or to the right means this is the
+                    # lit top/left side of the shape: soften the line there.
+                    for nx, ny, lit_side in ((x, y + 1, True), (x + 1, y, True), (x, y - 1, False), (x - 1, y, False)):
+                        k = m(nx, ny)
+                        if k is not None:
+                            line, shade = MATERIALS[k][3], MATERIALS[k][2]
+                            edge[y][x] = _mix(line, shade, 0.4) if lit_side else hex_rgba(line)
                             break
             for y in range(h):
                 for x in range(w):
@@ -168,6 +211,11 @@ class Canvas:
             if 0 <= int(x) < w and 0 <= int(y) < h:
                 out[int(y)][int(x)] = hex_rgba(color)
         return out
+
+
+def _mix(a, b, t):
+    ca, cb = hex_rgba(a), hex_rgba(b)
+    return tuple(round(ca[i] * (1 - t) + cb[i] * t) for i in range(3)) + (255,)
 
 
 def write_png(path, rows):
@@ -241,10 +289,10 @@ def kong(arm=0.0, leg=0.0, bob=0, pound=None, mouth=False, breathe=0.0):
         c.pixels([(42, 20 + bob), (43, 20 + bob), (44, 20 + bob)], "ink")
     # Near arm in front of everything.
     if pound == "near":
-        c.line((32, 18 + bob), (35, 24 + bob), 5.5, "fur")
+        c.line((32, 18 + bob), (35, 24 + bob), 5.5, "arm")
         c.ellipse(35.5, 25 + bob, 3, 2.6, "skin")
     else:
-        c.line((32, 18 + bob), (35 + arm * 3, g - 2), 5.5, "fur")
+        c.line((32, 18 + bob), (35 + arm * 3, g - 2), 5.5, "arm")
         c.ellipse(36 + arm * 3, g - 0.5, 3.6, 2, "skin")
     return c.render()
 
