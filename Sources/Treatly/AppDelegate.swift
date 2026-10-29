@@ -340,10 +340,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let now = Date()
         let dt = min(now.timeIntervalSince(lastTick), 0.1)
         lastTick = now
-        // The pet lives on whichever display it is on. If that display went
-        // away, it moves to the nearest one.
-        let ground = Ground.containing(NSPoint(x: brain.x, y: brain.y + 1))
-        if !ground.contains(NSPoint(x: brain.x, y: brain.y)) {
+        // The pet lives on whichever display it is on. If it ends up off every
+        // display (one was unplugged), it moves to the nearest one. Not while
+        // it runs to a bowl on another display: the way there can cross the
+        // menu bar or a gap between displays.
+        let spot = NSPoint(x: brain.x, y: brain.y + 1)
+        let ground = Ground.containing(spot)
+        if !Ground.isOnAnyDisplay(spot), !brain.isFetching, brain.activity != .held {
             let walk = ground.walkBounds
             brain.place(x: min(max(brain.x, walk.lowerBound), walk.upperBound), y: min(max(brain.y, ground.y), ground.maxY - PetView.size.height))
         }

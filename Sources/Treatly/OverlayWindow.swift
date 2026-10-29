@@ -59,8 +59,9 @@ struct Ground {
         return screens.min { distance($0.frame) < distance($1.frame) }.map { Ground($0.visibleFrame) } ?? current()
     }
 
-    func contains(_ point: NSPoint) -> Bool {
-        point.x >= minX && point.x <= maxX && point.y >= y && point.y <= maxY
+    /// True when `point` is anywhere on a display, menu bar and Dock included.
+    static func isOnAnyDisplay(_ point: NSPoint) -> Bool {
+        NSScreen.screens.contains { $0.frame.contains(point) }
     }
 
     var walkBounds: ClosedRange<Double> { (minX + 50)...(maxX - 50) }
