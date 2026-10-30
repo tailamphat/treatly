@@ -30,6 +30,8 @@ public enum Activity: Equatable, Sendable {
     case held
     /// Tripped over its own feet while walking; gets up and carries on.
     case tumbling
+    /// Showing off its special move, just for fun.
+    case tricking
 }
 
 public enum Facing: Sendable { case left, right }
@@ -51,10 +53,12 @@ public struct Temperament: Equatable, Sendable {
     public var patience: Double
     /// Trips per minute of walking; running trips twice as often.
     public var clumsiness: Double
+    /// Chance (0...1) of showing off a trick when it stops.
+    public var playfulness: Double
 
     public init(walkSpeed: Double, runSpeed: Double? = nil, energy: Double = 0.15, sleepiness: Double = 0.25,
                 rest: ClosedRange<Double> = 1.5...4.5, nagDuration: TimeInterval = 20, patience: Double = 1,
-                clumsiness: Double = 0) {
+                clumsiness: Double = 0, playfulness: Double = 0) {
         self.walkSpeed = walkSpeed
         self.runSpeed = runSpeed ?? walkSpeed * 2.2
         self.energy = energy
@@ -63,6 +67,7 @@ public struct Temperament: Equatable, Sendable {
         self.nagDuration = nagDuration
         self.patience = patience
         self.clumsiness = clumsiness
+        self.playfulness = playfulness
     }
 }
 
@@ -80,6 +85,7 @@ public struct PetBrain {
     public static let reactionDuration: TimeInterval = 1.6
     public static let poopDuration: TimeInterval = 1.2
     public static let tumbleDuration: TimeInterval = 1.6
+    public static let trickDuration: TimeInterval = 4
 
     private var timer: TimeInterval = 0
     private var wanderTarget: Double?
@@ -118,7 +124,7 @@ public struct PetBrain {
 
     /// The treat is in its mouth.
     public var carriesTreat: Bool {
-        level > .calm && fetchTarget == nil && [.idle, .walking, .running, .held].contains(activity)
+        level > .calm && fetchTarget == nil && [.idle, .walking, .running, .held, .tricking].contains(activity)
     }
 
     /// The treat is on the ground in front of it (also when it tripped while carrying it).
@@ -189,7 +195,7 @@ public struct PetBrain {
             } else {
                 rest(for: 0.3)
             }
-        case .sleeping:
+        case .sleeping, .tricking:
             timer -= dt
             if rising || timer <= 0 { rest(for: 0.5) }
         case .idle:
@@ -200,6 +206,10 @@ public struct PetBrain {
             if random.next() < napChance {
                 activity = .sleeping
                 timer = level == .calm ? 8 + random.next() * 12 : 4 + random.next() * 6
+            } else if temperament.playfulness > 0, random.next() < temperament.playfulness {
+                // Only playful pets draw this number, so other pets behave exactly as before.
+                activity = .tricking
+                timer = Self.trickDuration
             } else {
                 let span = bounds.upperBound - bounds.lowerBound
                 wanderTarget = bounds.lowerBound + random.next() * span

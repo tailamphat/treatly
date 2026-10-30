@@ -440,6 +440,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let list: [String]?
         switch brain.activity {
         case .eating: list = p.happy
+        case .tricking: list = p.trick
         case .burying: list = p.bury
         case .pooping: list = ["*plop*"]
         case .sitting: list = p.drop

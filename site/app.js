@@ -346,7 +346,16 @@
       say(null);
       setStep('');
       await walkTo(rand(W() * 0.55, W() * 0.65), g);
-      hero.sprite.play(Math.random() < 0.3 ? 'sleep' : 'idle');
+      if (data[hero.id].sheet.animations.trick && Math.random() < 0.6) {
+        // Playful pets show off their special move just for fun.
+        hero.sprite.play('trick');
+        say(fill(data[hero.id].phrases.trick, task), 'yell');
+        await wait(4000, g);
+        say(null);
+        hero.sprite.play('idle');
+      } else {
+        hero.sprite.play(Math.random() < 0.3 ? 'sleep' : 'idle');
+      }
       await wait(1800, g);
     }
   }

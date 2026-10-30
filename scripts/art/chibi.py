@@ -597,8 +597,16 @@ def _zappy_tail(g, x, y):
         g.px([(x + dx, y + dy)], "b")
 
 
+def _lift(g, anchors, dy):
+    """Moves everything drawn so far up by dy pixels (for jumps)."""
+    if dy:
+        g.cells = g.cells[dy:] + [[None] * g.w for _ in range(dy)]
+        anchors = {k: (v[0], v[1] - dy) + tuple(v[2:]) for k, v in anchors.items()}
+    return anchors
+
+
 def zappy(pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=0, paw=False, breathe=0, spark=False,
-          bolts=0, streaks=-1, happy=False):
+          bolts=0, streaks=-1, happy=False, jump=0):
     g = Grid(ZW, ZH)
     G_ = ZG
     if pose == "sleep":
@@ -629,6 +637,7 @@ def zappy(pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=0, paw=Fal
             g.rect(21, top + 2, 22, top + 4, "b")
         anchors = zappy_head(g, 12 + (1 if tilt else 0), top - 8 + tilt, mouth=mouth, blink=blink or happy, spark=spark or happy)
 
+    anchors = _lift(g, anchors, jump)
     if streaks >= 0:
         # Quick Attack: speed lines behind it, shifting each frame.
         for row, length in ((G_ - 12, 7), (G_ - 7, 9), (G_ - 3, 6)):
@@ -659,7 +668,13 @@ def poses_zappy():
     sleep = [zappy("sleep"), zappy("sleep", breathe=1)]
     quick = [zappy(step=s, bob=b, streaks=i) for i, (s, b) in enumerate(((1, 0), (0, -1), (-1, 0), (0, -1)))]
     happy = [zappy("sit", happy=True, mouth=True), zappy("sit", happy=True)]
-    return [idle, walk, sit, thunderbolt, beg, sleep, quick, happy]
+    # Its trick: crouch and charge, leap up, Thunderbolt at the top, land.
+    # It hangs in the air zapping for a while before it comes down.
+    peak = zappy(spark=True, mouth=True, blink=True, jump=6, bolts=2)
+    sparks = zappy(spark=True, mouth=True, blink=True, jump=5, bolts=3)
+    leap = [zappy("sit", blink=True, spark=True), zappy(spark=True, mouth=True, jump=4),
+            peak, sparks, peak, sparks, zappy("sit", spark=True)]
+    return [idle, walk, sit, thunderbolt, beg, sleep, quick, happy, leap]
 
 
 # ---------------------------------------------------------------- Kong
@@ -1307,7 +1322,8 @@ EXTRA_ANIMATIONS = {
     "panda": {"fall": {"row": 6, "count": 3, "fps": 2, "once": True}},
     # Thunderbolt when it yells, Quick Attack when it runs, sparks when it eats.
     "zappy": {"bark": {"row": 3, "count": 4, "fps": 8}, "beg": {"row": 4, "count": 2, "fps": 3},
-              "run": {"row": 6, "count": 4, "fps": 14}, "eat": {"row": 7, "count": 2, "fps": 4}},
+              "run": {"row": 6, "count": 4, "fps": 14}, "eat": {"row": 7, "count": 2, "fps": 4},
+              "trick": {"row": 8, "count": 7, "fps": 2, "once": True}},
 }
 
 

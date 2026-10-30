@@ -57,6 +57,12 @@
         "row": 7,
         "count": 2,
         "fps": 4
+      },
+      "trick": {
+        "row": 8,
+        "count": 7,
+        "fps": 2,
+        "once": true
       }
     },
     "wardrobe": [
@@ -78,7 +84,8 @@
       3
     ],
     "nagSeconds": 25,
-    "patience": 0.8
+    "patience": 0.8,
+    "playfulness": 0.35
   },
   "phrases": {
     "carry": [
@@ -103,6 +110,11 @@
     ],
     "bury": [
       "*stashes it in a thundercloud*"
+    ],
+    "trick": [
+      "{name} used Thunderbolt!",
+      "{name} used Thunder Shock!",
+      "{name} is charging up!"
     ]
   },
   "sound": "Pop"

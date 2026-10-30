@@ -216,6 +216,15 @@ do {
     }
     check(!steadyTripped, "not clumsy: never trips")
 
+    // Playful pets show off a trick now and then when they stop, then carry on.
+    var playful = PetBrain(x: 0, y: 0, temperament: Temperament(walkSpeed: 200, energy: 0, sleepiness: 0, rest: 0...0.2, playfulness: 0.5))
+    var tricked = false, after = false
+    for _ in 0..<600 {
+        playful.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng)
+        if playful.activity == .tricking { tricked = true } else if tricked, playful.activity == .walking { after = true }
+    }
+    check(tricked && after, "playful: shows off a trick, then goes back to roaming")
+
     // Nagging comes in bursts, then it roams, then it comes back.
     var nagger = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, sleepiness: 0, nagDuration: 5, patience: 0.1))
     for _ in 0..<40 { nagger.update(dt: 0.1, level: .whining, bounds: 0...1000, focusX: 500, random: &rng) }
