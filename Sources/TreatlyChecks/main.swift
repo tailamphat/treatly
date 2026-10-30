@@ -234,6 +234,18 @@ do {
         if climber.activity == .swinging { swung = true; swungAtTree = abs(climber.x - 300) < 1 }
     }
     check(swung && swungAtTree, "climbing: goes to its tree to swing")
+    var busyClimber = PetBrain(x: 0, y: 0, temperament: Temperament(walkSpeed: 400, energy: 0, sleepiness: 0, rest: 0...0.2, climbing: 0.5))
+    busyClimber.playground = (x: 300, y: 0)
+    var busySwung = false, nagSwung = false
+    for _ in 0..<600 {
+        busyClimber.update(dt: 0.05, level: .carrying, bounds: 0...1000, focusX: 500, random: &rng)
+        if busyClimber.activity == .swinging { busySwung = true }
+    }
+    for _ in 0..<600 {
+        busyClimber.update(dt: 0.05, level: .barking, bounds: 0...1000, focusX: 500, random: &rng)
+        if busyClimber.activity == .swinging { nagSwung = true }
+    }
+    check(busySwung && !nagSwung, "climbing: also with a task not yet due, never while nagging")
 
     // Music on: it sits and listens wherever it is. Music off: it carries on.
     var listener = PetBrain(x: 200, y: 0, temperament: Temperament(walkSpeed: 100, energy: 0, sleepiness: 0, rest: 0...0.2))

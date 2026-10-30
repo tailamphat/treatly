@@ -193,7 +193,7 @@ public struct PetBrain {
         }
 
         if let target = playTarget {
-            if level > .calm {
+            if level > .carrying {
                 playTarget = nil
             } else if move(toward: target.x, target.y, running: false, dt: dt) {
                 playTarget = nil
@@ -245,8 +245,8 @@ public struct PetBrain {
                 // Only playful pets draw this number, so other pets behave exactly as before.
                 activity = .tricking
                 timer = Self.trickDuration
-            } else if level == .calm, temperament.climbing > 0, let spot = playground, random.next() < temperament.climbing {
-                // Off to play on its tree.
+            } else if level <= .carrying, temperament.climbing > 0, let spot = playground, random.next() < temperament.climbing {
+                // Off to play on its tree (also with a task that isn't due yet; nagging comes first).
                 playTarget = spot
                 activity = .walking
             } else {
