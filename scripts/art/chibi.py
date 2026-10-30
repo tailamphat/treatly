@@ -65,8 +65,8 @@ def upscale(rows, k):
 
 W, H = 32, 26
 G = 23  # bottom row of the feet; row 24 is outline, row 25 stays empty
-KW, KH = 38, 34
-KG = 31
+KW, KH = 38, 38
+KG = 35
 
 
 class Grid:
@@ -552,84 +552,100 @@ def poses_simple(draw):
 # A mighty giant gorilla: huge hunched shoulders, a heavy brow and glowing
 # eyes. Walks on its knuckles, sits up to pound its chest and roar.
 
-MIGHTY = {"b": "#2E2B33", "s": "#1F1D23", "h": "#46424E", "f": "#7A6A62", "F": "#5E504A",
-          "e": "#FFD25A", "E": "#1A1414", "W": "#FFFFFF", "n": "#1A1616", "k": "#5A1E22",
-          "t": "#FFFFFF", "r": "#C24A4A", "line": "#0E0D10"}
-MIGHTY_MOUTH = [36, 18]
+MIGHTY = {"b": "#4A4656", "h": "#6B6680", "s": "#33303D", "d": "#24222B", "f": "#9C8A80", "F": "#7E6C63",
+          "l": "#B9A69A", "e": "#FFD25A", "E": "#1A1414", "n": "#2A2224", "k": "#5A1E22", "t": "#FFFFFF",
+          "r": "#C24A4A", "line": "#15131A"}
+MIGHTY_MOUTH = [37, 19]
+
+
+def _mighty_face(g, hx, hy, mouth=False, blink=False, asleep=False):
+    """Front-facing head, 16x13 from (hx, hy): crest, brow, glowing eyes, light muzzle."""
+    g.rect(hx, hy, hx + 15, hy + 12, "b", round_=5)
+    g.px([(hx + 5, hy - 1), (hx + 6, hy - 2), (hx + 7, hy - 2), (hx + 8, hy - 2), (hx + 9, hy - 2), (hx + 10, hy - 1)], "b")
+    g.rect(hx + 3, hy + 1, hx + 12, hy + 1, "h")
+    g.rect(hx + 2, hy + 4, hx + 13, hy + 12, "f", round_=3)
+    g.rect(hx + 1, hy + 3, hx + 14, hy + 4, "s", round_=1)
+    if blink or asleep:
+        g.px([(hx + 4, hy + 5), (hx + 5, hy + 5), (hx + 10, hy + 5), (hx + 11, hy + 5)], "s")
+    else:
+        g.px([(hx + 4, hy + 5), (hx + 11, hy + 5)], "e")
+        g.px([(hx + 5, hy + 5), (hx + 10, hy + 5)], "E")
+    g.rect(hx + 5, hy + 7, hx + 10, hy + 11, "l", round_=1)
+    g.px([(hx + 6, hy + 7), (hx + 9, hy + 7)], "n")
+    if mouth:
+        g.rect(hx + 5, hy + 9, hx + 10, hy + 12, "k")
+        g.px([(hx + 5, hy + 9), (hx + 10, hy + 9), (hx + 5, hy + 12), (hx + 10, hy + 12)], "t")
+        g.rect(hx + 6, hy + 11, hx + 9, hy + 11, "r")
+    else:
+        g.px([(hx + 6, hy + 10), (hx + 7, hy + 10), (hx + 8, hy + 10), (hx + 9, hy + 10)], "F")
+    return {"head": (hx + 3, hy, 10), "eye": (hx + 4, hy + 5), "neck": (hx + 3, hy + 13)}
 
 
 def mighty(pose="stand", step=0, bob=0, mouth=False, blink=False, pound=0, breathe=0):
     g = Grid(KW, KH)
     G_ = KG
     if pose == "stand":
-        # Far legs, body, huge shoulders, then the near legs on top.
-        g.rect(9 + step, G_ - 6, 11 + step, G_, "s")
-        g.rect(25 - step, G_ - 7, 27 - step, G_, "s")
-        g.rect(4, G_ - 12 + bob, 24, G_ - 4 + bob, "b", round_=4)
-        g.rect(13, G_ - 18 + bob, 28, G_ - 6 + bob, "b", round_=4)
-        g.rect(15, G_ - 17 + bob, 22, G_ - 15 + bob, "h", round_=1)
-        g.rect(24, G_ - 11 + bob, 29, G_ - 1, "b", round_=1)
-        g.rect(23 - step, G_, 30 - step, G_, "s")
-        g.rect(5, G_ - 4, 8, G_ - 1, "b")
-        g.rect(4 + step, G_, 9 + step, G_, "s")
-        # Head forward and low, with a heavy brow over a glowing eye.
-        hy = G_ - 23 + bob
-        g.rect(25, hy, 35, hy + 11, "b", round_=3)
-        g.rect(28, hy + 4, 36, hy + 10, "f", round_=2)
-        g.rect(27, hy + 3, 35, hy + 4, "s")
+        # Side-on on its knuckles: far legs, body, big shoulders, then the near legs.
+        g.rect(9 + step, G_ - 6, 11 + step, G_, "d")
+        g.rect(24 - step, G_ - 8, 26 - step, G_, "d")
+        g.rect(4, G_ - 13 + bob, 24, G_ - 4 + bob, "b", round_=4)
+        g.rect(13, G_ - 19 + bob, 27, G_ - 6 + bob, "b", round_=4)
+        g.rect(7, G_ - 12 + bob, 20, G_ - 11 + bob, "h")
+        g.rect(15, G_ - 18 + bob, 24, G_ - 17 + bob, "h")
+        g.rect(5, G_ - 5, 8, G_ - 1, "b")
+        g.rect(4 + step, G_, 9 + step, G_, "d")
+        g.rect(22, G_ - 11 + bob, 23, G_ - 2, "d")
+        g.rect(24, G_ - 12 + bob, 29, G_ - 1, "b", round_=1)
+        g.rect(23 - step, G_, 30 - step, G_, "d")
+        g.rect(25, G_ - 11 + bob, 26, G_ - 6 + bob, "h")
+        # Head with a crest, a heavy brow and a muzzle that juts forward.
+        hy = G_ - 25 + bob
+        g.rect(25, hy, 34, hy + 12, "b", round_=3)
+        g.px([(27, hy - 1), (28, hy - 2), (29, hy - 2), (30, hy - 1)], "b")
+        g.rect(29, hy + 4, 36, hy + 11, "f", round_=2)
+        g.rect(28, hy + 3, 35, hy + 4, "s")
         if blink:
             g.px([(31, hy + 5), (32, hy + 5)], "s")
         else:
             g.px([(31, hy + 5)], "e")
             g.px([(32, hy + 5)], "E")
-        g.px([(35, hy + 7), (36, hy + 7)], "n")
+        g.rect(33, hy + 6, 37, hy + 9, "l", round_=1)
+        g.px([(36, hy + 6)], "n")
         if mouth:
-            g.rect(32, hy + 8, 35, hy + 10, "k")
-            g.px([(32, hy + 8), (35, hy + 8)], "t")
+            g.rect(33, hy + 9, 36, hy + 11, "k")
+            g.px([(33, hy + 9), (36, hy + 9)], "t")
         else:
-            g.px([(32, hy + 9), (33, hy + 9), (34, hy + 9)], "F")
-        return g, {"head": (26, hy, 10), "eye": (31, hy + 5), "neck": (27, hy + 11)}
+            g.px([(33, hy + 9), (34, hy + 9), (35, hy + 9)], "F")
+        return g, {"head": (26, hy, 10), "eye": (31, hy + 5), "neck": (27, hy + 12)}
 
     # Sitting up, facing you: sit, chest pound (pound 1/2), sleep (head down).
     asleep = pose == "sleep"
-    g.rect(12, G_ - 3, 16, G_, "b")
-    g.rect(21, G_ - 3, 25, G_, "b")
-    g.rect(11, G_, 17, G_, "s")
-    g.rect(20, G_, 26, G_, "s")
-    g.rect(9, G_ - 17 + breathe, 28, G_ - 3, "b", round_=4)
-    g.rect(13, G_ - 14 + breathe, 24, G_ - 5, "f", round_=2)
-    g.px([(18, G_ - 13), (18, G_ - 12), (18, G_ - 11), (18, G_ - 10)], "F")
+    g.rect(10, G_ - 3, 16, G_, "s")
+    g.rect(21, G_ - 3, 27, G_, "s")
+    g.rect(9, G_ - 18 + breathe, 28, G_ - 2, "b", round_=5)
+    g.rect(13, G_ - 15 + breathe, 24, G_ - 5, "f", round_=3)
+    g.rect(14, G_ - 14 + breathe, 17, G_ - 11 + breathe, "l", round_=1)
+    g.rect(20, G_ - 14 + breathe, 23, G_ - 11 + breathe, "l", round_=1)
+    arms = {"left": (4, 9), "right": (28, 33)}
     if pound:
-        # One fist thumps the chest while the other swings back out.
-        near, far = ((10, 15), (28, 32)) if pound == 1 else ((22, 27), (5, 9))
-        g.rect(near[0], G_ - 13, near[1], G_ - 9, "h", round_=2)
-        g.rect(far[0], G_ - 18, far[1], G_ - 12, "b", round_=2)
-        for side in ((5, 9), (28, 32)):
-            if side != far:
-                g.rect(side[0], G_ - 13, side[1], G_ - 8, "b", round_=2)
+        # One fist thumps the chest while the other arm swings up and out.
+        thump, swing = ("left", "right") if pound == 1 else ("right", "left")
+        tx = (13, 18) if thump == "left" else (19, 24)
+        g.rect(tx[0], G_ - 14, tx[1], G_ - 10, "h", round_=2)
+        sx = (1, 6) if swing == "left" else (31, 36)
+        g.rect(*((5, G_ - 18, 10, G_ - 12) if swing == "left" else (27, G_ - 18, 32, G_ - 12)), "b", round_=1)  # shoulder
+        g.rect(sx[0], G_ - 23, sx[1], G_ - 14, "b", round_=2)
+        g.rect(sx[0], G_ - 25, sx[1], G_ - 22, "s", round_=2)
+        x0, x1 = arms[thump]
+        g.rect(x0, G_ - 17, x1, G_ - 9, "b", round_=2)
     else:
-        g.rect(5, G_ - 15, 9, G_ - 1, "b", round_=2)
-        g.rect(28, G_ - 15, 32, G_ - 1, "b", round_=2)
-        g.rect(4, G_, 9, G_, "s")
-        g.rect(28, G_, 33, G_, "s")
-    hy = G_ - 27 + (4 if asleep else 0) + breathe
-    g.rect(12, hy, 25, hy + 11, "b", round_=4)
-    g.px([(17, hy - 1), (18, hy - 2), (19, hy - 1), (20, hy - 2)], "b")
-    g.rect(14, hy + 4, 23, hy + 10, "f", round_=2)
-    g.rect(13, hy + 3, 24, hy + 4, "s")
-    if blink or asleep:
-        g.px([(15, hy + 5), (16, hy + 5), (21, hy + 5), (22, hy + 5)], "s")
-    else:
-        g.px([(15, hy + 5), (22, hy + 5)], "e")
-        g.px([(16, hy + 5), (21, hy + 5)], "E")
-    g.px([(18, hy + 6), (19, hy + 6)], "n")
-    if mouth or pound:
-        g.rect(16, hy + 7, 21, hy + 10, "k")
-        g.px([(16, hy + 7), (21, hy + 7), (16, hy + 10), (21, hy + 10)], "t")
-        g.rect(17, hy + 9, 20, hy + 9, "r")
-    else:
-        g.px([(17, hy + 8), (18, hy + 8), (19, hy + 8), (20, hy + 8)], "F")
-    return g, {"head": (14, hy, 10), "eye": (15, hy + 5), "neck": (14, hy + 11)}
+        for x0, x1 in arms.values():
+            g.rect(x0, G_ - 17, x1, G_, "b", round_=2)
+            g.rect(x0 + 1, G_ - 16, x0 + 2, G_ - 8, "h")
+            g.rect(x0 - 1, G_ - 2, x1 + 1, G_, "s", round_=1)
+    hy = G_ - 30 + (3 if asleep else 0) + breathe
+    anchors = _mighty_face(g, 11, hy, mouth=mouth or bool(pound), blink=blink, asleep=asleep)
+    return g, anchors
 
 
 def poses_mighty():
@@ -918,82 +934,56 @@ def bowl(style, source):
 
 # ---------------------------------------------------------------- Banana tree
 #
-# Mighty's version of a bowl: a little palm, bananas hang under the crown.
+# Mighty's version of a bowl: a chunky palm on a little sandy island.
+# Bananas (one per task) hang under the crown; BowlView places them.
 
-TREE_W, TREE_H = 38, 46
-TREE_CROWN = (19, 14)
-TREE = {"t": "#B07A44", "T": "#8C5A2C", "r": "#6E431E", "u": "#D9A066",
-        "g": "#62C04E", "G": "#3E9132", "l": "#A4E47E",
-        "q": "#3F9A3A", "Q": "#2A7028", "L": "#6CC452",
-        "d": "#9A6A3E", "D": "#7A4E2A", "y": "#F7C842", "w": "#FFFFFF"}
-
-
-def _bez(p0, p1, p2, t):
-    return tuple((1 - t) ** 2 * a + 2 * (1 - t) * t * b + t * t * c for a, b, c in zip(p0, p1, p2))
+TREE_CROWN = (19, 13)
+TREE = {"t": "#B07A44", "T": "#8C5A2C", "u": "#D9A066", "r": "#6E431E",
+        "l": "#74C454", "L": "#4E9C36", "m": "#A2DE7E", "M": "#3E7E2A",
+        "q": "#7DC25A", "s": "#F2D49A", "S": "#D9B46E"}
 
 
-def _frond(g, control, end, role, thick=4.2):
-    """A leaf along a curve: narrow at the crown, wide in the middle, pointed
-    tip, with a midrib. Returns the midrib pixels."""
-    rib = []
-    for i in range(61):
-        t = i / 60
-        x, y = _bez(TREE_CROWN, control, end, t)
-        r = thick * (0.35 + 0.65 * math.sin(math.pi * min(1.0, t * 1.05))) / 2
-        for py in range(int(y - r - 1), int(y + r + 2)):
-            for px in range(int(x - r - 1), int(x + r + 2)):
-                if (px + 0.5 - x) ** 2 + (py + 0.5 - y) ** 2 <= r * r + 0.15:
-                    g.px([(px, py)], role)
-        if 0.2 < t < 0.85:
-            rib.append((int(x), int(y)))
-    return rib
+def _palm_frond(g, x, y, dx, dy, length, width=2.6, droop=0.06):
+    """A chunky leaf from (x, y) towards (dx, dy) that droops at the tip, with a midrib."""
+    n = math.hypot(dx, dy)
+    dx, dy = dx / n, dy / n
+    nx, ny = -dy, dx
+    for i in range(int(length * 3)):
+        t = i / 3
+        cx, cy = x + dx * t, y + dy * t + droop * t * t
+        half = width * math.sin(math.pi * min(1, (t + 1) / (length + 1))) + 0.3
+        for o in [k / 2 for k in range(-6, 7)]:
+            if abs(o) <= half:
+                role = "M" if abs(o) < 0.4 else ("l" if o < 0 else "L")
+                g.px([(round(cx + nx * o), round(cy + ny * o))], role)
+    t = length * 0.35
+    g.px([(round(x + dx * t), round(y + dy * t + droop * t * t - 1))], "m")
 
 
 def tree(source):
-    c = SOURCES[source]
-    g = Grid(TREE_W, TREE_H)
-    # Ground mound with grass and a flower.
-    g.rect(9, 42, 28, 43, "d", round_=1)
-    g.rect(12, 41, 25, 41, "d")
-    g.rect(13, 43, 28, 43, "D")
-    g.px([(11, 41), (12, 40), (14, 40), (23, 40), (25, 40), (26, 41), (10, 42), (27, 42)], "g")
-    g.px([(9, 40), (8, 41), (10, 41), (9, 42)], "w")
-    g.px([(9, 41)], "y")
-    # Trunk: leans a little, rings every few rows, lit on the left.
-    for y in range(TREE_CROWN[1] + 2, 42):
-        f = (y - TREE_CROWN[1]) / (42 - TREE_CROWN[1])
-        cx = TREE_CROWN[0] - 3 * f * f + 1.5 * f
-        half = 1.5 + 1.2 * f
-        x0, x1 = round(cx - half), round(cx + half)
-        g.rect(x0, y, x1, y, "r" if y % 3 == 0 else "t")
-        if y % 3:
-            g.px([(x0, y)], "u")
-            g.px([(x1, y)], "T")
-    # Ribbon in the source's colour.
-    for y in (31, 32):
-        for x in range(TREE_W):
-            if g.get(x, y) in ("t", "u", "T", "r"):
-                g.px([(x, y)], "m" if y == 31 else "M")
-    g.px([(21, 33), (22, 34), (20, 33)], "m")
-    # Fronds: darker ones at the back, brighter drooping ones in front,
-    # each with a midrib so the leaves read separately.
-    ribs = []
-    for control, end, role in (((11, 0), (3, 9), "q"), ((27, 0), (35, 9), "q"), ((19, 0), (20, 1), "q"),
-                               ((8, 6), (2, 21), "g"), ((30, 6), (36, 21), "g"), ((14, 3), (9, 4), "g"), ((24, 3), (29, 4), "g")):
-        ribs.append((_frond(g, control, end, role), role))
-    for base, light, shade in (("g", "l", "G"), ("q", "L", "Q")):
-        leaf = [(x, y) for y in range(TREE_H) for x in range(TREE_W) if g.get(x, y) == base]
-        g.px([(x, y) for x, y in leaf if g.get(x, y - 1) not in (base, light)], light)
-        g.px([(x, y) for x, y in leaf if g.get(x, y + 1) is None], shade)
-    for rib, role in ribs:
-        g.px([p for p in rib if g.get(*p) in (role, "l" if role == "g" else "L")], "G" if role == "g" else "Q")
-    # A couple of coconuts where the fronds meet.
-    g.px([(17, 15), (18, 15), (20, 15), (21, 15), (17, 16), (21, 16)], "r")
-    pal = dict(TREE, m=c["m"], M=c["M"])
-    return g.render(pal, "#22401A")
+    g = Grid(38, 46)
+    # Curved, segmented trunk.
+    top, bottom, width = 14, 41, 5
+    for y in range(top, bottom + 1):
+        off = round(-0.8 * ((bottom - y) / (bottom - top)) ** 2 * 4)
+        for i in range(width):
+            role = "u" if i == 0 else ("T" if i == width - 1 else "t")
+            if (y - top) % 3 == 0:
+                role = "r" if i in (0, width - 1) else "T"
+            g.px([(16 + off + i, y)], role)
+    cx, cy = TREE_CROWN
+    for dx, dy, length in ((-1, -0.4, 14), (1, -0.4, 14), (-1, 0.3, 13), (1, 0.3, 13),
+                           (-0.4, -1, 9), (0.4, -1, 9), (0, 1, 6)):
+        _palm_frond(g, cx, cy, dx, dy, length)
+    # Sandy island with grass along the top and a few tufts.
+    for y in range(39, 45):
+        for x in range(38):
+            if ((x + 0.5 - 19) / 18) ** 2 + ((y + 0.5 - 46) / 7) ** 2 <= 1:
+                g.px([(x, y)], "q" if y <= 40 else "s" if (x * 5 + y) % 9 else "S")
+    for x in (5, 9, 29, 33):
+        g.px([(x, 39), (x, 38)], "q")
+    return g.render(TREE, "#24451A")
 
-
-# ---------------------------------------------------------------- App icon
 
 # ---------------------------------------------------------------- Bamboo pot
 #

@@ -12,12 +12,12 @@
   "sheet": {
     "image": "sheet.png",
     "frameWidth": 38,
-    "frameHeight": 34,
+    "frameHeight": 38,
     "scale": 2.5,
     "footPadding": 1,
     "mouth": [
-      36,
-      18
+      37,
+      19
     ],
     "animations": {
       "idle": {
