@@ -1,0 +1,103 @@
+{
+  "id": "capybara",
+  "name": "Capybara",
+  "species": "capybara",
+  "defaultName": "Yuzu",
+  "credit": "Treatly contributors, MIT (scripts/art/chibi.py)",
+  "treat": {
+    "name": "orange",
+    "image": "treat.png"
+  },
+  "sheet": {
+    "image": "sheet.png",
+    "frameWidth": 32,
+    "frameHeight": 26,
+    "scale": 2.5,
+    "footPadding": 1,
+    "mouth": [
+      28,
+      17
+    ],
+    "animations": {
+      "idle": {
+        "row": 0,
+        "count": 4,
+        "fps": 2
+      },
+      "walk": {
+        "row": 1,
+        "count": 4,
+        "fps": 8
+      },
+      "run": {
+        "row": 1,
+        "count": 4,
+        "fps": 14
+      },
+      "sit": {
+        "row": 2,
+        "count": 1
+      },
+      "bark": {
+        "row": 3,
+        "count": 2,
+        "fps": 5
+      },
+      "beg": {
+        "row": 4,
+        "count": 2,
+        "fps": 1.5
+      },
+      "sleep": {
+        "row": 5,
+        "count": 2,
+        "fps": 0.6
+      }
+    },
+    "wardrobe": [
+      "party-hat",
+      "bow",
+      "crown",
+      "bandana",
+      "glasses",
+      "flower"
+    ]
+  },
+  "personality": {
+    "walkSpeed": 35,
+    "runSpeed": 90,
+    "energy": 0.05,
+    "sleepiness": 0.5,
+    "rest": [
+      5,
+      12
+    ],
+    "nagSeconds": 15,
+    "patience": 2.0
+  },
+  "phrases": {
+    "carry": [
+      "{task}"
+    ],
+    "drop": [
+      "No rush. But {task}.",
+      "{name} placed this here gently. {task}."
+    ],
+    "yell": [
+      "Hey. Hey friend. {task}.",
+      "{name} is... mildly concerned about {task}."
+    ],
+    "whine": [
+      "*sits very calmly next to {task}*",
+      "{name} believes in you. {task}?"
+    ],
+    "happy": [
+      "Ok I pull up.",
+      "*vibes peacefully*"
+    ],
+    "bury": [
+      "Later is also fine. *chill*"
+    ]
+  },
+  "sound": "Frog"
+}

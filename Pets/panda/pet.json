@@ -1,0 +1,103 @@
+{
+  "id": "panda",
+  "name": "Panda",
+  "species": "panda",
+  "defaultName": "Bao",
+  "credit": "Treatly contributors, MIT (scripts/art/chibi.py)",
+  "treat": {
+    "name": "bamboo",
+    "image": "treat.png"
+  },
+  "sheet": {
+    "image": "sheet.png",
+    "frameWidth": 32,
+    "frameHeight": 26,
+    "scale": 2.5,
+    "footPadding": 1,
+    "mouth": [
+      28,
+      15
+    ],
+    "animations": {
+      "idle": {
+        "row": 0,
+        "count": 4,
+        "fps": 2
+      },
+      "walk": {
+        "row": 1,
+        "count": 4,
+        "fps": 8
+      },
+      "run": {
+        "row": 1,
+        "count": 4,
+        "fps": 14
+      },
+      "sit": {
+        "row": 2,
+        "count": 1
+      },
+      "bark": {
+        "row": 3,
+        "count": 2,
+        "fps": 5
+      },
+      "beg": {
+        "row": 4,
+        "count": 2,
+        "fps": 1.5
+      },
+      "sleep": {
+        "row": 5,
+        "count": 2,
+        "fps": 0.6
+      }
+    },
+    "wardrobe": [
+      "party-hat",
+      "bow",
+      "crown",
+      "bandana",
+      "glasses",
+      "flower"
+    ]
+  },
+  "personality": {
+    "walkSpeed": 40,
+    "runSpeed": 100,
+    "energy": 0.08,
+    "sleepiness": 0.6,
+    "rest": [
+      4,
+      10
+    ],
+    "nagSeconds": 18,
+    "patience": 1.5
+  },
+  "phrases": {
+    "carry": [
+      "{task}"
+    ],
+    "drop": [
+      "*flops down* ...{task}?",
+      "{name} brought bamboo. And {task}."
+    ],
+    "yell": [
+      "{task}! ...zzz... {task}!",
+      "{name} rolls over LOUDLY: {task}!"
+    ],
+    "whine": [
+      "*yawn* {task}... please...",
+      "{name} is too sleepy to remind you about {task}. But here we are."
+    ],
+    "happy": [
+      "*munch munch munch*",
+      "Bamboo time!"
+    ],
+    "bury": [
+      "*hides it and naps on top*"
+    ]
+  },
+  "sound": "Blow"
+}

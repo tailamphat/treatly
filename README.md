@@ -12,9 +12,12 @@ Your pet (a dog, a cat, King Kong...) roams the bottom of your screen. Each task
 | Golden Retriever | bone | patient, hopeful |
 | Husky | bone | loud, energetic, howls about everything |
 | Chihuahua | bone | tiny, yappy, runs everywhere |
+| Corgi | bone | bossy herder on tiny legs |
 | Orange Tabby | fish | chaotic, random zoomies |
 | Black Cat | fish | sleepy, silent and mysterious |
 | Sheep | clover | slow, sleepy, bleats politely |
+| Panda | bamboo | lazy, dozes off mid-nag |
+| Capybara | orange | extremely chill, nags very politely |
 | King Kong | banana | KONG SMASH |
 
 ## Install

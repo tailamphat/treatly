@@ -129,6 +129,10 @@ DOGS = {
         "b": "#D9A672", "s": "#B5824F", "w": "#F7E6CF", "line": "#3E2616",
         "ears": "big", "tail": "thin", "marks": ["muzzle", "chest"], "small": True,
     },
+    "corgi": {
+        "b": "#E3833A", "s": "#BF6526", "w": "#FFF4E2", "line": "#3A2112",
+        "ears": "big", "tail": "stub", "marks": ["muzzle", "chest", "belly", "socks", "brows"], "long": True,
+    },
 }
 
 CATS = {
@@ -244,6 +248,8 @@ def tail(g, spec, cat, bx, by, wag=0):
         g.px([(bx - 1, by), (bx - 2, by), (bx - 2, by - 1), (bx - 3, by - 1), (bx - 3 - wag, by - 2), (bx - 4 - wag, by - 2),
               (bx - 4 - wag, by - 3), (bx - 3, by)], role)
         g.px([(bx - 4 - wag, by - 1)], "w")
+    elif kind == "stub":
+        g.px([(bx - 1, by), (bx - 2, by), (bx - 2 - wag, by - 1)], role)
     else:
         g.px([(bx - 1, by), (bx - 2, by - 1), (bx - 2, by - 2), (bx - 3 - wag, by - 3)], role)
 
@@ -258,6 +264,8 @@ def quad(spec, cat, pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=
     if pose == "stand":
         by = G - 6 + bob - (1 if cat else 0)  # body top
         x0, x1 = (7, 20) if small else (5, 21)
+        if spec.get("long"):
+            x0 = 3
         if cat:
             x0, x1 = 6, 21
         tail(g, spec, cat, x0 + 1, by, wag=step % 2)
@@ -389,6 +397,130 @@ def poses_sheep():
     bark = [sheep("sit", mouth=True), sheep("sit")]
     beg = [sheep("sit", tilt=1, paw=True), sheep("sit", tilt=1)]
     sleep = [sheep("sleep"), sheep("sleep", breathe=1)]
+    return [idle, walk, sit, bark, beg, sleep]
+
+
+# ---------------------------------------------------------------- Panda
+#
+# A round white body with black legs, a black shoulder band, black ears and eye patches.
+
+PANDA = {"b": "#F7F5F0", "s": "#DCD8CE", "f": "#2E2C34", "F": "#1F1E24", "W": "#FFFFFF",
+         "e": "#2E2C34", "n": "#1F1E24", "p": "#F29BAE", "c": "#F4A7B4", "k": "#5A1E22", "line": "#1A191E"}
+
+
+def panda_head(g, hx, hy, mouth=False, blink=False):
+    """Round white head, 10x8 from (hx, hy), facing right."""
+    for ex in (hx + 1, hx + 6):
+        g.rect(ex, hy - 2, ex + 2, hy - 1, "f", round_=1)
+    g.rect(hx, hy, hx + 9, hy + 7, "b", round_=2)
+    g.rect(hx + 10, hy + 4, hx + 10, hy + 6, "b")
+    # A big droopy eye patch with a shiny eye in it.
+    g.rect(hx + 5, hy + 2, hx + 8, hy + 4, "f", round_=1)
+    g.px([(hx + 5, hy + 5), (hx + 6, hy + 5), (hx + 5, hy + 4)], "f")
+    if not blink:
+        g.px([(hx + 7, hy + 3)], "W")
+        g.px([(hx + 7, hy + 2)], "e")
+    g.px([(hx + 10, hy + 4)], "n")
+    g.px([(hx + 7, hy + 6)], "c")
+    if mouth:
+        g.px([(hx + 8, hy + 6), (hx + 9, hy + 6), (hx + 10, hy + 6)], "k")
+        g.px([(hx + 9, hy + 7)], "p")
+    return {"head": (hx, hy, 10), "eye": (hx + 7, hy + 3), "neck": (hx + 1, hy + 7)}
+
+
+def panda(pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=0, paw=False, breathe=0):
+    g = Grid(W, H)
+    if pose == "stand":
+        by = G - 8 + bob
+        for lx in (8, 17):
+            g.rect(lx, by + 4, lx + 1, G, "F")
+        g.px([(4, by + 1), (4, by + 2)], "b")
+        g.rect(5, by, 21, by + 5, "b", round_=2)
+        g.rect(8, by + 5, 15, by + 5, "s")
+        g.rect(15, by, 19, by + 5, "f", round_=1)
+        for lx, d in ((6, step), (18, -step)):
+            g.rect(lx, by + 5, lx + 1, G - 1, "f")
+            g.px([(lx + d, G), (lx + 1 + d, G)], "f")
+        return g, panda_head(g, 17, by - 6, mouth=mouth, blink=blink)
+    if pose == "sit":
+        g.rect(7, G - 7, 18, G, "b", round_=3)
+        g.rect(14, G - 8, 18, G - 4, "f", round_=1)
+        g.rect(7, G - 1, 10, G, "f")
+        if paw:
+            g.rect(17, G - 6, 20, G - 5, "f")
+        else:
+            g.rect(16, G - 4, 17, G, "f")
+        return g, panda_head(g, 12 + (1 if tilt else 0), G - 15 + tilt, mouth=mouth, blink=blink)
+    g.rect(5, G - 5 - breathe, 20, G, "b", round_=3)
+    g.rect(14, G - 5 - breathe, 17, G, "f", round_=1)
+    g.rect(6, G, 8, G, "f")
+    g.px([(21, G), (22, G)], "f")
+    return g, panda_head(g, 16, G - 8, blink=True)
+
+
+# ---------------------------------------------------------------- Capybara
+#
+# A brown barrel with a long blunt head, tiny ears and very relaxed eyes.
+
+CAPY = {"b": "#B07A4A", "s": "#8C5C32", "f": "#9A6A3E", "e": "#1E1410", "n": "#2A1A14",
+        "p": "#F29BAE", "c": "#E9967A", "k": "#5A1E22", "line": "#3A2414"}
+
+
+def capy_head(g, hx, hy, mouth=False, blink=False):
+    """Long boxy head, 12x7 from (hx, hy), facing right."""
+    g.px([(hx + 2, hy - 1), (hx + 3, hy - 1)], "s")
+    g.rect(hx, hy, hx + 11, hy + 6, "b", round_=1)
+    g.rect(hx + 9, hy + 1, hx + 11, hy + 6, "f", round_=1)
+    # Half-closed eyes: a lid over a single pixel.
+    if blink:
+        g.px([(hx + 5, hy + 2), (hx + 6, hy + 2)], "e")
+    else:
+        g.px([(hx + 5, hy + 2), (hx + 6, hy + 2)], "s")
+        g.px([(hx + 6, hy + 3)], "e")
+    g.px([(hx + 11, hy + 2)], "n")
+    g.px([(hx + 7, hy + 5)], "c")
+    if mouth:
+        g.px([(hx + 9, hy + 5), (hx + 10, hy + 5), (hx + 11, hy + 5)], "k")
+        g.px([(hx + 10, hy + 6)], "p")
+    else:
+        g.px([(hx + 10, hy + 5), (hx + 11, hy + 5)], "s")
+    return {"head": (hx, hy, 10), "eye": (hx + 6, hy + 2), "neck": (hx + 1, hy + 6)}
+
+
+def capybara(pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=0, paw=False, breathe=0):
+    g = Grid(W, H)
+    if pose == "stand":
+        by = G - 9 + bob
+        for lx in (8, 17):
+            g.rect(lx, by + 5, lx + 1, G, "s")
+        g.rect(3, by, 20, by + 6, "b", round_=3)
+        g.rect(6, by + 6, 17, by + 6, "s")
+        for lx, d in ((5, step), (17, -step)):
+            g.rect(lx, by + 6, lx + 1, G - 1, "b")
+            g.px([(lx + d, G), (lx + 1 + d, G)], "s")
+        return g, capy_head(g, 16, by - 3, mouth=mouth, blink=blink)
+    if pose == "sit":
+        g.rect(6, G - 8, 17, G, "b", round_=3)
+        g.rect(6, G, 9, G, "s")
+        if paw:
+            g.rect(16, G - 5, 19, G - 4, "b")
+        else:
+            g.rect(15, G - 3, 16, G, "b")
+            g.px([(15, G), (16, G)], "s")
+        return g, capy_head(g, 11 + (1 if tilt else 0), G - 14 + tilt, mouth=mouth, blink=blink)
+    g.rect(4, G - 6 - breathe, 20, G, "b", round_=3)
+    g.px([(21, G), (22, G)], "s")
+    return g, capy_head(g, 15, G - 7, blink=True)
+
+
+def poses_simple(draw):
+    """The six rows for a pet drawn by one function, like the sheep."""
+    walk = [draw(step=s, bob=b) for s, b in ((1, 0), (0, -1), (-1, 0), (0, -1))]
+    idle = [draw(), draw(), draw(blink=True), draw(bob=1)]
+    sit = [draw("sit")]
+    bark = [draw("sit", mouth=True), draw("sit")]
+    beg = [draw("sit", tilt=1, paw=True), draw("sit", tilt=1)]
+    sleep = [draw("sleep"), draw("sleep", breathe=1)]
     return [idle, walk, sit, bark, beg, sleep]
 
 
@@ -878,6 +1010,29 @@ def icon(size):
     return out
 
 
+def bamboo():
+    return text_sprite([
+        "...........gg.",
+        ".........gGg..",
+        "hhhhhKhhhhhKhh",
+        "bbbbbKbbbbbKbb",
+        "sssssKsssssKss",
+    ], {"h": "#C8EB8A", "b": "#8CCB52", "s": "#5E9A34", "K": "#3E6A22", "g": "#6CBF4A", "G": "#4C9A34"}, "#24451A")
+
+
+def orange():
+    return text_sprite([
+        "....kg...",
+        "...kgg...",
+        ".ohhooo..",
+        "ohhooooo.",
+        "ohooooos.",
+        "oooooooS.",
+        ".ooooSS..",
+        "..SSSS...",
+    ], {"o": "#FF9F2E", "h": "#FFD08A", "s": "#E8841A", "S": "#D06E10", "g": "#5DB04A", "k": "#3E7A2E"}, "#6A3608")
+
+
 # ---------------------------------------------------------------- Sheets
 
 def poses_quad(spec, cat):
@@ -946,6 +1101,8 @@ def main():
     for pet_id, spec in CATS.items():
         out[pet_id] = build(poses_quad(spec, True), palette_for(spec), spec["line"], W, H) + ((W, H), [27, 17])
     out["sheep"] = build(poses_sheep(), SHEEP, SHEEP["line"], W, H) + ((W, H), [26, 15])
+    out["panda"] = build(poses_simple(panda), PANDA, PANDA["line"], W, H) + ((W, H), [28, 15])
+    out["capybara"] = build(poses_simple(capybara), CAPY, CAPY["line"], W, H) + ((W, H), [28, 17])
     out["kong"] = build(poses_kong(), KONG, KONG["line"], KW, KH) + ((KW, KH), [34, 15])
 
     for pet_id, (pet, wears, (w, h), mouth) in out.items():
@@ -957,7 +1114,8 @@ def main():
         print("wrote", pet_id)
 
     extras = {f"Resources/Art/poop-{style}.png": poop(style) for style in POOP_STYLES}
-    for pet_id, treat in (("shiba", bone), ("golden", bone), ("chihuahua", bone), ("husky", bone), ("sheep", clover),
+    for pet_id, treat in (("shiba", bone), ("golden", bone), ("chihuahua", bone), ("husky", bone), ("corgi", bone), ("sheep", clover),
+                          ("panda", bamboo), ("capybara", orange),
                           ("orange-tabby", fish), ("black-cat", fish), ("kong", banana)):
         extras[f"Pets/{pet_id}/treat.png"] = treat()
     for path, rows in extras.items():
@@ -997,7 +1155,7 @@ def main():
                 over = [line[0:w] for line in wears[item][0:h]]
                 row.append([[o or p for p, o in zip(pl, ol)] for pl, ol in zip(frame, over)])
             tiles.append(row)
-        tiles.append(out_bowls + [poop(style) for style in POOP_STYLES] + [bone(), fish(), banana(), clover()])
+        tiles.append(out_bowls + [poop(style) for style in POOP_STYLES] + [bone(), fish(), banana(), clover(), bamboo(), orange()])
         tw = max(len(r[0][0]) for r in tiles)
         th = max(len(r[0]) for r in tiles)
         cols = max(len(r) for r in tiles)

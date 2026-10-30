@@ -1,0 +1,103 @@
+{
+  "id": "corgi",
+  "name": "Corgi",
+  "species": "dog",
+  "defaultName": "Biscuit",
+  "credit": "Treatly contributors, MIT (scripts/art/chibi.py)",
+  "treat": {
+    "name": "bone",
+    "image": "treat.png"
+  },
+  "sheet": {
+    "image": "sheet.png",
+    "frameWidth": 32,
+    "frameHeight": 26,
+    "scale": 2.5,
+    "footPadding": 1,
+    "mouth": [
+      29,
+      15
+    ],
+    "animations": {
+      "idle": {
+        "row": 0,
+        "count": 4,
+        "fps": 2
+      },
+      "walk": {
+        "row": 1,
+        "count": 4,
+        "fps": 8
+      },
+      "run": {
+        "row": 1,
+        "count": 4,
+        "fps": 14
+      },
+      "sit": {
+        "row": 2,
+        "count": 1
+      },
+      "bark": {
+        "row": 3,
+        "count": 2,
+        "fps": 5
+      },
+      "beg": {
+        "row": 4,
+        "count": 2,
+        "fps": 1.5
+      },
+      "sleep": {
+        "row": 5,
+        "count": 2,
+        "fps": 0.6
+      }
+    },
+    "wardrobe": [
+      "party-hat",
+      "bow",
+      "crown",
+      "bandana",
+      "glasses",
+      "flower"
+    ]
+  },
+  "personality": {
+    "walkSpeed": 75,
+    "runSpeed": 210,
+    "energy": 0.5,
+    "sleepiness": 0.15,
+    "rest": [
+      1,
+      3
+    ],
+    "nagSeconds": 25,
+    "patience": 0.8
+  },
+  "phrases": {
+    "carry": [
+      "{task}"
+    ],
+    "drop": [
+      "*herds you toward* {task}",
+      "{name} has organised your day. {task}."
+    ],
+    "yell": [
+      "BORK BORK! {task}!",
+      "{name} is the boss now: {task}!"
+    ],
+    "whine": [
+      "*sad stumpy wiggle* {task}...",
+      "{name} herded everyone except you. {task}."
+    ],
+    "happy": [
+      "*happy butt wiggle*",
+      "Zoomies on tiny legs!"
+    ],
+    "bury": [
+      "Fine. *digs with very short legs*"
+    ]
+  },
+  "sound": "Funk"
+}
