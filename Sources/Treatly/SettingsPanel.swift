@@ -255,6 +255,17 @@ struct SettingsView: View {
                 model.run { $0.settings.soundOn = on }
             }))
             .toggleStyle(.switch)
+            Toggle("Listen along with music", isOn: Binding(get: { app.settings.listenToMusic }, set: { on in
+                model.run { $0.settings.listenToMusic = on }
+            }))
+            .toggleStyle(.switch)
+            if app.settings.listenToMusic {
+                Toggle("Count browsers (YouTube…)", isOn: Binding(get: { app.settings.musicFromBrowsers }, set: { on in
+                    model.run { $0.settings.musicFromBrowsers = on }
+                }))
+                .toggleStyle(.switch)
+                .help("Browsers can keep the speakers open while silent, so this is off by default.")
+            }
         }
     }
 

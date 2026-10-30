@@ -51,7 +51,7 @@ The app lives in the menu bar (paw icon). It needs a real `.app` bundle for the 
 - **Bowl**: pick Classic, Steel, Ceramic, Puppy or Country Tub in Settings or the menu.
 - **Poop**: after eating, the pet leaves a poop for 10 to 15 seconds. Pick Cute, Classic, Golden or Rainbow in Settings, or turn it off.
 - **Wardrobe**: dress the pet in a party hat, bow, crown, bandana, sunglasses, a flower or headphones (Settings or the menu).
-- **Music**: when a music or video app is playing, the pet sits down, puts its headphones on and bobs along.
+- **Music**: when a music or video app (Music, Spotify, VLC...) is playing, the pet sits down, puts its headphones on and bobs along. Browsers count too if you turn that on in Settings; it's off by default because a browser can keep the speakers busy while silent.
 - **Menu bar**: choose the pet, rename it, pick lists, set how fast nagging escalates, turn on sound.
 
 ## Art

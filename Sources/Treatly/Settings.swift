@@ -43,6 +43,19 @@ final class Settings {
     }
 
     /// Off by default: yelling is a speech bubble unless you opt in.
+    /// Sit and listen along when music plays. On unless turned off.
+    var listenToMusic: Bool {
+        get { defaults.object(forKey: "listenToMusic") as? Bool ?? true }
+        set { defaults.set(newValue, forKey: "listenToMusic") }
+    }
+
+    /// Count sound from browsers (YouTube...) as music. Off by default: browsers
+    /// can keep the speakers open while silent (a paused tab, a web app).
+    var musicFromBrowsers: Bool {
+        get { defaults.bool(forKey: "musicFromBrowsers") }
+        set { defaults.set(newValue, forKey: "musicFromBrowsers") }
+    }
+
     var soundOn: Bool {
         get { defaults.bool(forKey: "soundOn") }
         set { defaults.set(newValue, forKey: "soundOn") }

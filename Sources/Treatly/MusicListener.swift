@@ -4,7 +4,8 @@ import Foundation
 /// Notices when a music or video app is playing sound, so the pet can sit and
 /// listen along. It asks Core Audio which apps are sending sound to the speakers,
 /// which needs no permission and never sees what is playing. Other apps (alerts,
-/// apps that keep the speakers open while silent, the pet itself) don't count.
+/// apps that keep the speakers open while silent, the pet itself) don't count,
+/// and browsers only count when turned on in Settings.
 @MainActor
 final class MusicListener {
     /// True once music has been playing for a few seconds, false a few seconds after it stops.
@@ -15,15 +16,21 @@ final class MusicListener {
     /// How long music has to keep playing (or stay quiet) before the pet reacts.
     private let settle: TimeInterval = 3
 
-    /// Apps that play music or video, by bundle id prefix (helpers included).
-    static let mediaApps = [
+    /// Music and video apps, by bundle id prefix (helpers included). They only
+    /// send sound while they really play, so they are always trusted.
+    static let players = [
         "com.apple.Music", "com.apple.podcasts", "com.apple.TV", "com.apple.QuickTimePlayerX",
-        "com.apple.WebKit.GPU", "com.apple.Safari",
         "com.spotify.client", "com.tidal.desktop", "com.amazon.music", "com.deezer", "com.pandora",
-        "com.google.Chrome", "company.thebrowser", "org.mozilla.firefox", "com.microsoft.edgemac",
-        "com.brave.Browser", "com.operasoftware", "com.vivaldi",
         "org.videolan.vlc", "com.colliderli.iina", "com.soundcloud", "com.bandcamp",
     ]
+    /// Browsers can keep the speakers open while silent, so they only count when
+    /// the user turns that on in Settings.
+    static let browsers = [
+        "com.apple.WebKit.GPU", "com.apple.Safari",
+        "com.google.Chrome", "company.thebrowser", "org.mozilla.firefox", "com.microsoft.edgemac",
+        "com.brave.Browser", "com.operasoftware", "com.vivaldi",
+    ]
+    private let settings = Settings()
 
     init() {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
@@ -32,7 +39,7 @@ final class MusicListener {
     }
 
     private func poll() {
-        let playing = Self.mediaIsPlaying()
+        let playing = settings.listenToMusic && Self.mediaIsPlaying(browsers: settings.musicFromBrowsers)
         if playing == isPlaying {
             since = nil
         } else if let since {
@@ -42,12 +49,12 @@ final class MusicListener {
         }
     }
 
-    static func isMediaApp(_ bundleID: String) -> Bool {
-        mediaApps.contains { bundleID.hasPrefix($0) }
+    static func isMediaApp(_ bundleID: String, browsers: Bool) -> Bool {
+        (players + (browsers ? Self.browsers : [])).contains { bundleID.hasPrefix($0) }
     }
 
     /// Whether any music or video app is sending sound to an output right now.
-    private static func mediaIsPlaying() -> Bool {
+    private static func mediaIsPlaying(browsers: Bool) -> Bool {
         let system = AudioObjectID(kAudioObjectSystemObject)
         var address = AudioObjectPropertyAddress(mSelector: kAudioHardwarePropertyProcessObjectList,
                                                  mScope: kAudioObjectPropertyScopeGlobal,
@@ -70,7 +77,7 @@ final class MusicListener {
                                                        mElement: kAudioObjectPropertyElementMain)
             guard AudioObjectGetPropertyData(process, &idAddress, 0, nil, &idSize, &bundleID) == noErr,
                   let id = bundleID?.takeRetainedValue() as String? else { return false }
-            return isMediaApp(id)
+            return isMediaApp(id, browsers: browsers)
         }
     }
 }
