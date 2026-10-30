@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Treatly - a desktop pet that nags you about your todos</title>
+<meta name="description" content="Treatly is a tiny pixel pet for your Mac. It fetches your Apple Reminders from its bowl as treats and nags you until you get them done.">
+<meta property="og:title" content="Treatly">
+<meta property="og:description" content="Your todos are treats. Your pet won't let you forget them.">
+<meta property="og:image" content="icon.png">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="#"><img src="icon.png" alt="" width="32" height="32"> Treatly</a>
+  <nav>
+    <a href="#how">How it works</a>
+    <a href="#pets">Pets</a>
+    <a href="#install">Install</a>
+    <a href="https://github.com/tailamphat/treatly">GitHub</a>
+  </nav>
+</header>
+
+<main>
+<section class="hero">
+  <h1>Your todos are treats.<br><span>Your pet won't let you forget.</span></h1>
+  <p class="lede">Treatly is a tiny pixel pet that lives on your Mac desktop. It fetches your Apple Reminders from its bowl, carries them around and nags louder and louder until you get them done.</p>
+
+  <div class="cta">
+    <div class="cmd">
+      <code>brew install --cask tailamphat/tap/treatly</code>
+      <button class="copy" type="button" data-copy="brew install --cask tailamphat/tap/treatly">Copy</button>
+    </div>
+    <a class="btn" href="https://github.com/tailamphat/treatly/releases/latest">Download</a>
+  </div>
+  <p class="fine">Free and open source. macOS 14 Sonoma or later.</p>
+
+  <div class="desk">
+    <div class="menubar"><span>Finder</span><span>File</span><span>Edit</span><span class="spacer"></span><span class="paw" aria-hidden="true">🐾</span><span id="clock">9:41</span></div>
+    <div id="stage" aria-label="Animated demo of a Treatly pet fetching and nagging about a task"></div>
+  </div>
+
+  <ol class="steps" id="steps">
+    <li data-step="fetch">Fetch</li>
+    <li data-step="carry">Carry</li>
+    <li data-step="drop">Drop</li>
+    <li data-step="yell">Yell</li>
+    <li data-step="whine">Whine</li>
+    <li data-step="done">Done</li>
+  </ol>
+
+  <div class="tryit">
+    <div class="row"><span class="label">Pet</span><div class="chips" id="pick-pet"></div></div>
+    <div class="row"><span class="label">Wardrobe</span><div class="chips" id="pick-wear"></div></div>
+    <div class="row"><span class="label">Bowl</span><div class="chips" id="pick-bowl"></div></div>
+    <div class="row"><span class="label">Poop</span><div class="chips" id="pick-poop"></div></div>
+  </div>
+</section>
+
+<section id="how">
+  <h2>How it works</h2>
+  <div class="cards">
+    <article class="card">
+      <div class="art" id="how-bowl"></div>
+      <h3>Tasks become treats</h3>
+      <p>Every task in the Reminders lists you pick is a treat in the bowl. The pet fetches the most urgent one and carries it around the bottom of your screen.</p>
+    </article>
+    <article class="card">
+      <div class="art" id="how-nag"></div>
+      <h3>The nagging escalates</h3>
+      <p>Ignore it and the pet drops the treat in front of you, then yells, then whines. It comes in bursts with roaming breaks, faster the more overdue the task is.</p>
+    </article>
+    <article class="card">
+      <div class="art" id="how-done"></div>
+      <h3>Done means dinner</h3>
+      <p>Click the pet and choose Done. It eats the treat, the task is completed in Reminders, and it leaves a little present that cleans itself up.</p>
+    </article>
+    <article class="card">
+      <div class="art" id="how-snooze"></div>
+      <h3>Snooze buries it</h3>
+      <p>Not now? Snooze for 10 minutes or an hour and the pet buries the treat. It will dig it back up later.</p>
+    </article>
+  </div>
+</section>
+
+<section id="pets">
+  <h2>Pick your pet</h2>
+  <p class="sub">Each one has its own walk speed, energy, sleepiness, patience and things to say. Click one to try it above.</p>
+  <div class="gallery" id="gallery"></div>
+</section>
+
+<section id="features">
+  <h2>Small pet, nice details</h2>
+  <ul class="features">
+    <li><b>Apple Reminders</b><span>Choose which lists feed the bowl. Changes sync both ways.</span></li>
+    <li><b>Your pace</b><span>Set how quickly the nagging escalates, and turn sound on or off.</span></li>
+    <li><b>Dress up</b><span>Party hat, bow, crown, bandana, sunglasses or a flower.</span></li>
+    <li><b>Multiple displays</b><span>Drag the pet and the bowl to any screen. They stay put.</span></li>
+    <li><b>Private</b><span>No account, no servers, no network. Your tasks never leave your Mac.</span></li>
+    <li><b>Make your own pet</b><span>Pets are a JSON file and a sprite sheet. <a href="https://github.com/tailamphat/treatly/blob/main/docs/pet-packs.md">Read the guide</a>.</span></li>
+  </ul>
+</section>
+
+<section id="install">
+  <h2>Install</h2>
+  <div class="install">
+    <div>
+      <h3>Homebrew</h3>
+      <div class="cmd">
+        <code>brew install --cask tailamphat/tap/treatly</code>
+        <button class="copy" type="button" data-copy="brew install --cask tailamphat/tap/treatly">Copy</button>
+      </div>
+    </div>
+    <div>
+      <h3>Download</h3>
+      <p>Get <code>Treatly-&lt;version&gt;.zip</code> from <a href="https://github.com/tailamphat/treatly/releases/latest">Releases</a>, unzip it and move Treatly to Applications.</p>
+    </div>
+  </div>
+  <p class="note"><b>First launch:</b> Treatly isn't notarized yet, so macOS may say it can't verify the app. Open System Settings &gt; Privacy &amp; Security and click <b>Open Anyway</b> next to Treatly. Then allow Reminders access, and look for the paw in the menu bar.</p>
+</section>
+</main>
+
+<footer>
+  <p><img src="icon.png" alt="" width="20" height="20"> Treatly is free and open source under the MIT license. All art is generated by a script in the repo.</p>
+  <p><a href="https://github.com/tailamphat/treatly">Source on GitHub</a> · <a href="https://github.com/tailamphat/treatly/issues">Report an issue</a></p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
