@@ -1,0 +1,103 @@
+{
+  "id": "siamese",
+  "name": "Siamese",
+  "species": "cat",
+  "defaultName": "Kiki",
+  "credit": "Treatly contributors, MIT (scripts/art/chibi.py)",
+  "treat": {
+    "name": "fish",
+    "image": "treat.png"
+  },
+  "sheet": {
+    "image": "sheet.png",
+    "frameWidth": 32,
+    "frameHeight": 26,
+    "scale": 2.5,
+    "footPadding": 1,
+    "mouth": [
+      27,
+      17
+    ],
+    "animations": {
+      "idle": {
+        "row": 0,
+        "count": 4,
+        "fps": 2
+      },
+      "walk": {
+        "row": 1,
+        "count": 4,
+        "fps": 8
+      },
+      "run": {
+        "row": 1,
+        "count": 4,
+        "fps": 14
+      },
+      "sit": {
+        "row": 2,
+        "count": 1
+      },
+      "bark": {
+        "row": 3,
+        "count": 2,
+        "fps": 5
+      },
+      "beg": {
+        "row": 4,
+        "count": 2,
+        "fps": 1.5
+      },
+      "sleep": {
+        "row": 5,
+        "count": 2,
+        "fps": 0.6
+      }
+    },
+    "wardrobe": [
+      "party-hat",
+      "bow",
+      "crown",
+      "bandana",
+      "glasses",
+      "flower"
+    ]
+  },
+  "personality": {
+    "walkSpeed": 70,
+    "runSpeed": 220,
+    "energy": 0.35,
+    "sleepiness": 0.25,
+    "rest": [
+      1.5,
+      4
+    ],
+    "nagSeconds": 35,
+    "patience": 0.6
+  },
+  "phrases": {
+    "carry": [
+      "{task}"
+    ],
+    "drop": [
+      "MROW. {task}.",
+      "{name} has opinions about {task}."
+    ],
+    "yell": [
+      "MRAAAOOOW! {task}!",
+      "{name} will not stop talking about {task}!"
+    ],
+    "whine": [
+      "*very long meow* {task}...",
+      "{name} has been saying {task} for ages."
+    ],
+    "happy": [
+      "*chatters happily*",
+      "Finally. Thank you."
+    ],
+    "bury": [
+      "*meows and hides it*"
+    ]
+  },
+  "sound": "Purr"
+}

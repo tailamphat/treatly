@@ -1,0 +1,103 @@
+{
+  "id": "tuxedo",
+  "name": "Tuxedo",
+  "species": "cat",
+  "defaultName": "Tux",
+  "credit": "Treatly contributors, MIT (scripts/art/chibi.py)",
+  "treat": {
+    "name": "fish",
+    "image": "treat.png"
+  },
+  "sheet": {
+    "image": "sheet.png",
+    "frameWidth": 32,
+    "frameHeight": 26,
+    "scale": 2.5,
+    "footPadding": 1,
+    "mouth": [
+      27,
+      17
+    ],
+    "animations": {
+      "idle": {
+        "row": 0,
+        "count": 4,
+        "fps": 2
+      },
+      "walk": {
+        "row": 1,
+        "count": 4,
+        "fps": 8
+      },
+      "run": {
+        "row": 1,
+        "count": 4,
+        "fps": 14
+      },
+      "sit": {
+        "row": 2,
+        "count": 1
+      },
+      "bark": {
+        "row": 3,
+        "count": 2,
+        "fps": 5
+      },
+      "beg": {
+        "row": 4,
+        "count": 2,
+        "fps": 1.5
+      },
+      "sleep": {
+        "row": 5,
+        "count": 2,
+        "fps": 0.6
+      }
+    },
+    "wardrobe": [
+      "party-hat",
+      "bow",
+      "crown",
+      "bandana",
+      "glasses",
+      "flower"
+    ]
+  },
+  "personality": {
+    "walkSpeed": 60,
+    "runSpeed": 190,
+    "energy": 0.2,
+    "sleepiness": 0.3,
+    "rest": [
+      2,
+      5
+    ],
+    "nagSeconds": 25,
+    "patience": 1.2
+  },
+  "phrases": {
+    "carry": [
+      "{task}"
+    ],
+    "drop": [
+      "Your {task}, as requested.",
+      "{name} presents: {task}."
+    ],
+    "yell": [
+      "Ahem. {task}. Immediately.",
+      "{name} must insist: {task}!"
+    ],
+    "whine": [
+      "*adjusts bow tie sadly* {task}...",
+      "{name} is most disappointed about {task}."
+    ],
+    "happy": [
+      "Splendid work.",
+      "*dignified purr*"
+    ],
+    "bury": [
+      "Very good. I shall store it for later."
+    ]
+  },
+  "sound": "Glass"
+}

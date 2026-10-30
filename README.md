@@ -15,6 +15,9 @@ Your pet (a dog, a cat, a panda, a mighty gorilla...) roams the bottom of your s
 | Corgi | bone | bossy herder on tiny legs |
 | Orange Tabby | fish | chaotic, random zoomies |
 | Black Cat | fish | sleepy, silent and mysterious |
+| Siamese | fish | very talkative, the loudest of the cats |
+| Calico | fish | moody, changes her mind a lot |
+| Tuxedo | fish | polite but insistent, like a tiny butler |
 | Sheep | clover | slow, sleepy, bleats politely |
 | Panda | bamboo | lazy, dozes off mid-nag |
 | Capybara | orange | extremely chill, nags very politely |

@@ -144,6 +144,21 @@ CATS = {
         "b": "#34323F", "s": "#24222C", "w": "#34323F", "i": "#F2D04A", "line": "#0E0D12",
         "marks": [], "nose": "#C77B8E",
     },
+    # Cream with dark "points": ears, face mask, paws and tail.
+    "siamese": {
+        "b": "#F2E4CC", "s": "#D9C4A2", "w": "#F2E4CC", "m": "#5A4030", "i": "#6EC1F5", "line": "#3A2A1E",
+        "marks": ["points"],
+    },
+    # White with orange (o) and black (q) patches.
+    "calico": {
+        "b": "#FBF6EE", "s": "#DCD4C6", "w": "#FBF6EE", "o": "#F09A48", "q": "#34323F", "i": "#E0B83A", "line": "#3A2A1E",
+        "marks": ["calico"],
+    },
+    # Black with a white chin, chest, belly and paws.
+    "tuxedo": {
+        "b": "#2E2C36", "s": "#22212A", "w": "#FFFFFF", "i": "#7ACB5A", "line": "#0E0D12",
+        "marks": ["muzzle", "chest", "belly", "socks"], "nose": "#C77B8E",
+    },
 }
 
 COMMON = {"e": "#1E1410", "n": "#2A1A14", "p": "#F29BAE", "c": "#F7A7A0", "k": "#5A1E22"}
@@ -154,7 +169,7 @@ def palette_for(spec):
     pal.update({k: v for k, v in spec.items() if isinstance(v, str) and len(k) == 1})
     if "nose" in spec:
         pal["n"] = spec["nose"]
-    if spec.get("b", "").upper() in ("#34323F",):
+    if spec.get("b", "").upper() in ("#34323F", "#2E2C36"):
         pal["e"] = "#0E0D12"
     return pal
 
@@ -166,8 +181,9 @@ def head(g, spec, cat, hx, hy, mouth=False, blink=False, look_up=False):
     marks = spec["marks"]
     # Ears first so the head covers their base.
     ears = "cat" if cat else spec["ears"]
+    ear_roles = ("m", "m") if "points" in marks else ("q", "o") if "calico" in marks else ("s", "b")
     if ears in ("pointy", "cat"):
-        for ex, role in ((hx + 1, "s"), (hx + 5, "b")):
+        for ex, role in ((hx + 1, ear_roles[0]), (hx + 5, ear_roles[1])):
             g.px([(ex + 1, hy - 3)], role)
             g.px([(ex, hy - 2), (ex + 1, hy - 2), (ex + 2, hy - 2)], role)
             g.px([(ex, hy - 1), (ex + 1, hy - 1), (ex + 2, hy - 1)], role)
@@ -194,6 +210,11 @@ def head(g, spec, cat, hx, hy, mouth=False, blink=False, look_up=False):
     if "muzzle" in marks:
         g.rect(hx + 5, hy + 6, hx + 9 if cat else hx + 10, hy + 8, "w", round_=1)
         g.px([(hx + 7, hy + 5), (hx + 8, hy + 5), (hx + 9, hy + 5)] if not cat else [(hx + 8, hy + 5)], "w")
+    if "points" in marks:
+        g.rect(hx + 5, hy + 4, hx + 9, hy + 8, "m", round_=1)
+    if "calico" in marks:
+        g.rect(hx, hy, hx + 3, hy + 3, "o", round_=1)
+        g.px([(hx + 8, hy), (hx + 9, hy + 1)], "q")
     if "mask" in marks:
         g.rect(hx + 5, hy + 2, hx + 9, hy + 5, "w", round_=1)
         g.px([(hx + 6, hy + 1)], "w")
@@ -235,7 +256,9 @@ def tail(g, spec, cat, bx, by, wag=0):
     """bx, by is where the tail meets the top of the back."""
     role = "b"
     if cat:
-        tip = "m" if "stripes" in spec["marks"] else "b"
+        marks = spec["marks"]
+        role = "m" if "points" in marks else "q" if "calico" in marks else "b"
+        tip = "m" if "stripes" in marks or "points" in marks else "o" if "calico" in marks else role
         g.px([(bx - 1, by + 1), (bx - 2, by), (bx - 3, by - 1), (bx - 3, by - 2), (bx - 3, by - 3)], role)
         g.px([(bx - 3 + wag, by - 4), (bx - 2 + wag, by - 5)], tip)
         return
@@ -259,7 +282,7 @@ def quad(spec, cat, pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=
     g = Grid(W, H)
     marks = spec["marks"]
     small = spec.get("small", False)
-    sock = "w" if "socks" in marks else None
+    sock = "w" if "socks" in marks else "m" if "points" in marks else None
 
     if pose == "stand":
         by = G - 6 + bob - (1 if cat else 0)  # body top
@@ -283,6 +306,10 @@ def quad(spec, cat, pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=
         if "stripes" in marks:
             for sx in range(x0 + 3, x1 - 3, 3):
                 g.px([(sx, by), (sx, by + 1)], "m")
+        if "calico" in marks:
+            g.rect(x0 + 1, by, x0 + 5, by + 2, "o", round_=1)
+            g.rect(x0 + 8, by, x0 + 11, by + 1, "q", round_=1)
+            g.px([(x0 + 9, by + 2)], "q")
         for lx, d in ((x0, step), (x1 - 1, -step)):
             g.rect(lx, legs_top, lx + 1, G - 1, "b")
             g.px([(lx + d, G), (lx + 1 + d, G)], sock or "b")
@@ -299,6 +326,9 @@ def quad(spec, cat, pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=
             g.rect(x0 + 10, G - 7, x0 + 12, G - 3, "w")
         if "stripes" in marks:
             g.px([(x0 + 2, G - 4), (x0 + 2, G - 3), (x0 + 4, G - 5), (x0 + 4, G - 4)], "m")
+        if "calico" in marks:
+            g.rect(x0 + 1, G - 5, x0 + 4, G - 3, "o", round_=1)
+            g.rect(x0 + 7, G - 9, x0 + 9, G - 8, "q")
         g.rect(x0 + 10, G - 3, x0 + 10, G, "s")
         if paw:
             g.rect(x0 + 12, G - 5, x0 + 13, G - 4, "b")
@@ -321,6 +351,9 @@ def quad(spec, cat, pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=
     if "stripes" in marks:
         for sx in range(x0 + 3, 18, 3):
             g.px([(sx, top), (sx, top + 1)], "m")
+    if "calico" in marks:
+        g.rect(x0 + 2, top, x0 + 6, top + 2, "o", round_=1)
+        g.rect(x0 + 9, top, x0 + 12, top + 1, "q", round_=1)
     g.rect(21, G, 25, G, sock or "w" if "muzzle" in marks else "b")
     anchors = head(g, spec, cat, 15, G - 8, blink=True)
     return g, anchors
@@ -1256,7 +1289,8 @@ def main():
     extras = {f"Resources/Art/poop-{style}.png": poop(style) for style in POOP_STYLES}
     for pet_id, treat in (("shiba", bone), ("golden", bone), ("chihuahua", bone), ("husky", bone), ("corgi", bone), ("sheep", clover),
                           ("panda", bamboo), ("capybara", orange),
-                          ("orange-tabby", fish), ("black-cat", fish), ("mighty", banana)):
+                          ("orange-tabby", fish), ("black-cat", fish),
+                          ("siamese", fish), ("calico", fish), ("tuxedo", fish), ("mighty", banana)):
         extras[f"Pets/{pet_id}/treat.png"] = treat()
     for name, angle in BAMBOO_HOLDS.items():
         extras[f"Pets/panda/treat-{name}.png"] = bamboo_held(angle)

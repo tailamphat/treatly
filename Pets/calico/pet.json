@@ -1,0 +1,103 @@
+{
+  "id": "calico",
+  "name": "Calico",
+  "species": "cat",
+  "defaultName": "Patches",
+  "credit": "Treatly contributors, MIT (scripts/art/chibi.py)",
+  "treat": {
+    "name": "fish",
+    "image": "treat.png"
+  },
+  "sheet": {
+    "image": "sheet.png",
+    "frameWidth": 32,
+    "frameHeight": 26,
+    "scale": 2.5,
+    "footPadding": 1,
+    "mouth": [
+      27,
+      17
+    ],
+    "animations": {
+      "idle": {
+        "row": 0,
+        "count": 4,
+        "fps": 2
+      },
+      "walk": {
+        "row": 1,
+        "count": 4,
+        "fps": 8
+      },
+      "run": {
+        "row": 1,
+        "count": 4,
+        "fps": 14
+      },
+      "sit": {
+        "row": 2,
+        "count": 1
+      },
+      "bark": {
+        "row": 3,
+        "count": 2,
+        "fps": 5
+      },
+      "beg": {
+        "row": 4,
+        "count": 2,
+        "fps": 1.5
+      },
+      "sleep": {
+        "row": 5,
+        "count": 2,
+        "fps": 0.6
+      }
+    },
+    "wardrobe": [
+      "party-hat",
+      "bow",
+      "crown",
+      "bandana",
+      "glasses",
+      "flower"
+    ]
+  },
+  "personality": {
+    "walkSpeed": 65,
+    "runSpeed": 210,
+    "energy": 0.3,
+    "sleepiness": 0.35,
+    "rest": [
+      2,
+      6
+    ],
+    "nagSeconds": 20,
+    "patience": 1.0
+  },
+  "phrases": {
+    "carry": [
+      "{task}"
+    ],
+    "drop": [
+      "Here. {task}. Or not. Actually yes.",
+      "{name} changed her mind twice. {task}."
+    ],
+    "yell": [
+      "MRRP?! {task}!",
+      "{name} DEMANDS {task}! ...probably."
+    ],
+    "whine": [
+      "*flops dramatically* {task}...",
+      "{name} is in a mood about {task}."
+    ],
+    "happy": [
+      "*purrs, then bites you gently*",
+      "Acceptable. For now."
+    ],
+    "bury": [
+      "*bats it under the sofa*"
+    ]
+  },
+  "sound": "Tink"
+}
