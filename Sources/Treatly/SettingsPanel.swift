@@ -29,7 +29,8 @@ final class SettingsPanel: NSPanel {
         self.model = model
         super.init(
             contentRect: NSRect(x: 0, y: 0, width: 360, height: 620),
-            styleMask: [.titled, .closable, .fullSizeContentView],
+            // No full-size content: the page scrolls below the title bar, never under its buttons.
+            styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
         )
@@ -74,7 +75,7 @@ struct SettingsView: View {
                 footer
             }
             .padding(.horizontal, 20)
-            .padding(.top, 34)
+            .padding(.top, 12)
             .padding(.bottom, 20)
         }
         .frame(width: 360, height: 620)
