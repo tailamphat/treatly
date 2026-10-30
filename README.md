@@ -18,7 +18,7 @@ Your pet (a dog, a cat, King Kong...) roams the bottom of your screen. Each task
 | Sheep | clover | slow, sleepy, bleats politely |
 | Panda | bamboo | lazy, dozes off mid-nag |
 | Capybara | orange | extremely chill, nags very politely |
-| Zappy | berry | electric mouse: Thunderbolt when it yells, Quick Attack when it runs |
+| Zappy | berry | electric mouse with a plug tail: leaps and zaps for fun, Quick Attack when it runs |
 | King Kong | banana | KONG SMASH |
 
 ## Install

@@ -555,9 +555,9 @@ def poses_simple(draw):
 
 ZW, ZH = 40, 32
 ZG = 29
-ZAPPY = {"b": "#FFD93B", "s": "#E0A91E", "w": "#FFF4C2", "t": "#C9661E", "r": "#F2545B", "R": "#FF8A8F",
-         "e": "#1E1410", "W": "#FFFFFF", "n": "#2A1A14", "k": "#7A2A2A", "p": "#F29BAE",
-         "Y": "#FFF27A", "S": "#FFFFFF", "line": "#4A3010"}
+ZAPPY = {"b": "#FFDA4D", "s": "#E6B12A", "w": "#FFF6D6", "o": "#F28A1E", "c": "#FF9AAE", "R": "#FF5A6E",
+         "e": "#1E1410", "W": "#FFFFFF", "n": "#2A1A14", "k": "#7A2A2A", "p": "#F7A8BC",
+         "d": "#5A5560", "P": "#D6D3DC", "Q": "#8A8794", "Y": "#FFF27A", "S": "#FFFFFF", "line": "#4A3010"}
 BOLT = ["..YY", ".YY.", "YYYY", "..YY", ".YY.", "YY..", "Y..."]
 ZAPPY_MOUTH = [27, 20]
 
@@ -569,17 +569,18 @@ def _bolt(g, x, y, big=False):
 
 
 def zappy_head(g, hx, hy, mouth=False, blink=False, spark=False):
-    """Round head, 12x9 from (hx, hy), with tall ears; facing right."""
-    for i in range(6):  # back ear leans back, front ear leans forward
-        g.px([(hx + 2 - i // 3, hy - 1 - i), (hx + 3 - i // 3, hy - 1 - i)], "t" if i >= 4 else "s")
-        g.px([(hx + 7 + i // 3, hy - 1 - i), (hx + 8 + i // 3, hy - 1 - i)], "t" if i >= 4 else "b")
+    """Round chubby head, 12x9 from (hx, hy), with round ears; facing right."""
+    for ex, role in ((hx + 1, "s"), (hx + 7, "b")):
+        g.rect(ex, hy - 3, ex + 3, hy, role, round_=1)
+        g.px([(ex + 1, hy - 2), (ex + 2, hy - 2)], "p")
     g.rect(hx, hy, hx + 11, hy + 8, "b", round_=3)
+    g.px([(hx + 6, hy + 1), (hx + 5, hy + 2), (hx + 6, hy + 2), (hx + 5, hy + 3)], "o")  # lightning mark
     if blink:
         g.px([(hx + 7, hy + 4), (hx + 8, hy + 3), (hx + 9, hy + 4)], "e")  # ^ eyes
     else:
-        g.rect(hx + 8, hy + 3, hx + 9, hy + 4, "e")
+        g.rect(hx + 8, hy + 3, hx + 9, hy + 5, "e")
         g.px([(hx + 8, hy + 3)], "W")
-    g.rect(hx + 8, hy + 6, hx + 10, hy + 7, "R" if spark else "r", round_=1)
+    g.px([(hx + 7, hy + 6), (hx + 8, hy + 6)], "R" if spark else "c")
     g.px([(hx + 11, hy + 5)], "n")
     if mouth:
         g.px([(hx + 10, hy + 7), (hx + 11, hy + 7), (hx + 11, hy + 8)], "k")
@@ -589,12 +590,13 @@ def zappy_head(g, hx, hy, mouth=False, blink=False, spark=False):
     return {"head": (hx + 1, hy, 10), "eye": (hx + 8, hy + 3), "neck": (hx + 2, hy + 8)}
 
 
-def _zappy_tail(g, x, y):
-    """Zigzag tail rising up and back from (x, y)."""
-    g.px([(x, y), (x - 1, y), (x - 1, y - 1), (x - 2, y - 1)], "t")
-    for dx, dy in ((-3, -2), (-2, -3), (-3, -3), (-1, -4), (-2, -4), (-1, -5), (-3, -6), (-2, -6), (-4, -7), (-3, -7),
-                   (-5, -8), (-4, -8), (-3, -8), (-2, -8), (-5, -9), (-4, -9), (-3, -9), (-2, -9), (-1, -9), (-4, -10), (-3, -10)):
-        g.px([(x + dx, y + dy)], "b")
+def _zappy_tail(g, x, y, wag=0):
+    """A power-cord tail curling up and back from (x, y), with a plug on the end."""
+    for dx, dy in ((-1, 0), (-2, -1), (-3, -1), (-4, -2), (-4, -3), (-3 + wag, -4), (-3 + wag, -5), (-4 + wag, -6)):
+        g.px([(x + dx, y + dy)], "d")
+    px, py = x - 5 + wag, y - 9
+    g.rect(px, py, px + 2, py + 2, "P")
+    g.px([(px, py - 1), (px + 2, py - 1)], "Q")
 
 
 def _lift(g, anchors, dy):
@@ -610,9 +612,9 @@ def zappy(pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=0, paw=Fal
     g = Grid(ZW, ZH)
     G_ = ZG
     if pose == "sleep":
+        _zappy_tail(g, 13, G_ - 2)
         g.rect(12, G_ - 6 - breathe, 25, G_, "b", round_=3)
         g.rect(14, G_ - 4 - breathe, 23, G_ - 1, "w", round_=2)
-        _zappy_tail(g, 13, G_ - 2)
         return g, zappy_head(g, 16, G_ - 13 - breathe, blink=True)
 
     lean = 1 if streaks >= 0 else 0
@@ -620,7 +622,7 @@ def zappy(pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=0, paw=Fal
         for fx, lift in ((14, step == 1), (19, step == -1)):
             g.rect(fx, G_ - (1 if lift else 0), fx + 2, G_ - (1 if lift else 0), "s")
         top = G_ - 8 + bob
-        _zappy_tail(g, 13, top + 3)
+        _zappy_tail(g, 13, top + 3, wag=step % 2)
         g.rect(13, top, 22, G_ - 1, "b", round_=2)
         g.rect(15, top + 2, 20, G_ - 2, "w", round_=1)
         g.rect(22 + lean, top + 2, 23 + lean, top + 3, "b")
