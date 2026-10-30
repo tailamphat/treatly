@@ -1,6 +1,6 @@
 // Treatly site: a small replay of the app's pet loop, drawn from the real pet packs.
 (() => {
-  const PETS = ['shiba', 'golden', 'husky', 'chihuahua', 'corgi', 'orange-tabby', 'black-cat', 'sheep', 'panda', 'capybara', 'kong'];
+  const PETS = ['shiba', 'golden', 'husky', 'chihuahua', 'corgi', 'orange-tabby', 'black-cat', 'sheep', 'panda', 'capybara', 'zappy', 'kong'];
   const PERSONALITY = {
     shiba: 'Sassy, dramatic screamer',
     golden: 'Patient and hopeful',
@@ -12,6 +12,7 @@
     sheep: 'Slow, sleepy, bleats politely',
     panda: 'Lazy, dozes off mid-nag',
     capybara: 'Extremely chill, nags very politely',
+    zappy: 'Electric mouse: Thunderbolt and Quick Attack',
     kong: 'KONG SMASH',
   };
   const WEAR = [['none', 'None'], ['party-hat', 'Party hat'], ['bow', 'Bow'], ['crown', 'Crown'], ['bandana', 'Bandana'], ['glasses', 'Sunglasses'], ['flower', 'Flower']];

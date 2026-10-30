@@ -97,7 +97,7 @@ do {
     let result = PetPackLoader.load(from: [repo.appendingPathComponent("Pets")])
     check(result.errors.isEmpty, "bundled packs load cleanly: \(result.errors)")
     let ids = Set(result.packs.map(\.id))
-    check(ids == ["shiba", "golden", "husky", "chihuahua", "corgi", "orange-tabby", "black-cat", "sheep", "panda", "capybara", "kong"], "all eleven bundled packs present, got \(ids)")
+    check(ids == ["shiba", "golden", "husky", "chihuahua", "corgi", "orange-tabby", "black-cat", "sheep", "panda", "capybara", "zappy", "kong"], "all twelve bundled packs present, got \(ids)")
     for pack in result.packs {
         let folder = pack.folder!
         if let image = pack.treat.image {

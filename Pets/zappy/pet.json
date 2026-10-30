@@ -1,0 +1,109 @@
+{
+  "id": "zappy",
+  "name": "Zappy",
+  "species": "electric mouse",
+  "defaultName": "Sparky",
+  "credit": "Treatly contributors, MIT (scripts/art/chibi.py)",
+  "treat": {
+    "name": "berry",
+    "image": "treat.png"
+  },
+  "sheet": {
+    "image": "sheet.png",
+    "frameWidth": 40,
+    "frameHeight": 32,
+    "scale": 2.5,
+    "footPadding": 1,
+    "mouth": [
+      27,
+      20
+    ],
+    "animations": {
+      "idle": {
+        "row": 0,
+        "count": 4,
+        "fps": 2
+      },
+      "walk": {
+        "row": 1,
+        "count": 4,
+        "fps": 8
+      },
+      "run": {
+        "row": 6,
+        "count": 4,
+        "fps": 14
+      },
+      "sit": {
+        "row": 2,
+        "count": 1
+      },
+      "bark": {
+        "row": 3,
+        "count": 4,
+        "fps": 8
+      },
+      "beg": {
+        "row": 4,
+        "count": 2,
+        "fps": 3
+      },
+      "sleep": {
+        "row": 5,
+        "count": 2,
+        "fps": 0.6
+      },
+      "eat": {
+        "row": 7,
+        "count": 2,
+        "fps": 4
+      }
+    },
+    "wardrobe": [
+      "party-hat",
+      "bow",
+      "crown",
+      "bandana",
+      "glasses",
+      "flower"
+    ]
+  },
+  "personality": {
+    "walkSpeed": 80,
+    "runSpeed": 280,
+    "energy": 0.6,
+    "sleepiness": 0.15,
+    "rest": [
+      1,
+      3
+    ],
+    "nagSeconds": 25,
+    "patience": 0.8
+  },
+  "phrases": {
+    "carry": [
+      "{task}"
+    ],
+    "drop": [
+      "Zap? ...{task}.",
+      "{name} brought you {task}. Bzzt."
+    ],
+    "yell": [
+      "THUNDERBOLT! {task}!",
+      "Bzzzzt! {task}!!",
+      "{name} is fully charged: {task}!"
+    ],
+    "whine": [
+      "*sad little sparks* {task}...",
+      "{name}'s battery is low. {task}?"
+    ],
+    "happy": [
+      "Zap zap!",
+      "*happy sparks*"
+    ],
+    "bury": [
+      "*stashes it in a thundercloud*"
+    ]
+  },
+  "sound": "Pop"
+}

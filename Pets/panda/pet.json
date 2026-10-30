@@ -27,12 +27,6 @@
       16
     ],
     "animations": {
-      "fall": {
-        "row": 6,
-        "count": 3,
-        "fps": 2,
-        "once": true
-      },
       "idle": {
         "row": 0,
         "count": 4,
@@ -66,6 +60,12 @@
         "row": 5,
         "count": 2,
         "fps": 0.6
+      },
+      "fall": {
+        "row": 6,
+        "count": 3,
+        "fps": 2,
+        "once": true
       }
     },
     "wardrobe": [
