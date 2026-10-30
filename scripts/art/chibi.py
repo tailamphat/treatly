@@ -591,27 +591,37 @@ MIGHTY = {"b": "#4A4656", "h": "#6B6680", "s": "#33303D", "d": "#24222B", "f": "
 MIGHTY_MOUTH = [37, 19]
 
 
-def _mighty_face(g, hx, hy, mouth=False, blink=False, asleep=False):
-    """Front-facing head, 16x13 from (hx, hy): crest, brow, glowing eyes, light muzzle."""
-    g.rect(hx, hy, hx + 15, hy + 12, "b", round_=5)
-    g.px([(hx + 5, hy - 1), (hx + 6, hy - 2), (hx + 7, hy - 2), (hx + 8, hy - 2), (hx + 9, hy - 2), (hx + 10, hy - 1)], "b")
-    g.rect(hx + 3, hy + 1, hx + 12, hy + 1, "h")
-    g.rect(hx + 2, hy + 4, hx + 13, hy + 12, "f", round_=3)
-    g.rect(hx + 1, hy + 3, hx + 14, hy + 4, "s", round_=1)
-    if blink or asleep:
-        g.px([(hx + 4, hy + 5), (hx + 5, hy + 5), (hx + 10, hy + 5), (hx + 11, hy + 5)], "s")
+def _mighty_head(g, hx, hy, mouth=False, blink=False):
+    """Side-on head, facing right, from (hx, hy): crest, heavy brow, glowing eye,
+    and a light muzzle that juts forward."""
+    g.rect(hx, hy, hx + 9, hy + 12, "b", round_=3)
+    g.px([(hx + 2, hy - 1), (hx + 3, hy - 2), (hx + 4, hy - 2), (hx + 5, hy - 1)], "b")
+    g.rect(hx + 4, hy + 4, hx + 11, hy + 11, "f", round_=2)
+    g.rect(hx + 3, hy + 3, hx + 10, hy + 4, "s")
+    if blink:
+        g.px([(hx + 6, hy + 5), (hx + 7, hy + 5)], "s")
     else:
-        g.px([(hx + 4, hy + 5), (hx + 11, hy + 5)], "e")
-        g.px([(hx + 5, hy + 5), (hx + 10, hy + 5)], "E")
-    g.rect(hx + 5, hy + 7, hx + 10, hy + 11, "l", round_=1)
-    g.px([(hx + 6, hy + 7), (hx + 9, hy + 7)], "n")
+        g.px([(hx + 6, hy + 5)], "e")
+        g.px([(hx + 7, hy + 5)], "E")
+    g.rect(hx + 8, hy + 6, hx + 12, hy + 9, "l", round_=1)
+    g.px([(hx + 11, hy + 6)], "n")
     if mouth:
-        g.rect(hx + 5, hy + 9, hx + 10, hy + 12, "k")
-        g.px([(hx + 5, hy + 9), (hx + 10, hy + 9), (hx + 5, hy + 12), (hx + 10, hy + 12)], "t")
-        g.rect(hx + 6, hy + 11, hx + 9, hy + 11, "r")
+        g.rect(hx + 8, hy + 9, hx + 11, hy + 11, "k")
+        g.px([(hx + 8, hy + 9), (hx + 11, hy + 9)], "t")
     else:
-        g.px([(hx + 6, hy + 10), (hx + 7, hy + 10), (hx + 8, hy + 10), (hx + 9, hy + 10)], "F")
-    return {"head": (hx + 3, hy, 10), "eye": (hx + 4, hy + 5), "neck": (hx + 3, hy + 13)}
+        g.px([(hx + 8, hy + 9), (hx + 9, hy + 9), (hx + 10, hy + 9)], "F")
+    return {"head": (hx + 1, hy, 10), "eye": (hx + 6, hy + 5), "neck": (hx + 2, hy + 12)}
+
+
+def _mighty_sitting_body(g):
+    """Sitting up side-on: haunch, upright body with a lighter chest, far arm behind."""
+    G_ = KG
+    g.rect(20, G_ - 14, 22, G_, "d")  # far arm
+    g.rect(8, G_ - 8, 18, G_, "b", round_=3)
+    g.rect(8, G_, 13, G_, "d")
+    g.rect(10, G_ - 20, 22, G_ - 3, "b", round_=4)
+    g.rect(11, G_ - 18, 12, G_ - 8, "h")
+    g.rect(18, G_ - 16, 23, G_ - 6, "f", round_=2)
 
 
 def mighty(pose="stand", step=0, bob=0, mouth=False, blink=False, pound=0, breathe=0):
@@ -631,103 +641,60 @@ def mighty(pose="stand", step=0, bob=0, mouth=False, blink=False, pound=0, breat
         g.rect(24, G_ - 12 + bob, 29, G_ - 1, "b", round_=1)
         g.rect(23 - step, G_, 30 - step, G_, "d")
         g.rect(25, G_ - 11 + bob, 26, G_ - 6 + bob, "h")
-        # Head with a crest, a heavy brow and a muzzle that juts forward.
-        hy = G_ - 25 + bob
-        g.rect(25, hy, 34, hy + 12, "b", round_=3)
-        g.px([(27, hy - 1), (28, hy - 2), (29, hy - 2), (30, hy - 1)], "b")
-        g.rect(29, hy + 4, 36, hy + 11, "f", round_=2)
-        g.rect(28, hy + 3, 35, hy + 4, "s")
-        if blink:
-            g.px([(31, hy + 5), (32, hy + 5)], "s")
-        else:
-            g.px([(31, hy + 5)], "e")
-            g.px([(32, hy + 5)], "E")
-        g.rect(33, hy + 6, 37, hy + 9, "l", round_=1)
-        g.px([(36, hy + 6)], "n")
-        if mouth:
-            g.rect(33, hy + 9, 36, hy + 11, "k")
-            g.px([(33, hy + 9), (36, hy + 9)], "t")
-        else:
-            g.px([(33, hy + 9), (34, hy + 9), (35, hy + 9)], "F")
-        return g, {"head": (26, hy, 10), "eye": (31, hy + 5), "neck": (27, hy + 12)}
+        return g, _mighty_head(g, 25, G_ - 25 + bob, mouth=mouth, blink=blink)
 
-    # Sitting up, facing you: sit, chest pound (pound 1/2), sleep (head down).
+    # Sitting up, still side-on: sit, chest pound (pound 1/2), sleep (head drooping).
     asleep = pose == "sleep"
-    g.rect(10, G_ - 3, 16, G_, "s")
-    g.rect(21, G_ - 3, 27, G_, "s")
-    g.rect(9, G_ - 18 + breathe, 28, G_ - 2, "b", round_=5)
-    g.rect(13, G_ - 15 + breathe, 24, G_ - 5, "f", round_=3)
-    g.rect(14, G_ - 14 + breathe, 17, G_ - 11 + breathe, "l", round_=1)
-    g.rect(20, G_ - 14 + breathe, 23, G_ - 11 + breathe, "l", round_=1)
-    arms = {"left": (4, 9), "right": (28, 33)}
-    if pound:
-        # One fist thumps the chest while the other arm swings up and out.
-        thump, swing = ("left", "right") if pound == 1 else ("right", "left")
-        tx = (13, 18) if thump == "left" else (19, 24)
-        g.rect(tx[0], G_ - 14, tx[1], G_ - 10, "h", round_=2)
-        sx = (1, 6) if swing == "left" else (31, 36)
-        g.rect(*((5, G_ - 18, 10, G_ - 12) if swing == "left" else (27, G_ - 18, 32, G_ - 12)), "b", round_=1)  # shoulder
-        g.rect(sx[0], G_ - 23, sx[1], G_ - 14, "b", round_=2)
-        g.rect(sx[0], G_ - 25, sx[1], G_ - 22, "s", round_=2)
-        x0, x1 = arms[thump]
-        g.rect(x0, G_ - 17, x1, G_ - 9, "b", round_=2)
+    _mighty_sitting_body(g)
+    if pound == 1:
+        # Near fist thumps the chest.
+        g.rect(21, G_ - 17, 25, G_ - 12, "b", round_=1)
+        g.rect(19, G_ - 14, 24, G_ - 10, "h", round_=1)
     else:
-        for x0, x1 in arms.values():
-            g.rect(x0, G_ - 17, x1, G_, "b", round_=2)
-            g.rect(x0 + 1, G_ - 16, x0 + 2, G_ - 8, "h")
-            g.rect(x0 - 1, G_ - 2, x1 + 1, G_, "s", round_=1)
-    hy = G_ - 30 + (3 if asleep else 0) + breathe
-    anchors = _mighty_face(g, 11, hy, mouth=mouth or bool(pound), blink=blink, asleep=asleep)
-    return g, anchors
+        g.rect(22, G_ - 15, 26, G_ - 1, "b", round_=1)
+        g.rect(23, G_ - 14, 23, G_ - 8, "h")
+        g.rect(21, G_, 27, G_, "d")
+        if pound == 2:
+            # Far fist comes round onto the chest.
+            g.rect(18, G_ - 15, 22, G_ - 11, "s", round_=1)
+    hy = G_ - 31 + (3 if asleep else 0) + breathe
+    return g, _mighty_head(g, 17, hy, mouth=mouth or bool(pound), blink=blink or asleep)
 
 
 def mighty_arms(up=True):
-    """Reared up facing you with both arms swung up high (up) or flung out wide."""
+    """Reared up side-on with its arms thrown up high (up) or swung out in front."""
     g = Grid(KW, KH)
     G_ = KG
-    g.rect(10, G_ - 3, 16, G_, "s")
-    g.rect(21, G_ - 3, 27, G_, "s")
-    g.rect(9, G_ - 18, 28, G_ - 2, "b", round_=5)
-    g.rect(13, G_ - 15, 24, G_ - 5, "f", round_=3)
-    g.rect(14, G_ - 14, 17, G_ - 11, "l", round_=1)
-    g.rect(20, G_ - 14, 23, G_ - 11, "l", round_=1)
-    for side in (-1, 1):
-        sx = 9 if side < 0 else 28
-        if up:
-            # Shoulder, then the arm straight up beside the head, fist on top.
-            g.rect(min(sx, sx + side * 4), G_ - 18, max(sx, sx + side * 4), G_ - 12, "b", round_=1)
-            ax = (2, 7) if side < 0 else (30, 35)
-            g.rect(ax[0], G_ - 30, ax[1], G_ - 15, "b", round_=2)
-            g.rect(ax[0] + 1, G_ - 29, ax[0] + 2, G_ - 20, "h")
-            g.rect(ax[0], G_ - 33, ax[1], G_ - 29, "s", round_=2)
-        else:
-            ax = (0, 9) if side < 0 else (28, 37)
-            g.rect(ax[0], G_ - 18, ax[1], G_ - 13, "b", round_=2)
-            g.rect(ax[0] + 1, G_ - 17, ax[1] - 1, G_ - 17, "h")
-            g.rect(*((0, G_ - 19, 3, G_ - 12) if side < 0 else (34, G_ - 19, 37, G_ - 12)), "s", round_=1)
-    anchors = _mighty_face(g, 11, G_ - 30, mouth=True)
-    return g, anchors
+    _mighty_sitting_body(g)
+    if up:
+        g.rect(19, G_ - 32, 22, G_ - 15, "s", round_=1)  # far arm up behind
+        g.rect(22, G_ - 33, 26, G_ - 15, "b", round_=1)
+        g.rect(23, G_ - 32, 23, G_ - 22, "h")
+        g.rect(21, G_ - 35, 26, G_ - 32, "d", round_=1)
+    else:
+        g.rect(22, G_ - 19, 35, G_ - 15, "b", round_=1)
+        g.rect(23, G_ - 18, 33, G_ - 18, "h")
+        g.rect(34, G_ - 20, 37, G_ - 14, "d", round_=1)
+    return g, _mighty_head(g, 13, G_ - 31, mouth=True)
 
 
 def mighty_hang(sway=0):
-    """Hanging by one hand from a palm frond (top-left), body swinging by `sway`."""
+    """Hanging side-on by one hand from a palm frond (top-left), swinging by `sway`."""
     g = Grid(KW, KH)
     gx, gy = 7, 1  # the hand, fixed on the frond
-    top = 4
-    hx = 11 + sway
-    # Raised arm from the grip down to the shoulder.
-    for i in range(10):
-        x = round(gx + (hx - 1 - gx) * i / 9)
+    sx, sy = 11 + sway, 15  # shoulder
+    for i in range(sy - gy + 1):
+        x = round(gx + (sx - gx) * i / (sy - gy))
         g.rect(x, gy + i, x + 3, gy + i, "b")
-    g.rect(gx - 1, 0, gx + 4, 2, "s", round_=1)
-    g.rect(9 + sway, top + 11, 28 + sway, top + 24, "b", round_=5)
-    g.rect(13 + sway, top + 13, 24 + sway, top + 22, "f", round_=3)
-    g.rect(28 + sway, top + 13, 32 + sway, top + 22, "b", round_=2)  # other arm hanging down
-    g.rect(28 + sway, top + 22, 32 + sway, top + 24, "s", round_=1)
-    for lx in (12, 21):  # legs dangling
-        g.rect(lx + sway - sway // 2, top + 24, lx + 4 + sway - sway // 2, top + 27, "s", round_=1)
-    anchors = _mighty_face(g, hx, top, mouth=sway == 0)
-    return g, anchors
+    g.rect(gx - 1, 0, gx + 4, 2, "d", round_=1)
+    g.rect(9 + sway, 14, 22 + sway, 28, "b", round_=4)
+    g.rect(10 + sway, 16, 11 + sway, 25, "h")
+    g.rect(18 + sway, 17, 23 + sway, 26, "f", round_=2)
+    g.rect(21 + sway, 18, 25 + sway, 29, "b", round_=1)  # other arm hanging down in front
+    g.rect(20 + sway, 29, 26 + sway, 30, "d", round_=1)
+    for lx in (11, 16):  # legs dangling
+        g.rect(lx + sway // 2, 28, lx + 3 + sway // 2, 31, "d", round_=1)
+    return g, _mighty_head(g, 14 + sway, 4, mouth=sway == 0)
 
 
 def poses_mighty():
