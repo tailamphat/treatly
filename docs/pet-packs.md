@@ -47,7 +47,7 @@ A pet pack is a folder containing `pet.json`. Built-in packs are in `Pets/`; you
 - `scale` is points per sheet pixel (default 2). `facing` is `"right"` (default) or `"left"`. `footPadding` is blank rows under the feet. `mouth` is where the treat is held, in frame pixels from the top-left of a right-facing frame.
 - `wardrobe` (optional) lists items the pet can wear, such as `["party-hat", "bow"]`. Each item `x` is an overlay `wear-x.png` with exactly the same layout as the sheet, drawn on top of the pet. Ids are lowercase letters, digits and dashes. Built-in names: `party-hat`, `bow`, `crown`, `bandana`, `glasses`, `flower`; any other id is shown title-cased.
 - `treat.image` is a PNG in the pack folder.
-- `container` is `"bowl"` (default) or `"tree"` (banana trees, used by King Kong).
+- `container` is `"bowl"` (default), `"tree"` (banana trees, used by King Kong) or `"bamboo"` (a bamboo grove, used by the Panda).
 - `credit` names the artist and license.
 
 ## Text sprites

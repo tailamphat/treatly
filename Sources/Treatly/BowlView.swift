@@ -15,6 +15,8 @@ enum ContainerStyle: String {
     case bowl
     /// A banana tree; treats hang under the crown.
     case tree
+    /// A bamboo grove; cut bamboo stacks up at the base.
+    case bamboo
 
     init(pack: PetPack) {
         self = ContainerStyle(rawValue: pack.container ?? "") ?? .bowl
@@ -24,6 +26,7 @@ enum ContainerStyle: String {
         switch self {
         case .bowl: return NSSize(width: 72, height: 46)
         case .tree: return NSSize(width: 90, height: 100)
+        case .bamboo: return NSSize(width: 80, height: 96)
         }
     }
 }
@@ -57,6 +60,9 @@ final class BowlView: NSView {
         case .tree:
             back = Self.art("tree-\(source.rawValue)")
             front = nil
+        case .bamboo:
+            back = Self.art("bamboo-\(source.rawValue)")
+            front = nil
         }
         super.init(frame: NSRect(origin: .zero, size: style.viewSize))
         toolTip = source.displayName
@@ -83,7 +89,7 @@ final class BowlView: NSView {
         /// Converts art pixels (top-left origin) to view points.
         func point(_ x: CGFloat, _ y: CGFloat) -> NSPoint { NSPoint(x: art.minX + x * s, y: art.maxY - y * s) }
 
-        let shadowWidth = style == .bowl ? art.width - 8 : art.width * 0.45
+        let shadowWidth = style == .bowl ? art.width - 8 : style == .bamboo ? art.width * 0.8 : art.width * 0.45
         NSColor(white: 0, alpha: 0.18).setFill()
         NSBezierPath(ovalIn: NSRect(x: art.midX - shadowWidth / 2 - (style == .tree ? 8 : 0), y: 0, width: shadowWidth, height: 6)).fill()
         back.draw(in: art)
@@ -103,6 +109,14 @@ final class BowlView: NSView {
                 let hangs: [(CGFloat, CGFloat)] = [(15, 17), (23, 17), (19, 19), (13, 20), (25, 20), (19, 22)]
                 let t = NSSize(width: CGFloat(treat.width), height: CGFloat(treat.height))
                 for (i, (x, y)) in hangs.prefix(min(treatCount, hangs.count)).enumerated() {
+                    let c = point(x, y)
+                    treat.draw(in: NSRect(x: c.x - t.width / 2, y: c.y - t.height / 2, width: t.width, height: t.height), flipped: i % 2 == 1)
+                }
+            case .bamboo:
+                // A stack of cut bamboo in front of the stalks, bottom row first.
+                let stack: [(CGFloat, CGFloat)] = [(11, 40), (23, 40), (17, 40), (14, 38), (20, 38), (17, 36)]
+                let t = NSSize(width: CGFloat(treat.width), height: CGFloat(treat.height))
+                for (i, (x, y)) in stack.prefix(min(treatCount, stack.count)).enumerated() {
                     let c = point(x, y)
                     treat.draw(in: NSRect(x: c.x - t.width / 2, y: c.y - t.height / 2, width: t.width, height: t.height), flipped: i % 2 == 1)
                 }

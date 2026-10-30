@@ -428,20 +428,23 @@ def panda_head(g, hx, hy, mouth=False, blink=False):
     return {"head": (hx, hy, 10), "eye": (hx + 7, hy + 3), "neck": (hx + 1, hy + 7)}
 
 
+PANDA_PAWS = [23, 16]  # where the treat is held while carrying, in frame pixels
+
+
 def panda(pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=0, paw=False, breathe=0):
     g = Grid(W, H)
     if pose == "stand":
-        by = G - 8 + bob
-        for lx in (8, 17):
-            g.rect(lx, by + 4, lx + 1, G, "F")
-        g.px([(4, by + 1), (4, by + 2)], "b")
-        g.rect(5, by, 21, by + 5, "b", round_=2)
-        g.rect(8, by + 5, 15, by + 5, "s")
-        g.rect(15, by, 19, by + 5, "f", round_=1)
-        for lx, d in ((6, step), (18, -step)):
-            g.rect(lx, by + 5, lx + 1, G - 1, "f")
-            g.px([(lx + d, G), (lx + 1 + d, G)], "f")
-        return g, panda_head(g, 17, by - 6, mouth=mouth, blink=blink)
+        # Waddles upright on its hind legs, both paws out front to hold the treat.
+        top = G - 10 + bob
+        for lx, lift in ((12, step == 1), (17, step == -1)):
+            g.rect(lx, top + 8, lx + 2, G - (1 if lift else 0), "f", round_=1 if lift else 0)
+        g.px([(10, top + 5), (10, top + 6)], "b")
+        g.rect(11, top, 20, top + 8, "b", round_=2)
+        g.rect(13, top + 7, 18, top + 8, "s")
+        g.rect(11, top, 20, top + 2, "f", round_=1)
+        g.rect(17, top + 1, 21, top + 3, "F", round_=1)
+        g.rect(18, top + 2, 23, top + 4, "f", round_=1)
+        return g, panda_head(g, 13, top - 7, mouth=mouth, blink=blink)
     if pose == "sit":
         g.rect(7, G - 7, 18, G, "b", round_=3)
         g.rect(14, G - 8, 18, G - 4, "f", round_=1)
@@ -941,6 +944,47 @@ def tree(source):
 
 # ---------------------------------------------------------------- App icon
 
+# ---------------------------------------------------------------- Bamboo grove
+#
+# The panda's container: a few stalks on a grassy mound; cut bamboo stacks at the base.
+
+GROVE_W, GROVE_H = 34, 44
+GROVE = {"h": "#B6E486", "g": "#7CC04E", "G": "#5A9A34", "n": "#3E7A2A", "l": "#6CBF4A", "L": "#4C9A34",
+         "d": "#9A6A3A", "D": "#7A4E26", "q": "#7DC25A", "Q": "#5FA542"}
+
+
+def _stalk(g, x, top, bottom=40):
+    for y in range(top, bottom + 1):
+        g.px([(x, y)], "h")
+        g.px([(x + 1, y)], "g")
+        g.px([(x + 2, y)], "G")
+        if (y - top) % 7 == 6:
+            g.px([(x, y), (x + 1, y), (x + 2, y)], "n")
+    g.px([(x, top - 1), (x + 1, top - 1)], "g")
+
+
+def _leaf(g, x, y, d):
+    """A slanted leaf from (x, y), d = 1 to the right, -1 to the left."""
+    g.px([(x + d * i, y - i // 2) for i in range(1, 7)], "l")
+    g.px([(x + d * i, y - i // 2 + 1) for i in range(2, 6)], "L")
+
+
+def bamboo_grove(source):
+    g = Grid(GROVE_W, GROVE_H)
+    for x, top in ((7, 6), (15, 2), (23, 10)):
+        _stalk(g, x, top)
+    # Tufts at the tops plus a few leaves lower down.
+    for x, y, d in ((7, 6, -1), (9, 5, 1), (15, 4, -1), (17, 4, 1), (17, 7, 1), (23, 11, -1), (25, 10, 1),
+                    (7, 20, -1), (17, 18, 1), (25, 24, 1), (15, 26, -1)):
+        _leaf(g, x, y, d)
+    # Grassy mound.
+    for y in range(38, GROVE_H - 1):
+        for x in range(GROVE_W):
+            if ((x + 0.5 - 17) / 16) ** 2 + ((y + 0.5 - 43) / 5.5) ** 2 <= 1:
+                g.px([(x, y)], "q" if y <= 39 else "Q" if y == 40 else "D" if (x + y) % 5 == 0 else "d")
+    return g.render(GROVE, "#24451A")
+
+
 ICON_SIZES = [16, 32, 128, 256, 512]
 
 
@@ -1101,7 +1145,7 @@ def main():
     for pet_id, spec in CATS.items():
         out[pet_id] = build(poses_quad(spec, True), palette_for(spec), spec["line"], W, H) + ((W, H), [27, 17])
     out["sheep"] = build(poses_sheep(), SHEEP, SHEEP["line"], W, H) + ((W, H), [26, 15])
-    out["panda"] = build(poses_simple(panda), PANDA, PANDA["line"], W, H) + ((W, H), [28, 15])
+    out["panda"] = build(poses_simple(panda), PANDA, PANDA["line"], W, H) + ((W, H), PANDA_PAWS)
     out["capybara"] = build(poses_simple(capybara), CAPY, CAPY["line"], W, H) + ((W, H), [28, 17])
     out["kong"] = build(poses_kong(), KONG, KONG["line"], KW, KH) + ((KW, KH), [34, 15])
 
@@ -1124,6 +1168,7 @@ def main():
 
     for source in SOURCES:
         write_png(os.path.join(ROOT, f"Resources/Art/tree-{source}.png"), tree(source))
+        write_png(os.path.join(ROOT, f"Resources/Art/bamboo-{source}.png"), bamboo_grove(source))
     print("wrote trees")
 
     for style in BOWL_STYLES:

@@ -21,6 +21,7 @@
   // Same spots the app uses (BowlView.swift), in bowl pixels from the top left.
   const PILE = [[10, 5.5, false], [16, 5.5, true], [13, 4.5, false], [7, 6, true], [19, 6, false]];
   const HANGS = [[15, 17], [23, 17], [19, 19], [13, 20], [25, 20], [19, 22]];
+  const STACK = [[11, 40], [23, 40], [17, 40], [14, 38], [20, 38], [17, 36]];
   const GROUND = 30;
 
   const $ = (s) => document.querySelector(s);
@@ -103,15 +104,18 @@
   const bowlArt = (style, back) => `art/bowl-${style}-appleReminders${back ? '-back' : ''}.png`;
   const treatArt = (id) => `pets/${id}/treat.png`;
   const poopArt = (style) => `art/poop-${style}.png`;
-  const isTree = (id) => data[id].container === 'tree';
+  // Kong's banana tree and the panda's bamboo grove stand in for the bowl.
+  const kind = (id) => data[id].container || 'bowl';
+  const isTree = (id) => kind(id) !== 'bowl';
 
   // A bowl (or tree) with up to `count` treats, at `scale` per art pixel.
   function container(id, style, count, scale, parent) {
     const box = el('div', 'bowlart', parent);
     if (isTree(id)) {
-      const tree = art('art/tree-appleReminders.png', scale, box);
+      const bamboo = kind(id) === 'bamboo';
+      const tree = art(`art/${bamboo ? 'bamboo' : 'tree'}-appleReminders.png`, scale, box);
       box.style.width = tree.width + 'px'; box.style.height = tree.height + 'px';
-      HANGS.slice(0, count).forEach(([x, y], i) => placeTreat(box, id, x, y, scale, i % 2 === 1));
+      (bamboo ? STACK : HANGS).slice(0, count).forEach(([x, y], i) => placeTreat(box, id, x, y, scale, i % 2 === 1));
     } else {
       const back = art(bowlArt(style, true), scale, box);
       box.style.width = back.width + 'px'; box.style.height = back.height + 'px';
@@ -179,7 +183,7 @@
     hero.bowl.style.bottom = GROUND + 'px';
     hero.bowl.style.left = bowlLeft() + 'px';
   }
-  const bowlWidth = () => (isTree(hero.id) ? 38 : 26) * hero.S * 0.8;
+  const bowlWidth = () => ({ tree: 38, bamboo: 34 }[kind(hero.id)] || 26) * hero.S * 0.8;
   const bowlLeft = () => stage.clientWidth * 0.86 - bowlWidth();
   // Where the pet stands to reach into the bowl.
   const bowlSpot = () => bowlLeft() + bowlWidth() * (isTree(hero.id) ? 0.3 : 0.1) - hero.sprite.w * 0.4;
@@ -271,7 +275,7 @@
       setStep('fetch'); say(null);
       await walkTo(bowlSpot(), g);
       hero.facing = 1; place();
-      hero.sprite.play(isTree(hero.id) ? 'beg' : 'sit');
+      hero.sprite.play(kind(hero.id) === 'tree' ? 'beg' : 'sit');
       await wait(700, g);
       hero.count -= 1; renderBowl();
       hero.carry.hidden = false;
@@ -457,7 +461,7 @@
     PETS.forEach((id) => images.push(treatArt(id)));
     BOWLS.forEach(([s]) => images.push(bowlArt(s, true), bowlArt(s, false)));
     POOPS.forEach(([s]) => { if (s !== 'off') images.push(poopArt(s)); });
-    images.push('art/tree-appleReminders.png');
+    images.push('art/tree-appleReminders.png', 'art/bamboo-appleReminders.png');
     await Promise.all(images.map(loadImage));
 
     buildPickers();

@@ -16,7 +16,7 @@ public struct PetPack: Codable, Equatable, Identifiable, Sendable {
     public var phrases: Phrases
     /// A macOS system sound name (e.g. "Funk"), played on yelling when sound is on.
     public var sound: String?
-    /// What the treats are kept in: "bowl" (default) or "tree".
+    /// What the treats are kept in: "bowl" (default), "tree" or "bamboo".
     public var container: String?
     /// Who drew the art and under which license; shown in the app's About list.
     public var credit: String?

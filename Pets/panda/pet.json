@@ -4,6 +4,7 @@
   "species": "panda",
   "defaultName": "Bao",
   "credit": "Treatly contributors, MIT (scripts/art/chibi.py)",
+  "container": "bamboo",
   "treat": {
     "name": "bamboo",
     "image": "treat.png"
@@ -15,8 +16,8 @@
     "scale": 2.5,
     "footPadding": 1,
     "mouth": [
-      28,
-      15
+      23,
+      16
     ],
     "animations": {
       "idle": {
