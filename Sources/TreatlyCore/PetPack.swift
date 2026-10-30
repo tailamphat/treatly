@@ -32,6 +32,8 @@ public struct PetPack: Codable, Equatable, Identifiable, Sendable {
         /// A PNG in the pack folder, or `sprite`.
         public var image: String?
         public var sprite: PixelSprite?
+        /// Optional PNG drawn while the pet carries it, e.g. held at an angle.
+        public var heldImage: String?
     }
 
     /// How the animal behaves. Only `walkSpeed` and `sleepiness` are required.
@@ -50,12 +52,14 @@ public struct PetPack: Codable, Equatable, Identifiable, Sendable {
         public var nagSeconds: Double?
         /// Scales the breaks between bursts; above 1 is more patient. Defaults to 1.
         public var patience: Double?
+        /// Trips per minute of walking (running trips twice as often). Defaults to 0.
+        public var clumsiness: Double?
 
         public var temperament: Temperament {
             let r = rest ?? []
             let restRange = r.count == 2 && r[0] <= r[1] ? r[0]...r[1] : 1.5...4.5
             return Temperament(walkSpeed: walkSpeed, runSpeed: runSpeed, energy: energy ?? 0.15, sleepiness: sleepiness,
-                               rest: restRange, nagDuration: nagSeconds ?? 20, patience: patience ?? 1)
+                               rest: restRange, nagDuration: nagSeconds ?? 20, patience: patience ?? 1, clumsiness: clumsiness ?? 0)
         }
     }
 
@@ -72,7 +76,7 @@ public struct PetPack: Codable, Equatable, Identifiable, Sendable {
     public func validate() throws {
         guard sheet != nil || sprite != nil else { throw SpriteError(description: "\(id) needs a 'sheet' or a 'sprite'") }
         // Packs come from strangers; keep their files inside the pack folder.
-        for file in [sheet?.image, treat.image].compactMap({ $0 }) where !Self.isPlainFileName(file) {
+        for file in [sheet?.image, treat.image, treat.heldImage].compactMap({ $0 }) where !Self.isPlainFileName(file) {
             throw SpriteError(description: "\(id) image '\(file)' must be a file name inside the pack folder")
         }
         guard treat.image != nil || treat.sprite != nil else { throw SpriteError(description: "\(id) treat needs an 'image' or a 'sprite'") }

@@ -7,7 +7,8 @@
   "container": "bamboo",
   "treat": {
     "name": "bamboo",
-    "image": "treat.png"
+    "image": "treat.png",
+    "heldImage": "treat-held.png"
   },
   "sheet": {
     "image": "sheet.png",
@@ -20,6 +21,12 @@
       16
     ],
     "animations": {
+      "fall": {
+        "row": 6,
+        "count": 3,
+        "fps": 2,
+        "once": true
+      },
       "idle": {
         "row": 0,
         "count": 4,
@@ -74,7 +81,8 @@
       10
     ],
     "nagSeconds": 18,
-    "patience": 1.5
+    "patience": 1.5,
+    "clumsiness": 4
   },
   "phrases": {
     "carry": [

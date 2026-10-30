@@ -454,6 +454,21 @@ def panda(pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=0, paw=Fal
         else:
             g.rect(16, G - 4, 17, G, "f")
         return g, panda_head(g, 12 + (1 if tilt else 0), G - 15 + tilt, mouth=mouth, blink=blink)
+    if pose == "trip":
+        # Face-plant: head on the ground, bottom and hind legs up in the air.
+        g.rect(6, G - 13, 8, G - 10, "f", round_=1)
+        g.rect(9, G - 12, 11, G - 9, "F", round_=1)
+        g.rect(7, G - 10, 17, G - 3, "b", round_=2)
+        g.rect(13, G - 9, 17, G - 4, "f", round_=1)
+        g.rect(19, G - 1, 24, G, "f")
+        return g, panda_head(g, 15, G - 8, blink=True)
+    if pose == "flop":
+        # Rolled onto its back, paws in the air.
+        for lx in (8, 15):
+            g.rect(lx, G - 10, lx + 2, G - 6, "f", round_=1)
+        g.rect(6, G - 6, 19, G, "b", round_=3)
+        g.rect(15, G - 6, 18, G - 3, "f", round_=1)
+        return g, panda_head(g, 16, G - 8, mouth=True, blink=True)
     g.rect(5, G - 5 - breathe, 20, G, "b", round_=3)
     g.rect(14, G - 5 - breathe, 17, G, "f", round_=1)
     g.rect(6, G, 8, G, "f")
@@ -514,6 +529,11 @@ def capybara(pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=0, paw=
     g.rect(4, G - 6 - breathe, 20, G, "b", round_=3)
     g.px([(21, G), (22, G)], "s")
     return g, capy_head(g, 15, G - 7, blink=True)
+
+
+def poses_panda():
+    """The usual six rows plus a seventh: tripping over its own feet."""
+    return poses_simple(panda) + [[panda("trip"), panda("flop"), panda("sit", blink=True)]]
 
 
 def poses_simple(draw):
@@ -1064,6 +1084,22 @@ def bamboo():
     ], {"h": "#C8EB8A", "b": "#8CCB52", "s": "#5E9A34", "K": "#3E6A22", "g": "#6CBF4A", "G": "#4C9A34"}, "#24451A")
 
 
+def bamboo_held():
+    """The bamboo as the panda holds it: tilted up towards the front."""
+    length, rise = 13, 6
+    g = Grid(length + 6, rise + 9)
+    for i in range(length):
+        x = i + 1
+        y = rise + 3 - (i * rise) // (length - 1)
+        node = i in (4, 9)
+        for dy, role in ((0, "h"), (1, "b"), (2, "s")):
+            g.px([(x, y + dy)], "K" if node else role)
+    # A leaf sprouting from the top end.
+    g.px([(length + 1, 2), (length + 2, 1), (length + 3, 1), (length + 4, 0)], "g")
+    g.px([(length + 2, 2), (length + 3, 2)], "G")
+    return g.render({"h": "#C8EB8A", "b": "#8CCB52", "s": "#5E9A34", "K": "#3E6A22", "g": "#6CBF4A", "G": "#4C9A34"}, "#24451A")
+
+
 def orange():
     return text_sprite([
         "....kg...",
@@ -1107,8 +1143,8 @@ def build(poses, palette, outline, w, h):
     return pet, wears
 
 
-def animations():
-    return {
+def animations(extra=None):
+    return {**(extra or {}), **{
         "idle": {"row": 0, "count": 4, "fps": 2},
         "walk": {"row": 1, "count": 4, "fps": 8},
         "run": {"row": 1, "count": 4, "fps": 14},
@@ -1116,7 +1152,13 @@ def animations():
         "bark": {"row": 3, "count": 2, "fps": 5},
         "beg": {"row": 4, "count": 2, "fps": 1.5},
         "sleep": {"row": 5, "count": 2, "fps": 0.6},
-    }
+    }}
+
+
+# Pets with extra animation rows beyond the usual six.
+EXTRA_ANIMATIONS = {
+    "panda": {"fall": {"row": 6, "count": 3, "fps": 2, "once": True}},
+}
 
 
 def update_pack(pet_id, w, h, mouth, scale=2.5):
@@ -1127,7 +1169,7 @@ def update_pack(pet_id, w, h, mouth, scale=2.5):
     old = pack["sheet"]
     pack["sheet"] = {
         "image": "sheet.png", "frameWidth": w, "frameHeight": h, "scale": scale,
-        "footPadding": 1, "mouth": mouth, "animations": animations(), "wardrobe": WARDROBE,
+        "footPadding": 1, "mouth": mouth, "animations": animations(EXTRA_ANIMATIONS.get(pet_id)), "wardrobe": WARDROBE,
     }
     if old.get("facing"):
         pack["sheet"]["facing"] = old["facing"]
@@ -1145,7 +1187,7 @@ def main():
     for pet_id, spec in CATS.items():
         out[pet_id] = build(poses_quad(spec, True), palette_for(spec), spec["line"], W, H) + ((W, H), [27, 17])
     out["sheep"] = build(poses_sheep(), SHEEP, SHEEP["line"], W, H) + ((W, H), [26, 15])
-    out["panda"] = build(poses_simple(panda), PANDA, PANDA["line"], W, H) + ((W, H), PANDA_PAWS)
+    out["panda"] = build(poses_panda(), PANDA, PANDA["line"], W, H) + ((W, H), PANDA_PAWS)
     out["capybara"] = build(poses_simple(capybara), CAPY, CAPY["line"], W, H) + ((W, H), [28, 17])
     out["kong"] = build(poses_kong(), KONG, KONG["line"], KW, KH) + ((KW, KH), [34, 15])
 
@@ -1162,6 +1204,7 @@ def main():
                           ("panda", bamboo), ("capybara", orange),
                           ("orange-tabby", fish), ("black-cat", fish), ("kong", banana)):
         extras[f"Pets/{pet_id}/treat.png"] = treat()
+    extras["Pets/panda/treat-held.png"] = bamboo_held()
     for path, rows in extras.items():
         write_png(os.path.join(ROOT, path), rows)
         print("wrote", path)

@@ -73,12 +73,13 @@ final class PetView: NSView {
         art.overlay(wearing, for: s.activity, elapsed: s.activityElapsed)?.draw(in: petRect, flipped: flipped, alpha: alpha)
         var hit = petRect
 
-        if let treat = art.treat {
+        let carrying = s.carriesTreat || s.activity == .eating
+        if let treat = carrying ? art.heldTreat : art.treat {
             let scale = Self.treatScale * CGFloat(s.treatScale)
             let size = NSSize(width: CGFloat(treat.width) * scale, height: CGFloat(treat.height) * scale)
             let facingLeft = s.facing == .left
             var treatRect: NSRect?
-            if s.carriesTreat || s.activity == .eating {
+            if carrying {
                 // Mouth position is in frame pixels from the top-left of a right-facing frame.
                 let mouthFromLeft = art.mouth.x * art.scale
                 let mouthX = facingLeft ? petRect.maxX - mouthFromLeft : petRect.minX + mouthFromLeft

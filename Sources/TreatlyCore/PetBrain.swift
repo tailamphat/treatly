@@ -28,6 +28,8 @@ public enum Activity: Equatable, Sendable {
     case eating, burying, pooping
     /// Being dragged by the mouse.
     case held
+    /// Tripped over its own feet while walking; gets up and carries on.
+    case tumbling
 }
 
 public enum Facing: Sendable { case left, right }
@@ -47,9 +49,12 @@ public struct Temperament: Equatable, Sendable {
     public var nagDuration: TimeInterval
     /// Scales the breaks between nagging bursts (above 1 = more patient).
     public var patience: Double
+    /// Trips per minute of walking; running trips twice as often.
+    public var clumsiness: Double
 
     public init(walkSpeed: Double, runSpeed: Double? = nil, energy: Double = 0.15, sleepiness: Double = 0.25,
-                rest: ClosedRange<Double> = 1.5...4.5, nagDuration: TimeInterval = 20, patience: Double = 1) {
+                rest: ClosedRange<Double> = 1.5...4.5, nagDuration: TimeInterval = 20, patience: Double = 1,
+                clumsiness: Double = 0) {
         self.walkSpeed = walkSpeed
         self.runSpeed = runSpeed ?? walkSpeed * 2.2
         self.energy = energy
@@ -57,6 +62,7 @@ public struct Temperament: Equatable, Sendable {
         self.rest = rest
         self.nagDuration = nagDuration
         self.patience = patience
+        self.clumsiness = clumsiness
     }
 }
 
@@ -73,6 +79,7 @@ public struct PetBrain {
 
     public static let reactionDuration: TimeInterval = 1.6
     public static let poopDuration: TimeInterval = 1.2
+    public static let tumbleDuration: TimeInterval = 1.6
 
     private var timer: TimeInterval = 0
     private var wanderTarget: Double?
@@ -114,15 +121,28 @@ public struct PetBrain {
         level > .calm && fetchTarget == nil && [.idle, .walking, .running, .held].contains(activity)
     }
 
-    /// The treat is on the ground in front of it.
+    /// The treat is on the ground in front of it (also when it tripped while carrying it).
     public var treatOnGround: Bool {
-        [.sitting, .yelling, .whining].contains(activity)
+        [.sitting, .yelling, .whining].contains(activity) || activity == .tumbling && level > .calm && fetchTarget == nil
     }
 
     public mutating func update<R: RandomSource>(dt: TimeInterval, level: EscalationLevel, bounds: ClosedRange<Double>, focusX: Double, random: inout R) {
         switch activity {
         case .held:
             return
+        case .tumbling:
+            timer -= dt
+            if timer <= 0 { rest(for: 0.3) }
+            return
+        case .walking, .running:
+            // Clumsy pets trip now and then. Only clumsy ones draw a random number.
+            guard temperament.clumsiness > 0 else { break }
+            let perSecond = temperament.clumsiness / 60 * (activity == .running ? 2 : 1)
+            if random.next() < perSecond * dt {
+                activity = .tumbling
+                timer = Self.tumbleDuration
+                return
+            }
         case .eating, .burying, .pooping:
             timer -= dt
             guard timer <= 0 else { return }

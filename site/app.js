@@ -103,6 +103,8 @@
 
   const bowlArt = (style, back) => `art/bowl-${style}-appleReminders${back ? '-back' : ''}.png`;
   const treatArt = (id) => `pets/${id}/treat.png`;
+  // Some pets hold their treat differently, e.g. the panda tilts its bamboo up.
+  const heldArt = (id) => `pets/${id}/${data[id].treat.heldImage || 'treat.png'}`;
   const poopArt = (style) => `art/poop-${style}.png`;
   // Kong's banana tree and the panda's bamboo grove stand in for the bowl.
   const kind = (id) => data[id].container || 'bowl';
@@ -154,7 +156,7 @@
     const body = el('div', 'body', wrap);
     body.appendChild(sprite.el);
     const mouth = data[id].sheet.mouth || [sprite.fw - 3, sprite.fh / 2];
-    const carry = art(treatArt(id), S / 2.5, body);
+    const carry = art(heldArt(id), S / 2.5, body);
     carry.className = 'carry';
     carry.style.left = mouth[0] * S - carry.width / 2 + 'px';
     carry.style.top = mouth[1] * S - carry.height / 2 + 'px';
@@ -458,7 +460,7 @@
     packs.forEach((p) => { data[p.id] = p; });
     if (!data[state.pet]) state.pet = 'shiba';
     const images = [];
-    PETS.forEach((id) => images.push(treatArt(id)));
+    PETS.forEach((id) => images.push(treatArt(id), heldArt(id)));
     BOWLS.forEach(([s]) => images.push(bowlArt(s, true), bowlArt(s, false)));
     POOPS.forEach(([s]) => { if (s !== 'off') images.push(poopArt(s)); });
     images.push('art/tree-appleReminders.png', 'art/bamboo-appleReminders.png');

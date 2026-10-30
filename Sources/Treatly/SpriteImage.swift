@@ -70,6 +70,8 @@ struct PetArt {
     /// True when there are real animations; otherwise the view fakes motion.
     let isAnimated: Bool
     let treat: SpriteImage?
+    /// The treat while carried, when the pack draws it differently (else `treat`).
+    let heldTreat: SpriteImage?
 
     private let sheet: SpriteSheet?
     private let frames: [String: [SpriteImage]]
@@ -84,6 +86,7 @@ struct PetArt {
         } else {
             treat = pack.treat.sprite.flatMap(SpriteImage.init)
         }
+        heldTreat = pack.treat.heldImage.flatMap { name in folder.flatMap { SpriteImage(contentsOf: $0.appendingPathComponent(name)) } } ?? treat
 
         if let sheet = pack.sheet, let folder, let image = SpriteImage(contentsOf: folder.appendingPathComponent(sheet.image)) {
             let size = (sheet.frameWidth, sheet.frameHeight)

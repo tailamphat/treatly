@@ -447,6 +447,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .whining: list = p.whine
         case .sleeping: list = ["z z z"]
         case .held: list = ["Wheee!"]
+        case .tumbling: list = ["Oof!", "*tumbles*", "Oopsie!"]
         case .idle, .walking, .running:
             // While carrying, flash the task now and then.
             let showing = brain.carriesTreat && Int(now.timeIntervalSince(becameCurrentAt)) % 30 < 5

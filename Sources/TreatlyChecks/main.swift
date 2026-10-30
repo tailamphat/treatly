@@ -200,6 +200,22 @@ do {
     for _ in 0..<200 { held.update(dt: 0.05, level: .dropping, bounds: 0...1000, focusX: 500, random: &rng) }
     check(held.activity == .sitting && held.y == 400, "dropping: walks to focus at its own height")
 
+    // Clumsy pets trip while walking, lie there a moment, then carry on.
+    var clumsy = PetBrain(x: 0, y: 0, temperament: Temperament(walkSpeed: 50, energy: 0, sleepiness: 0, rest: 0...0, clumsiness: 600))
+    var tripped = false, recovered = false
+    for _ in 0..<400 {
+        clumsy.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng)
+        if clumsy.activity == .tumbling { tripped = true } else if tripped, clumsy.activity != .idle { recovered = true }
+    }
+    check(tripped && recovered, "clumsy: trips while walking, then gets up and carries on")
+    var steady = PetBrain(x: 0, y: 0, temperament: Temperament(walkSpeed: 50, energy: 0, sleepiness: 0, rest: 0...0))
+    var steadyTripped = false
+    for _ in 0..<400 {
+        steady.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng)
+        if steady.activity == .tumbling { steadyTripped = true }
+    }
+    check(!steadyTripped, "not clumsy: never trips")
+
     // Nagging comes in bursts, then it roams, then it comes back.
     var nagger = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, sleepiness: 0, nagDuration: 5, patience: 0.1))
     for _ in 0..<40 { nagger.update(dt: 0.1, level: .whining, bounds: 0...1000, focusX: 500, random: &rng) }
