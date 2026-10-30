@@ -1,6 +1,6 @@
 cask "treatly" do
-  version "0.1.1"
-  sha256 "1f0a8844378477f1da65c6a133b57a51fef1d3b1c4206f1127e6013f848ceb2e"
+  version "0.1.2"
+  sha256 "f921115cde6843d24a9b42f3d5dce0fa03bb68af57a4f2efdafc7dcb3baecad5"
 
   url "https://github.com/tailamphat/treatly/releases/download/v#{version}/Treatly-#{version}.zip"
   name "Treatly"
