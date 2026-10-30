@@ -547,138 +547,6 @@ def poses_simple(draw):
     return [idle, walk, sit, bark, beg, sleep]
 
 
-# ---------------------------------------------------------------- Zappy
-#
-# An original electric mouse: yellow, red cheeks, orange-tipped ears and a
-# zigzag tail. Its frame is bigger than the others so its moves fit:
-# Thunderbolt when it yells, Quick Attack streaks when it runs.
-
-ZW, ZH = 40, 32
-ZG = 29
-ZAPPY = {"b": "#FFDA4D", "s": "#E6B12A", "w": "#FFF6D6", "o": "#F28A1E", "c": "#FF9AAE", "R": "#FF5A6E",
-         "e": "#1E1410", "W": "#FFFFFF", "n": "#2A1A14", "k": "#7A2A2A", "p": "#F7A8BC",
-         "d": "#5A5560", "P": "#D6D3DC", "Q": "#8A8794", "Y": "#FFF27A", "S": "#FFFFFF", "line": "#4A3010"}
-BOLT = ["..YY", ".YY.", "YYYY", "..YY", ".YY.", "YY..", "Y..."]
-ZAPPY_MOUTH = [27, 20]
-
-
-def _bolt(g, x, y, big=False):
-    rows = BOLT if not big else ["...YY", "..YY.", ".YY..", "YYYYY", "...YY", "..YY.", ".YY..", "YY...", "Y...."]
-    for dy, row in enumerate(rows):
-        g.px([(x + dx, y + dy) for dx, ch in enumerate(row) if ch == "Y"], "Y")
-
-
-def zappy_head(g, hx, hy, mouth=False, blink=False, spark=False):
-    """Round chubby head, 12x9 from (hx, hy), with round ears; facing right."""
-    for ex, role in ((hx + 1, "s"), (hx + 7, "b")):
-        g.rect(ex, hy - 3, ex + 3, hy, role, round_=1)
-        g.px([(ex + 1, hy - 2), (ex + 2, hy - 2)], "p")
-    g.rect(hx, hy, hx + 11, hy + 8, "b", round_=3)
-    g.px([(hx + 6, hy + 1), (hx + 5, hy + 2), (hx + 6, hy + 2), (hx + 5, hy + 3)], "o")  # lightning mark
-    if blink:
-        g.px([(hx + 7, hy + 4), (hx + 8, hy + 3), (hx + 9, hy + 4)], "e")  # ^ eyes
-    else:
-        g.rect(hx + 8, hy + 3, hx + 9, hy + 5, "e")
-        g.px([(hx + 8, hy + 3)], "W")
-    g.px([(hx + 7, hy + 6), (hx + 8, hy + 6)], "R" if spark else "c")
-    g.px([(hx + 11, hy + 5)], "n")
-    if mouth:
-        g.px([(hx + 10, hy + 7), (hx + 11, hy + 7), (hx + 11, hy + 8)], "k")
-        g.px([(hx + 10, hy + 8)], "p")
-    if spark:
-        g.px([(hx + 12, hy + 6), (hx + 13, hy + 5), (hx + 12, hy + 8), (hx + 14, hy + 7)], "Y")
-    return {"head": (hx + 1, hy, 10), "eye": (hx + 8, hy + 3), "neck": (hx + 2, hy + 8)}
-
-
-def _zappy_tail(g, x, y, wag=0):
-    """A power-cord tail curling up and back from (x, y), with a plug on the end."""
-    for dx, dy in ((-1, 0), (-2, -1), (-3, -1), (-4, -2), (-4, -3), (-3 + wag, -4), (-3 + wag, -5), (-4 + wag, -6)):
-        g.px([(x + dx, y + dy)], "d")
-    px, py = x - 5 + wag, y - 9
-    g.rect(px, py, px + 2, py + 2, "P")
-    g.px([(px, py - 1), (px + 2, py - 1)], "Q")
-
-
-def _lift(g, anchors, dy):
-    """Moves everything drawn so far up by dy pixels (for jumps)."""
-    if dy:
-        g.cells = g.cells[dy:] + [[None] * g.w for _ in range(dy)]
-        anchors = {k: (v[0], v[1] - dy) + tuple(v[2:]) for k, v in anchors.items()}
-    return anchors
-
-
-def zappy(pose="stand", step=0, bob=0, mouth=False, blink=False, tilt=0, paw=False, breathe=0, spark=False,
-          bolts=0, streaks=-1, happy=False, jump=0):
-    g = Grid(ZW, ZH)
-    G_ = ZG
-    if pose == "sleep":
-        _zappy_tail(g, 13, G_ - 2)
-        g.rect(12, G_ - 6 - breathe, 25, G_, "b", round_=3)
-        g.rect(14, G_ - 4 - breathe, 23, G_ - 1, "w", round_=2)
-        return g, zappy_head(g, 16, G_ - 13 - breathe, blink=True)
-
-    lean = 1 if streaks >= 0 else 0
-    if pose == "stand":
-        for fx, lift in ((14, step == 1), (19, step == -1)):
-            g.rect(fx, G_ - (1 if lift else 0), fx + 2, G_ - (1 if lift else 0), "s")
-        top = G_ - 8 + bob
-        _zappy_tail(g, 13, top + 3, wag=step % 2)
-        g.rect(13, top, 22, G_ - 1, "b", round_=2)
-        g.rect(15, top + 2, 20, G_ - 2, "w", round_=1)
-        g.rect(22 + lean, top + 2, 23 + lean, top + 3, "b")
-        anchors = zappy_head(g, 13 + lean, top - 8, mouth=mouth, blink=blink, spark=spark)
-    else:
-        top = G_ - 7
-        _zappy_tail(g, 13, top + 3)
-        g.rect(13, top, 22, G_, "b", round_=2)
-        g.rect(15, top + 2, 20, G_ - 1, "w", round_=1)
-        g.rect(21, G_ - 1, 24, G_, "b")
-        if paw:
-            g.rect(22, top - 1, 24, top, "b")
-        else:
-            g.rect(21, top + 2, 22, top + 4, "b")
-        anchors = zappy_head(g, 12 + (1 if tilt else 0), top - 8 + tilt, mouth=mouth, blink=blink or happy, spark=spark or happy)
-
-    anchors = _lift(g, anchors, jump)
-    if streaks >= 0:
-        # Quick Attack: speed lines behind it, shifting each frame.
-        for row, length in ((G_ - 12, 7), (G_ - 7, 9), (G_ - 3, 6)):
-            start = 1 + (streaks + row) % 3
-            g.px([(x, row) for x in range(start, start + length)], "S")
-    if bolts == 1:
-        _bolt(g, 3, 2)
-        _bolt(g, 32, 4)
-    elif bolts == 2:
-        _bolt(g, 1, 8, big=True)
-        _bolt(g, 33, 6, big=True)
-        _bolt(g, 18, 0)
-    elif bolts == 3:
-        for x, y in ((5, 10), (8, 4), (31, 3), (34, 12), (6, 20), (33, 20), (11, 0), (27, 1)):
-            g.px([(x, y), (x + 1, y)], "Y")
-    if happy:
-        for x, y in ((7, 8), (30, 6), (9, 15)):
-            g.px([(x, y), (x + 1, y - 1), (x, y - 2)], "Y")
-    return g, anchors
-
-
-def poses_zappy():
-    walk = [zappy(step=s, bob=b) for s, b in ((1, 0), (0, -1), (-1, 0), (0, -1))]
-    idle = [zappy(), zappy(), zappy(blink=True), zappy(spark=True)]
-    sit = [zappy("sit")]
-    thunderbolt = [zappy("sit", mouth=True, blink=True, spark=True, bolts=b) for b in (0, 1, 2, 3)]
-    beg = [zappy("sit", tilt=1, paw=True), zappy("sit", tilt=1, spark=True)]
-    sleep = [zappy("sleep"), zappy("sleep", breathe=1)]
-    quick = [zappy(step=s, bob=b, streaks=i) for i, (s, b) in enumerate(((1, 0), (0, -1), (-1, 0), (0, -1)))]
-    happy = [zappy("sit", happy=True, mouth=True), zappy("sit", happy=True)]
-    # Its trick: crouch and charge, leap up, Thunderbolt at the top, land.
-    # It hangs in the air zapping for a while before it comes down.
-    peak = zappy(spark=True, mouth=True, blink=True, jump=6, bolts=2)
-    sparks = zappy(spark=True, mouth=True, blink=True, jump=5, bolts=3)
-    leap = [zappy("sit", blink=True, spark=True), zappy(spark=True, mouth=True, jump=4),
-            peak, sparks, peak, sparks, zappy("sit", spark=True)]
-    return [idle, walk, sit, thunderbolt, beg, sleep, quick, happy, leap]
-
-
 # ---------------------------------------------------------------- Kong
 
 KONG = {"b": "#4A4752", "s": "#35333C", "w": "#9C8C80", "f": "#B9A797", "line": "#16151A",
@@ -1251,19 +1119,6 @@ def bamboo_held(angle):
     return g.render(BAMBOO_PAL, "#24451A")
 
 
-def berry():
-    return text_sprite([
-        "...gG..",
-        "..gg...",
-        ".pppp..",
-        "phpppp.",
-        "phppppP",
-        "ppppppP",
-        ".ppppP.",
-        "..PPP..",
-    ], {"p": "#F06AA0", "h": "#FFC2DA", "P": "#C2477A", "g": "#6CBF4A", "G": "#4C9A34"}, "#5A1E3A")
-
-
 def orange():
     return text_sprite([
         "....kg...",
@@ -1322,10 +1177,6 @@ def animations(extra=None):
 # Pets with extra animation rows beyond the usual six.
 EXTRA_ANIMATIONS = {
     "panda": {"fall": {"row": 6, "count": 3, "fps": 2, "once": True}},
-    # Thunderbolt when it yells, Quick Attack when it runs, sparks when it eats.
-    "zappy": {"bark": {"row": 3, "count": 4, "fps": 8}, "beg": {"row": 4, "count": 2, "fps": 3},
-              "run": {"row": 6, "count": 4, "fps": 14}, "eat": {"row": 7, "count": 2, "fps": 4},
-              "trick": {"row": 8, "count": 7, "fps": 2, "once": True}},
 }
 
 
@@ -1357,7 +1208,6 @@ def main():
     out["sheep"] = build(poses_sheep(), SHEEP, SHEEP["line"], W, H) + ((W, H), [26, 15])
     out["panda"] = build(poses_panda(), PANDA, PANDA["line"], W, H) + ((W, H), PANDA_PAWS)
     out["capybara"] = build(poses_simple(capybara), CAPY, CAPY["line"], W, H) + ((W, H), [28, 17])
-    out["zappy"] = build(poses_zappy(), ZAPPY, ZAPPY["line"], ZW, ZH) + ((ZW, ZH), ZAPPY_MOUTH)
     out["kong"] = build(poses_kong(), KONG, KONG["line"], KW, KH) + ((KW, KH), [34, 15])
 
     for pet_id, (pet, wears, (w, h), mouth) in out.items():
@@ -1370,7 +1220,7 @@ def main():
 
     extras = {f"Resources/Art/poop-{style}.png": poop(style) for style in POOP_STYLES}
     for pet_id, treat in (("shiba", bone), ("golden", bone), ("chihuahua", bone), ("husky", bone), ("corgi", bone), ("sheep", clover),
-                          ("panda", bamboo), ("capybara", orange), ("zappy", berry),
+                          ("panda", bamboo), ("capybara", orange),
                           ("orange-tabby", fish), ("black-cat", fish), ("kong", banana)):
         extras[f"Pets/{pet_id}/treat.png"] = treat()
     for name, angle in BAMBOO_HOLDS.items():
