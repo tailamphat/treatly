@@ -17,7 +17,7 @@
     capybara: 'Extremely chill, nags very politely',
     mighty: 'Huge, grumpy, pounds its chest',
   };
-  const WEAR = [['none', 'None'], ['party-hat', 'Party hat'], ['bow', 'Bow'], ['crown', 'Crown'], ['bandana', 'Bandana'], ['glasses', 'Sunglasses'], ['flower', 'Flower']];
+  const WEAR = [['none', 'None'], ['party-hat', 'Party hat'], ['bow', 'Bow'], ['crown', 'Crown'], ['bandana', 'Bandana'], ['glasses', 'Sunglasses'], ['flower', 'Flower'], ['headphones', 'Headphones']];
   const BOWLS = [['classic', 'Classic'], ['steel', 'Steel'], ['ceramic', 'Ceramic'], ['puppy', 'Puppy'], ['tub', 'Country Tub']];
   const POOPS = [['cute', 'Cute'], ['classic', 'Classic'], ['golden', 'Golden'], ['rainbow', 'Rainbow'], ['off', 'Off']];
   const TASKS = ['Pay rent', 'Water the plants', 'Book the dentist', 'Reply to emails', 'Ship the release', 'Call grandma', 'Do the laundry', 'Renew passport'];

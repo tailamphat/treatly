@@ -10,6 +10,7 @@ public enum Wardrobe {
         ("bandana", "Bandana"),
         ("glasses", "Sunglasses"),
         ("flower", "Flower"),
+        ("headphones", "Headphones"),
     ]
 
     public static func name(for id: String) -> String {

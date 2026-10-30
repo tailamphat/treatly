@@ -67,17 +67,25 @@ final class PetView: NSView {
             petRect.size.height *= 0.85
         case .held:
             petRect.origin.y += 6
+        case .listening:
+            // Bobbing along to the beat.
+            petRect.origin.y += abs(sin(s.time * 4)) * 3
         default:
             break
         }
 
         if s.activity != .held { drawShadow(under: petRect, art: art) }
+        if s.activity == .listening { drawNotes(around: petRect, time: s.time) }
 
         // Flip when the art faces the other way from where the pet is going.
         let flipped = (s.facing == .left) != art.facesLeft
         let alpha: CGFloat = s.activity == .whining && !art.isAnimated ? 0.85 : 1
         pet.draw(in: petRect, flipped: flipped, alpha: alpha)
         art.overlay(wearing, for: s.activity, elapsed: s.activityElapsed)?.draw(in: petRect, flipped: flipped, alpha: alpha)
+        if s.activity == .listening, wearing != "headphones" {
+            // Puts its headphones on to listen, on top of whatever else it wears.
+            art.overlay("headphones", for: s.activity, elapsed: s.activityElapsed)?.draw(in: petRect, flipped: flipped, alpha: alpha)
+        }
         var hit = petRect
 
         let carrying = s.carriesTreat || s.activity == .eating
@@ -126,6 +134,20 @@ final class PetView: NSView {
         let shadow = NSRect(x: petRect.midX - width / 2, y: Self.groundPad - 3, width: width, height: 6)
         NSColor(white: 0, alpha: 0.18).setFill()
         NSBezierPath(ovalIn: shadow).fill()
+    }
+
+    /// Music notes floating up and fading out around a pet that is listening.
+    private func drawNotes(around petRect: NSRect, time: TimeInterval) {
+        let notes = ["♪", "♫", "♪"]
+        for (i, note) in notes.enumerated() {
+            let phase = (time * 0.5 + Double(i) / Double(notes.count)).truncatingRemainder(dividingBy: 1)
+            let side: CGFloat = i % 2 == 0 ? -1 : 1
+            let x = petRect.midX + side * (petRect.width * 0.35 + CGFloat(sin(time * 2 + Double(i))) * 4)
+            let y = petRect.maxY - 6 + CGFloat(phase) * 28
+            let color = NSColor(calibratedRed: 0.36, green: 0.3, blue: 0.75, alpha: CGFloat(1 - phase))
+            let attributes: [NSAttributedString.Key: Any] = [.font: NSFont.systemFont(ofSize: 15, weight: .bold), .foregroundColor: color]
+            (note as NSString).draw(at: NSPoint(x: x, y: y), withAttributes: attributes)
+        }
     }
 
     private func drawStink(above rect: NSRect, time: TimeInterval) {

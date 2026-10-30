@@ -235,6 +235,21 @@ do {
     }
     check(swung && swungAtTree, "climbing: goes to its tree to swing")
 
+    // Music on: it sits and listens wherever it is. Music off: it carries on.
+    var listener = PetBrain(x: 200, y: 0, temperament: Temperament(walkSpeed: 100, energy: 0, sleepiness: 0, rest: 0...0.2))
+    for _ in 0..<40 { listener.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng) }
+    listener.musicPlaying = true
+    listener.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng)
+    let listeningAt = listener.x
+    for _ in 0..<100 { listener.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng) }
+    check(listener.activity == .listening && listener.x == listeningAt, "music: sits and listens where it is")
+    listener.musicPlaying = false
+    listener.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng)
+    check(listener.activity == .idle, "music stops: gets up again")
+    listener.musicPlaying = true
+    for _ in 0..<5 { listener.update(dt: 0.05, level: .barking, bounds: 0...1000, focusX: 500, random: &rng) }
+    check(listener.activity != .listening, "music: nagging still comes first")
+
     // Nagging comes in bursts, then it roams, then it comes back.
     var nagger = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, sleepiness: 0, nagDuration: 5, patience: 0.1))
     for _ in 0..<40 { nagger.update(dt: 0.1, level: .whining, bounds: 0...1000, focusX: 500, random: &rng) }

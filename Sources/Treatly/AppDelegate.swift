@@ -8,6 +8,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var pack: PetPack!
 
     private(set) var reminders: RemindersSource!
+    /// Tells the pet when the Mac is playing music, so it can sit and listen.
+    private let music = MusicListener()
     var sources: [TaskSource] { [reminders] }
 
     /// Every incomplete task from every connected source.
@@ -371,6 +373,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if let home = bowlWindows.values.first(where: { $0.window.isVisible })?.window.frame {
             brain.playground = (home.midX + 22, home.minY)
         }
+        brain.musicPlaying = music.isPlaying
         brain.update(dt: dt, level: level, bounds: ground.walkBounds, focusX: focusX, random: &random)
 
         if brain.activity != lastActivity {
@@ -445,6 +448,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .eating: list = p.happy
         case .tricking: list = p.trick
         case .swinging: list = p.swing ?? ["Wheee!"]
+        case .listening: list = nil
         case .burying: list = p.bury
         case .pooping: list = ["*plop*"]
         case .sitting: list = p.drop

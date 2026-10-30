@@ -713,10 +713,11 @@ def poses_mighty():
 
 # ---------------------------------------------------------------- Wardrobe
 
-WARDROBE = ["party-hat", "bow", "crown", "bandana", "glasses", "flower"]
+WARDROBE = ["party-hat", "bow", "crown", "bandana", "glasses", "flower", "headphones"]
 WEAR_PALETTE = {
     "r": "#E8485A", "y": "#F7D046", "Y": "#D9A520", "b": "#5AA0F0", "p": "#F48FB8", "P": "#D9608E",
     "g": "#58B368", "k": "#22202A", "l": "#BFE6FF", "w": "#FFFFFF", "o": "#F79A3E",
+    "c": "#4FC3D9", "C": "#2A93A8",
 }
 WEAR_LINE = "#2A1E24"
 
@@ -755,6 +756,15 @@ def wear(item, anchors, w, h):
         g.px([(ex - 1, ey), (ex, ey), (ex + 1, ey), (ex - 1, ey + 1), (ex, ey + 1), (ex + 1, ey + 1)], "k")
         g.px([(ex - 1, ey)], "l")
         g.px([(ex - 2, ey), (ex - 3, ey)], "k")
+    elif item == "headphones":
+        # A band over the top of the head and a cup over the ear with a little music note.
+        g.px([(hx + i, hy - 1) for i in range(1, hw - 1)], "k")
+        g.px([(hx, hy), (hx + hw - 1, hy)], "k")
+        cx, cy = hx + 1, hy + 2
+        g.rect(cx, cy, cx + 3, cy + 4, "c")
+        g.px([(cx + 3, cy + 1), (cx + 3, cy + 2), (cx + 3, cy + 3)], "C")
+        g.px([(cx + 2, cy + 1), (cx + 2, cy + 2), (cx + 1, cy + 3)], "w")  # ♪
+        g.px([(cx, cy - 1)], "k")
     elif item == "flower":
         fx, fy = hx + 2, hy - 1
         g.px([(fx, fy - 1), (fx - 1, fy), (fx + 1, fy), (fx, fy + 1)], "w")

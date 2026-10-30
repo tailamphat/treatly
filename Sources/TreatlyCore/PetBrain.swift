@@ -34,6 +34,8 @@ public enum Activity: Equatable, Sendable {
     case tricking
     /// Hanging from its tree and swinging, for fun.
     case swinging
+    /// Sitting and bobbing along while the Mac plays music.
+    case listening
 }
 
 public enum Facing: Sendable { case left, right }
@@ -102,6 +104,8 @@ public struct PetBrain {
     public var playground: (x: Double, y: Double)?
     /// Set while it heads to the playground.
     private var playTarget: (x: Double, y: Double)?
+    /// Set by the app while the Mac is playing music; the pet sits and listens along.
+    public var musicPlaying = false
     /// Nagging comes in bursts: `nagging` flips when `nagClock` runs out.
     public private(set) var nagging = false
     private var nagClock: TimeInterval = 0
@@ -134,7 +138,7 @@ public struct PetBrain {
 
     /// The treat is in its mouth.
     public var carriesTreat: Bool {
-        level > .calm && fetchTarget == nil && [.idle, .walking, .running, .held, .tricking].contains(activity)
+        level > .calm && fetchTarget == nil && [.idle, .walking, .running, .held, .tricking, .listening].contains(activity)
     }
 
     /// The treat is on the ground in front of it (also when it tripped while carrying it).
@@ -204,6 +208,15 @@ public struct PetBrain {
             if move(toward: min(max(focusX, bounds.lowerBound), bounds.upperBound), y, running: true, dt: dt) {
                 activity = level == .dropping ? .sitting : level == .barking ? .yelling : .whining
             }
+            return
+        }
+
+        // Music on: stop wherever it is and listen along. Music off: back to normal.
+        if musicPlaying {
+            if activity != .listening { activity = .listening; wanderTarget = nil }
+            return
+        } else if activity == .listening {
+            rest(for: 0.8)
             return
         }
 
