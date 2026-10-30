@@ -1,6 +1,6 @@
 // Treatly site: a small replay of the app's pet loop, drawn from the real pet packs.
 (() => {
-  const PETS = ['shiba', 'golden', 'husky', 'chihuahua', 'corgi', 'orange-tabby', 'black-cat', 'sheep', 'panda', 'capybara', 'kong'];
+  const PETS = ['shiba', 'golden', 'husky', 'chihuahua', 'corgi', 'orange-tabby', 'black-cat', 'sheep', 'panda', 'capybara', 'mighty'];
   const PERSONALITY = {
     shiba: 'Sassy, dramatic screamer',
     golden: 'Patient and hopeful',
@@ -12,7 +12,7 @@
     sheep: 'Slow, sleepy, bleats politely',
     panda: 'Lazy, dozes off mid-nag',
     capybara: 'Extremely chill, nags very politely',
-    kong: 'KONG SMASH',
+    mighty: 'Huge, grumpy, pounds its chest',
   };
   const WEAR = [['none', 'None'], ['party-hat', 'Party hat'], ['bow', 'Bow'], ['crown', 'Crown'], ['bandana', 'Bandana'], ['glasses', 'Sunglasses'], ['flower', 'Flower']];
   const BOWLS = [['classic', 'Classic'], ['steel', 'Steel'], ['ceramic', 'Ceramic'], ['puppy', 'Puppy'], ['tub', 'Country Tub']];
@@ -106,7 +106,7 @@
   // Some pets hold their treat differently each time, e.g. the panda's bamboo at any angle.
   const heldList = (id) => (data[id].treat.heldImages || ['treat.png']).map((f) => `pets/${id}/${f}`);
   const poopArt = (style) => `art/poop-${style}.png`;
-  // Kong's banana tree and the panda's bamboo grove stand in for the bowl.
+  // The gorilla's banana tree and the panda's bamboo pot stand in for the bowl.
   const kind = (id) => data[id].container || 'bowl';
   const isTree = (id) => kind(id) !== 'bowl';
 

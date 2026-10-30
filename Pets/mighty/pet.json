@@ -1,8 +1,8 @@
 {
-  "id": "kong",
-  "name": "King Kong",
-  "species": "ape",
-  "defaultName": "Kong",
+  "id": "mighty",
+  "name": "Mighty Gorilla",
+  "species": "gorilla",
+  "defaultName": "Mighty",
   "credit": "Treatly contributors, MIT (scripts/art/chibi.py)",
   "container": "tree",
   "treat": {
@@ -12,12 +12,12 @@
   "sheet": {
     "image": "sheet.png",
     "frameWidth": 38,
-    "frameHeight": 30,
+    "frameHeight": 34,
     "scale": 2.5,
     "footPadding": 1,
     "mouth": [
-      34,
-      15
+      36,
+      18
     ],
     "animations": {
       "idle": {
@@ -81,21 +81,21 @@
       "{task}"
     ],
     "drop": [
-      "Kong bring banana. {task}."
+      "Mighty bring banana. {task}."
     ],
     "yell": [
-      "KONG SMASH {task}!",
+      "MIGHTY SMASH {task}!",
       "*chest pound* {task}!!"
     ],
     "whine": [
-      "Kong sad. {task} not done."
+      "Mighty sad. {task} not done."
     ],
     "happy": [
       "BANANA GOOD!",
       "*happy chest pound*"
     ],
     "bury": [
-      "Kong save banana for later."
+      "Mighty save banana for later."
     ]
   },
   "sound": "Basso"

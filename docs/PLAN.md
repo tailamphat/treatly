@@ -19,7 +19,7 @@ An open-source macOS desktop pet that nags you about your todos. Tasks are treat
 | Task sources | Version 1: Apple Reminders (EventKit). Google Tasks was prototyped and removed until sign-in can work without any credentials (see git history) |
 | Art | Placeholder pixel art as text sprites in JSON packs |
 | Sound | Opt-in, macOS system sounds |
-| Pets (MVP) | Shiba Inu, Golden Retriever, Orange Tabby, Black Cat, King Kong |
+| Pets (MVP) | Shiba Inu, Golden Retriever, Orange Tabby, Black Cat, Mighty Gorilla |
 | Tests | `swift run TreatlyChecks` (Command Line Tools have no working XCTest/Swift Testing) |
 
 ## Behaviour

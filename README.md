@@ -4,7 +4,7 @@ A desktop pet for macOS that turns your todos into treats and nags you until you
 
 **Website:** https://tailamphat.github.io/treatly/
 
-Your pet (a dog, a cat, King Kong...) roams the bottom of your screen. Each task from **Apple Reminders** is a treat in its bowl. The pet fetches the most urgent one and carries it around. Ignore it and the pet escalates: it drops the treat in front of you, then yells, then whines. Nagging comes in bursts with roaming breaks in between, and every animal has its own walk speed, energy, sleepiness and patience. Mark the task done and it eats the treat.
+Your pet (a dog, a cat, a panda, a mighty gorilla...) roams the bottom of your screen. Each task from **Apple Reminders** is a treat in its bowl. The pet fetches the most urgent one and carries it around. Ignore it and the pet escalates: it drops the treat in front of you, then yells, then whines. Nagging comes in bursts with roaming breaks in between, and every animal has its own walk speed, energy, sleepiness and patience. Mark the task done and it eats the treat.
 
 | Pet | Treat | Personality |
 |---|---|---|
@@ -18,7 +18,7 @@ Your pet (a dog, a cat, King Kong...) roams the bottom of your screen. Each task
 | Sheep | clover | slow, sleepy, bleats politely |
 | Panda | bamboo | lazy, dozes off mid-nag |
 | Capybara | orange | extremely chill, nags very politely |
-| King Kong | banana | KONG SMASH |
+| Mighty Gorilla | banana | huge, grumpy, pounds its chest |
 
 ## Install
 

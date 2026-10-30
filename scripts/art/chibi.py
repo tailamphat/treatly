@@ -65,8 +65,8 @@ def upscale(rows, k):
 
 W, H = 32, 26
 G = 23  # bottom row of the feet; row 24 is outline, row 25 stays empty
-KW, KH = 38, 30
-KG = 27
+KW, KH = 38, 34
+KG = 31
 
 
 class Grid:
@@ -547,68 +547,99 @@ def poses_simple(draw):
     return [idle, walk, sit, bark, beg, sleep]
 
 
-# ---------------------------------------------------------------- Kong
+# ---------------------------------------------------------------- Mighty
+#
+# A mighty giant gorilla: huge hunched shoulders, a heavy brow and glowing
+# eyes. Walks on its knuckles, sits up to pound its chest and roar.
 
-KONG = {"b": "#4A4752", "s": "#35333C", "w": "#9C8C80", "f": "#B9A797", "line": "#16151A",
-        "e": "#1A1414", "n": "#3A2E2A", "k": "#5A1E22", "p": "#E88A98", "c": "#C99A8E"}
-
-
-def kong_head(g, hx, hy, mouth=False, blink=False):
-    g.rect(hx, hy, hx + 9, hy + 8, "b", round_=2)
-    g.px([(hx + 1, hy + 3), (hx, hy + 4)], "s")  # ear
-    g.rect(hx + 4, hy + 3, hx + 10, hy + 8, "f", round_=1)
-    g.rect(hx + 4, hy + 2, hx + 9, hy + 2, "s")  # brow
-    if blink:
-        g.px([(hx + 7, hy + 4), (hx + 8, hy + 4)], "e")
-    else:
-        g.px([(hx + 8, hy + 3), (hx + 8, hy + 4)], "e")
-    g.px([(hx + 10, hy + 5)], "n")
-    if mouth:
-        g.rect(hx + 7, hy + 6, hx + 10, hy + 7, "k")
-        g.px([(hx + 8, hy + 7)], "p")
-    else:
-        g.px([(hx + 8, hy + 7), (hx + 9, hy + 7)], "s")
-    return {"head": (hx, hy, 10), "eye": (hx + 8, hy + 3), "neck": (hx + 1, hy + 8)}
+MIGHTY = {"b": "#2E2B33", "s": "#1F1D23", "h": "#46424E", "f": "#7A6A62", "F": "#5E504A",
+          "e": "#FFD25A", "E": "#1A1414", "W": "#FFFFFF", "n": "#1A1616", "k": "#5A1E22",
+          "t": "#FFFFFF", "r": "#C24A4A", "line": "#0E0D10"}
+MIGHTY_MOUTH = [36, 18]
 
 
-def kong(pose="stand", step=0, bob=0, mouth=False, pound=0, breathe=0, blink=False):
+def mighty(pose="stand", step=0, bob=0, mouth=False, blink=False, pound=0, breathe=0):
     g = Grid(KW, KH)
+    G_ = KG
     if pose == "stand":
-        top = KG - 13 + bob
-        # Far arm and leg, then the body sloping down to the rump.
-        g.rect(13, top + 8, 14, KG, "s")
-        g.rect(23, top + 5, 24, KG, "s")
-        g.rect(5, top + 3, 26, top + 10, "b", round_=3)
-        g.rect(13, top, 26, top + 4, "b", round_=2)
-        g.rect(20, top + 4, 24, top + 8, "f", round_=1)
-        g.rect(7, top + 9, 9, KG - 1, "b")
-        g.px([(7 + step, KG), (8 + step, KG), (9 + step, KG)], "b")
-        g.rect(25, top + 5, 27, KG - 1, "b")
-        g.px([(25 - step, KG), (26 - step, KG), (27 - step, KG), (28 - step, KG)], "s")
-        return g, kong_head(g, 24, top - 6, mouth=mouth, blink=blink)
-    if pose == "sit":
-        top = KG - 15
-        g.rect(8, top + 2, 24, KG, "b", round_=3)
-        g.rect(16, top + 4, 22, KG - 3, "f", round_=2)
-        g.rect(9, KG - 1, 14, KG, "s")
-        g.rect(19, KG - 1, 25, KG, "s")
-        if pound:
-            # Arms up beating the chest, one at a time.
-            ax = 18 if pound == 1 else 20
-            g.rect(ax, top + 4, ax + 4, top + 6, "b", round_=1)
-            g.rect(24, top + 3, 26, top + 9, "b", round_=1)
+        # Far legs, body, huge shoulders, then the near legs on top.
+        g.rect(9 + step, G_ - 6, 11 + step, G_, "s")
+        g.rect(25 - step, G_ - 7, 27 - step, G_, "s")
+        g.rect(4, G_ - 12 + bob, 24, G_ - 4 + bob, "b", round_=4)
+        g.rect(13, G_ - 18 + bob, 28, G_ - 6 + bob, "b", round_=4)
+        g.rect(15, G_ - 17 + bob, 22, G_ - 15 + bob, "h", round_=1)
+        g.rect(24, G_ - 11 + bob, 29, G_ - 1, "b", round_=1)
+        g.rect(23 - step, G_, 30 - step, G_, "s")
+        g.rect(5, G_ - 4, 8, G_ - 1, "b")
+        g.rect(4 + step, G_, 9 + step, G_, "s")
+        # Head forward and low, with a heavy brow over a glowing eye.
+        hy = G_ - 23 + bob
+        g.rect(25, hy, 35, hy + 11, "b", round_=3)
+        g.rect(28, hy + 4, 36, hy + 10, "f", round_=2)
+        g.rect(27, hy + 3, 35, hy + 4, "s")
+        if blink:
+            g.px([(31, hy + 5), (32, hy + 5)], "s")
         else:
-            g.rect(23, top + 4, 25, KG - 1, "b", round_=1)
-            g.px([(24, KG), (25, KG), (26, KG)], "s")
-        return g, kong_head(g, 14, top - 7, mouth=mouth or bool(pound), blink=blink)
-    # Sleep: dozing sitting up, head nodding down onto the chest.
-    top = KG - 15 + breathe
-    g.rect(8, top + 2, 24, KG, "b", round_=3)
-    g.rect(16, top + 4, 22, KG - 3, "f", round_=2)
-    g.rect(9, KG - 1, 14, KG, "s")
-    g.rect(19, KG - 1, 25, KG, "s")
-    g.rect(21, top + 6, 24, KG - 1, "b", round_=1)
-    return g, kong_head(g, 13, top - 5, blink=True)
+            g.px([(31, hy + 5)], "e")
+            g.px([(32, hy + 5)], "E")
+        g.px([(35, hy + 7), (36, hy + 7)], "n")
+        if mouth:
+            g.rect(32, hy + 8, 35, hy + 10, "k")
+            g.px([(32, hy + 8), (35, hy + 8)], "t")
+        else:
+            g.px([(32, hy + 9), (33, hy + 9), (34, hy + 9)], "F")
+        return g, {"head": (26, hy, 10), "eye": (31, hy + 5), "neck": (27, hy + 11)}
+
+    # Sitting up, facing you: sit, chest pound (pound 1/2), sleep (head down).
+    asleep = pose == "sleep"
+    g.rect(12, G_ - 3, 16, G_, "b")
+    g.rect(21, G_ - 3, 25, G_, "b")
+    g.rect(11, G_, 17, G_, "s")
+    g.rect(20, G_, 26, G_, "s")
+    g.rect(9, G_ - 17 + breathe, 28, G_ - 3, "b", round_=4)
+    g.rect(13, G_ - 14 + breathe, 24, G_ - 5, "f", round_=2)
+    g.px([(18, G_ - 13), (18, G_ - 12), (18, G_ - 11), (18, G_ - 10)], "F")
+    if pound:
+        # One fist thumps the chest while the other swings back out.
+        near, far = ((10, 15), (28, 32)) if pound == 1 else ((22, 27), (5, 9))
+        g.rect(near[0], G_ - 13, near[1], G_ - 9, "h", round_=2)
+        g.rect(far[0], G_ - 18, far[1], G_ - 12, "b", round_=2)
+        for side in ((5, 9), (28, 32)):
+            if side != far:
+                g.rect(side[0], G_ - 13, side[1], G_ - 8, "b", round_=2)
+    else:
+        g.rect(5, G_ - 15, 9, G_ - 1, "b", round_=2)
+        g.rect(28, G_ - 15, 32, G_ - 1, "b", round_=2)
+        g.rect(4, G_, 9, G_, "s")
+        g.rect(28, G_, 33, G_, "s")
+    hy = G_ - 27 + (4 if asleep else 0) + breathe
+    g.rect(12, hy, 25, hy + 11, "b", round_=4)
+    g.px([(17, hy - 1), (18, hy - 2), (19, hy - 1), (20, hy - 2)], "b")
+    g.rect(14, hy + 4, 23, hy + 10, "f", round_=2)
+    g.rect(13, hy + 3, 24, hy + 4, "s")
+    if blink or asleep:
+        g.px([(15, hy + 5), (16, hy + 5), (21, hy + 5), (22, hy + 5)], "s")
+    else:
+        g.px([(15, hy + 5), (22, hy + 5)], "e")
+        g.px([(16, hy + 5), (21, hy + 5)], "E")
+    g.px([(18, hy + 6), (19, hy + 6)], "n")
+    if mouth or pound:
+        g.rect(16, hy + 7, 21, hy + 10, "k")
+        g.px([(16, hy + 7), (21, hy + 7), (16, hy + 10), (21, hy + 10)], "t")
+        g.rect(17, hy + 9, 20, hy + 9, "r")
+    else:
+        g.px([(17, hy + 8), (18, hy + 8), (19, hy + 8), (20, hy + 8)], "F")
+    return g, {"head": (14, hy, 10), "eye": (15, hy + 5), "neck": (14, hy + 11)}
+
+
+def poses_mighty():
+    walk = [mighty(step=s, bob=b) for s, b in ((1, 0), (0, -1), (-1, 0), (0, -1))]
+    idle = [mighty(), mighty(), mighty(blink=True), mighty(bob=1)]
+    sit = [mighty("sit")]
+    bark = [mighty("sit", pound=1), mighty("sit", pound=2)]
+    beg = [mighty("sit", blink=True), mighty("sit", mouth=True)]
+    sleep = [mighty("sleep"), mighty("sleep", breathe=1)]
+    return [idle, walk, sit, bark, beg, sleep]
 
 
 # ---------------------------------------------------------------- Wardrobe
@@ -887,7 +918,7 @@ def bowl(style, source):
 
 # ---------------------------------------------------------------- Banana tree
 #
-# King Kong's version of a bowl: a little palm, bananas hang under the crown.
+# Mighty's version of a bowl: a little palm, bananas hang under the crown.
 
 TREE_W, TREE_H = 38, 46
 TREE_CROWN = (19, 14)
@@ -1165,16 +1196,6 @@ def poses_quad(spec, cat):
     return [idle, walk, sit, bark, beg, sleep]
 
 
-def poses_kong():
-    walk = [kong(step=s, bob=b) for s, b in ((1, 0), (0, -1), (-1, 0), (0, -1))]
-    idle = [kong(), kong(), kong(blink=True), kong(bob=1)]
-    sit = [kong("sit")]
-    bark = [kong("sit", pound=1), kong("sit", pound=2)]
-    beg = [kong("sit", blink=True), kong("sit")]
-    sleep = [kong("sleep"), kong("sleep", breathe=1)]
-    return [idle, walk, sit, bark, beg, sleep]
-
-
 def build(poses, palette, outline, w, h):
     pet = sheet([[g.render(palette, outline) for g, _ in row] for row in poses])
     wears = {}
@@ -1229,7 +1250,7 @@ def main():
     out["sheep"] = build(poses_sheep(), SHEEP, SHEEP["line"], W, H) + ((W, H), [26, 15])
     out["panda"] = build(poses_panda(), PANDA, PANDA["line"], W, H) + ((W, H), PANDA_PAWS)
     out["capybara"] = build(poses_simple(capybara), CAPY, CAPY["line"], W, H) + ((W, H), [28, 17])
-    out["kong"] = build(poses_kong(), KONG, KONG["line"], KW, KH) + ((KW, KH), [34, 15])
+    out["mighty"] = build(poses_mighty(), MIGHTY, MIGHTY["line"], KW, KH) + ((KW, KH), MIGHTY_MOUTH)
 
     for pet_id, (pet, wears, (w, h), mouth) in out.items():
         folder = os.path.join(ROOT, "Pets", pet_id)
@@ -1242,7 +1263,7 @@ def main():
     extras = {f"Resources/Art/poop-{style}.png": poop(style) for style in POOP_STYLES}
     for pet_id, treat in (("shiba", bone), ("golden", bone), ("chihuahua", bone), ("husky", bone), ("corgi", bone), ("sheep", clover),
                           ("panda", bamboo), ("capybara", orange),
-                          ("orange-tabby", fish), ("black-cat", fish), ("kong", banana)):
+                          ("orange-tabby", fish), ("black-cat", fish), ("mighty", banana)):
         extras[f"Pets/{pet_id}/treat.png"] = treat()
     for name, angle in BAMBOO_HOLDS.items():
         extras[f"Pets/panda/treat-{name}.png"] = bamboo_held(angle)
