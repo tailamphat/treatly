@@ -15,7 +15,7 @@ enum ContainerStyle: String {
     case bowl
     /// A banana tree; treats hang under the crown.
     case tree
-    /// A bamboo grove; cut bamboo stacks up at the base.
+    /// Lucky bamboo in a pot; cut bamboo stacks up on the rim.
     case bamboo
 
     init(pack: PetPack) {
@@ -113,8 +113,8 @@ final class BowlView: NSView {
                     treat.draw(in: NSRect(x: c.x - t.width / 2, y: c.y - t.height / 2, width: t.width, height: t.height), flipped: i % 2 == 1)
                 }
             case .bamboo:
-                // A stack of cut bamboo in front of the stalks, bottom row first.
-                let stack: [(CGFloat, CGFloat)] = [(11, 40), (23, 40), (17, 40), (14, 38), (20, 38), (17, 36)]
+                // A stack of cut bamboo on the pot's rim, in front of the stalks, bottom row first.
+                let stack: [(CGFloat, CGFloat)] = [(11, 31), (23, 31), (17, 31), (14, 29), (20, 29), (17, 27)]
                 let t = NSSize(width: CGFloat(treat.width), height: CGFloat(treat.height))
                 for (i, (x, y)) in stack.prefix(min(treatCount, stack.count)).enumerated() {
                     let c = point(x, y)

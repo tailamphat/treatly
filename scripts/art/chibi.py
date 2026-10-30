@@ -964,44 +964,65 @@ def tree(source):
 
 # ---------------------------------------------------------------- App icon
 
-# ---------------------------------------------------------------- Bamboo grove
+# ---------------------------------------------------------------- Bamboo pot
 #
-# The panda's container: a few stalks on a grassy mound; cut bamboo stacks at the base.
+# The panda's container: lucky bamboo in a little terracotta pot with a face.
+# Cut bamboo stacks up on the rim, in front of the stalks.
 
 GROVE_W, GROVE_H = 34, 44
-GROVE = {"h": "#B6E486", "g": "#7CC04E", "G": "#5A9A34", "n": "#3E7A2A", "l": "#6CBF4A", "L": "#4C9A34",
-         "d": "#9A6A3A", "D": "#7A4E26", "q": "#7DC25A", "Q": "#5FA542"}
+GROVE = {"h": "#C9EE9A", "g": "#86C95A", "G": "#5E9E3A", "n": "#3F7A2A", "N": "#A6DB78",
+         "l": "#74C454", "L": "#4E9C36", "m": "#A2DE7E",
+         "t": "#E0875A", "T": "#B8633A", "u": "#F2A87E", "v": "#FFE3CF", "e": "#2A1A14", "p": "#F7A8BC"}
 
 
-def _stalk(g, x, top, bottom=40):
+def _stalk(g, x, top, bottom):
+    """A chunky 4px stalk with a highlight, a shaded side and nodes."""
     for y in range(top, bottom + 1):
         g.px([(x, y)], "h")
-        g.px([(x + 1, y)], "g")
-        g.px([(x + 2, y)], "G")
-        if (y - top) % 7 == 6:
-            g.px([(x, y), (x + 1, y), (x + 2, y)], "n")
-    g.px([(x, top - 1), (x + 1, top - 1)], "g")
+        g.px([(x + 1, y), (x + 2, y)], "g")
+        g.px([(x + 3, y)], "G")
+    for y in range(top + 5, bottom, 6):
+        g.px([(x, y), (x + 1, y), (x + 2, y), (x + 3, y)], "n")
+        g.px([(x + 1, y - 1)], "N")
+    g.px([(x + 1, top - 1), (x + 2, top - 1)], "g")
 
 
-def _leaf(g, x, y, d):
-    """A slanted leaf from (x, y), d = 1 to the right, -1 to the left."""
-    g.px([(x + d * i, y - i // 2) for i in range(1, 7)], "l")
-    g.px([(x + d * i, y - i // 2 + 1) for i in range(2, 6)], "L")
+def _blade(g, x, y, d, length=7, rise=0.5):
+    """A tapered leaf from (x, y): d = 1 to the right, -1 to the left."""
+    for i in range(length * 2):
+        t = i / 2
+        cx, cy = x + d * t, y - t * rise
+        half = 1.3 * (1 - t / length) + 0.2
+        for oy in range(-2, 3):
+            if abs(oy) <= half:
+                g.px([(round(cx), round(cy + oy))], "L" if oy > 0 else "l")
+    g.px([(round(x + d * length * 0.4), round(y - length * 0.4 * rise - 1))], "m")
+
+
+def _tuft(g, x, y):
+    _blade(g, x, y, -1, 6, 0.6)
+    _blade(g, x + 3, y, 1, 6, 0.6)
+    _blade(g, x + 1, y - 1, -1, 4, 1.4)
+    _blade(g, x + 2, y - 1, 1, 4, 1.4)
 
 
 def bamboo_grove(source):
     g = Grid(GROVE_W, GROVE_H)
-    for x, top in ((7, 6), (15, 2), (23, 10)):
-        _stalk(g, x, top)
-    # Tufts at the tops plus a few leaves lower down.
-    for x, y, d in ((7, 6, -1), (9, 5, 1), (15, 4, -1), (17, 4, 1), (17, 7, 1), (23, 11, -1), (25, 10, 1),
-                    (7, 20, -1), (17, 18, 1), (25, 24, 1), (15, 26, -1)):
-        _leaf(g, x, y, d)
-    # Grassy mound.
-    for y in range(38, GROVE_H - 1):
+    for x, top in ((9, 8), (15, 3), (21, 11)):
+        _stalk(g, x, top, 34)
+        _tuft(g, x, top + 1)
+    _blade(g, 12, 22, 1, 5)
+    _blade(g, 21, 24, -1, 5)
+    # The pot narrows towards the bottom, with a lighter rim and a little face.
+    for y in range(33, 43):
+        half = 12 - (y - 33) * 0.45
         for x in range(GROVE_W):
-            if ((x + 0.5 - 17) / 16) ** 2 + ((y + 0.5 - 43) / 5.5) ** 2 <= 1:
-                g.px([(x, y)], "q" if y <= 39 else "Q" if y == 40 else "D" if (x + y) % 5 == 0 else "d")
+            if abs(x + 0.5 - 17) <= half:
+                g.px([(x, y)], "t" if x + 0.5 < 17 + half - 2 else "T")
+    g.rect(4, 32, 29, 34, "u", round_=1)
+    g.rect(5, 32, 28, 32, "v")
+    g.px([(13, 37), (13, 38), (20, 37), (20, 38), (16, 39), (17, 39)], "e")
+    g.px([(11, 39), (22, 39)], "p")
     return g.render(GROVE, "#24451A")
 
 

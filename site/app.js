@@ -21,7 +21,7 @@
   // Same spots the app uses (BowlView.swift), in bowl pixels from the top left.
   const PILE = [[10, 5.5, false], [16, 5.5, true], [13, 4.5, false], [7, 6, true], [19, 6, false]];
   const HANGS = [[15, 17], [23, 17], [19, 19], [13, 20], [25, 20], [19, 22]];
-  const STACK = [[11, 40], [23, 40], [17, 40], [14, 38], [20, 38], [17, 36]];
+  const STACK = [[11, 31], [23, 31], [17, 31], [14, 29], [20, 29], [17, 27]];
   const GROUND = 30;
 
   const $ = (s) => document.querySelector(s);

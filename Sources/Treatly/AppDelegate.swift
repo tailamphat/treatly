@@ -73,10 +73,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             MainActor.assumeIsolated { self?.layoutBowls() }
         }
 
-        Task {
-            _ = await reminders.requestAccess()
-            refresh()
-        }
+        // Reminders access is only requested when the user asks for it (menu or Settings),
+        // so the pet can live on the desktop without it.
+        refresh()
         // Demo mode: another process can post this to press "Done".
         if ProcessInfo.processInfo.environment["TREATLY_DEMO"] != nil {
             DistributedNotificationCenter.default().addObserver(forName: .init("io.github.treatly.demo.done"), object: nil, queue: .main) { [weak self] _ in
