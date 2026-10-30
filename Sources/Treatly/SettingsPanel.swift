@@ -43,6 +43,13 @@ final class SettingsPanel: NSPanel {
     }
 
     override var canBecomeKey: Bool { true }
+
+    /// Opens without focusing (and selecting) the name field; click it to rename.
+    override func makeKeyAndOrderFront(_ sender: Any?) {
+        super.makeKeyAndOrderFront(sender)
+        // SwiftUI focuses the first text field after the window shows, so clear it a tick later.
+        DispatchQueue.main.async { [weak self] in self?.makeFirstResponder(nil) }
+    }
 }
 
 struct SettingsView: View {
