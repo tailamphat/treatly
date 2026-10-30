@@ -263,8 +263,14 @@ struct SettingsView: View {
                     VStack(spacing: 4) {
                         PetPreview(pack: pack)
                             .frame(height: 44)
+                        // The breed first, so a Corgi reads "Corgi", not just "Biscuit".
+                        Text(pack.name)
+                            .font(.caption.weight(selected ? .bold : .semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
                         Text(app.settings.petName(for: pack))
-                            .font(.caption.weight(selected ? .bold : .regular))
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
                     .frame(maxWidth: .infinity)
@@ -280,7 +286,7 @@ struct SettingsView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .help(pack.name)
+                .help("\(pack.name) (\(pack.treat.name))")
             }
         }
     }
