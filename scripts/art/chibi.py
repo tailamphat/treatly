@@ -681,6 +681,55 @@ def mighty(pose="stand", step=0, bob=0, mouth=False, blink=False, pound=0, breat
     return g, anchors
 
 
+def mighty_arms(up=True):
+    """Reared up facing you with both arms swung up high (up) or flung out wide."""
+    g = Grid(KW, KH)
+    G_ = KG
+    g.rect(10, G_ - 3, 16, G_, "s")
+    g.rect(21, G_ - 3, 27, G_, "s")
+    g.rect(9, G_ - 18, 28, G_ - 2, "b", round_=5)
+    g.rect(13, G_ - 15, 24, G_ - 5, "f", round_=3)
+    g.rect(14, G_ - 14, 17, G_ - 11, "l", round_=1)
+    g.rect(20, G_ - 14, 23, G_ - 11, "l", round_=1)
+    for side in (-1, 1):
+        sx = 9 if side < 0 else 28
+        if up:
+            # Shoulder, then the arm straight up beside the head, fist on top.
+            g.rect(min(sx, sx + side * 4), G_ - 18, max(sx, sx + side * 4), G_ - 12, "b", round_=1)
+            ax = (2, 7) if side < 0 else (30, 35)
+            g.rect(ax[0], G_ - 30, ax[1], G_ - 15, "b", round_=2)
+            g.rect(ax[0] + 1, G_ - 29, ax[0] + 2, G_ - 20, "h")
+            g.rect(ax[0], G_ - 33, ax[1], G_ - 29, "s", round_=2)
+        else:
+            ax = (0, 9) if side < 0 else (28, 37)
+            g.rect(ax[0], G_ - 18, ax[1], G_ - 13, "b", round_=2)
+            g.rect(ax[0] + 1, G_ - 17, ax[1] - 1, G_ - 17, "h")
+            g.rect(*((0, G_ - 19, 3, G_ - 12) if side < 0 else (34, G_ - 19, 37, G_ - 12)), "s", round_=1)
+    anchors = _mighty_face(g, 11, G_ - 30, mouth=True)
+    return g, anchors
+
+
+def mighty_hang(sway=0):
+    """Hanging by one hand from a palm frond (top-left), body swinging by `sway`."""
+    g = Grid(KW, KH)
+    gx, gy = 7, 1  # the hand, fixed on the frond
+    top = 4
+    hx = 11 + sway
+    # Raised arm from the grip down to the shoulder.
+    for i in range(10):
+        x = round(gx + (hx - 1 - gx) * i / 9)
+        g.rect(x, gy + i, x + 3, gy + i, "b")
+    g.rect(gx - 1, 0, gx + 4, 2, "s", round_=1)
+    g.rect(9 + sway, top + 11, 28 + sway, top + 24, "b", round_=5)
+    g.rect(13 + sway, top + 13, 24 + sway, top + 22, "f", round_=3)
+    g.rect(28 + sway, top + 13, 32 + sway, top + 22, "b", round_=2)  # other arm hanging down
+    g.rect(28 + sway, top + 22, 32 + sway, top + 24, "s", round_=1)
+    for lx in (12, 21):  # legs dangling
+        g.rect(lx + sway - sway // 2, top + 24, lx + 4 + sway - sway // 2, top + 27, "s", round_=1)
+    anchors = _mighty_face(g, hx, top, mouth=sway == 0)
+    return g, anchors
+
+
 def poses_mighty():
     walk = [mighty(step=s, bob=b) for s, b in ((1, 0), (0, -1), (-1, 0), (0, -1))]
     idle = [mighty(), mighty(), mighty(blink=True), mighty(bob=1)]
@@ -688,7 +737,11 @@ def poses_mighty():
     bark = [mighty("sit", pound=1), mighty("sit", pound=2)]
     beg = [mighty("sit", blink=True), mighty("sit", mouth=True)]
     sleep = [mighty("sleep"), mighty("sleep", breathe=1)]
-    return [idle, walk, sit, bark, beg, sleep]
+    # Show-off: rears up, swings its arms up and out, pounds its chest.
+    trick = [mighty("sit"), mighty_arms(True), mighty_arms(False), mighty_arms(True),
+             mighty("sit", pound=1), mighty("sit", pound=2)]
+    swing = [mighty_hang(s) for s in (-2, -1, 0, 1, 2, 1, 0, -1)]
+    return [idle, walk, sit, bark, beg, sleep, trick, swing]
 
 
 # ---------------------------------------------------------------- Wardrobe
@@ -1245,6 +1298,8 @@ PET_SCALES = {"mighty": 2.1}
 # Pets with extra animation rows beyond the usual six.
 EXTRA_ANIMATIONS = {
     "panda": {"fall": {"row": 6, "count": 3, "fps": 2, "once": True}},
+    # Swings its arms and pounds its chest for fun; swings from its palm tree.
+    "mighty": {"trick": {"row": 6, "count": 6, "fps": 3}, "swing": {"row": 7, "count": 8, "fps": 5}},
 }
 
 

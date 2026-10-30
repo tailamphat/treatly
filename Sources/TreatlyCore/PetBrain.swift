@@ -32,6 +32,8 @@ public enum Activity: Equatable, Sendable {
     case tumbling
     /// Showing off its special move, just for fun.
     case tricking
+    /// Hanging from its tree and swinging, for fun.
+    case swinging
 }
 
 public enum Facing: Sendable { case left, right }
@@ -55,10 +57,12 @@ public struct Temperament: Equatable, Sendable {
     public var clumsiness: Double
     /// Chance (0...1) of showing off a trick when it stops.
     public var playfulness: Double
+    /// Chance (0...1) that, with nothing to do, it goes to swing on its tree.
+    public var climbing: Double
 
     public init(walkSpeed: Double, runSpeed: Double? = nil, energy: Double = 0.15, sleepiness: Double = 0.25,
                 rest: ClosedRange<Double> = 1.5...4.5, nagDuration: TimeInterval = 20, patience: Double = 1,
-                clumsiness: Double = 0, playfulness: Double = 0) {
+                clumsiness: Double = 0, playfulness: Double = 0, climbing: Double = 0) {
         self.walkSpeed = walkSpeed
         self.runSpeed = runSpeed ?? walkSpeed * 2.2
         self.energy = energy
@@ -68,6 +72,7 @@ public struct Temperament: Equatable, Sendable {
         self.patience = patience
         self.clumsiness = clumsiness
         self.playfulness = playfulness
+        self.climbing = climbing
     }
 }
 
@@ -86,12 +91,17 @@ public struct PetBrain {
     public static let poopDuration: TimeInterval = 1.2
     public static let tumbleDuration: TimeInterval = 1.6
     public static let trickDuration: TimeInterval = 4
+    public static let swingDuration: TimeInterval = 5
 
     private var timer: TimeInterval = 0
     private var wanderTarget: Double?
     private var wanderRunning = false
     /// Set while it goes to a bowl to take out the next treat.
     private var fetchTarget: (x: Double, y: Double)?
+    /// Where it can swing for fun (next to its tree), kept up to date by the app.
+    public var playground: (x: Double, y: Double)?
+    /// Set while it heads to the playground.
+    private var playTarget: (x: Double, y: Double)?
     /// Nagging comes in bursts: `nagging` flips when `nagClock` runs out.
     public private(set) var nagging = false
     private var nagClock: TimeInterval = 0
@@ -178,6 +188,18 @@ public struct PetBrain {
             return
         }
 
+        if let target = playTarget {
+            if level > .calm {
+                playTarget = nil
+            } else if move(toward: target.x, target.y, running: false, dt: dt) {
+                playTarget = nil
+                activity = .swinging
+                facing = .right
+                timer = Self.swingDuration
+            }
+            return
+        }
+
         if nagging {
             if move(toward: min(max(focusX, bounds.lowerBound), bounds.upperBound), y, running: true, dt: dt) {
                 activity = level == .dropping ? .sitting : level == .barking ? .yelling : .whining
@@ -195,7 +217,7 @@ public struct PetBrain {
             } else {
                 rest(for: 0.3)
             }
-        case .sleeping, .tricking:
+        case .sleeping, .tricking, .swinging:
             timer -= dt
             if rising || timer <= 0 { rest(for: 0.5) }
         case .idle:
@@ -210,6 +232,10 @@ public struct PetBrain {
                 // Only playful pets draw this number, so other pets behave exactly as before.
                 activity = .tricking
                 timer = Self.trickDuration
+            } else if level == .calm, temperament.climbing > 0, let spot = playground, random.next() < temperament.climbing {
+                // Off to play on its tree.
+                playTarget = spot
+                activity = .walking
             } else {
                 let span = bounds.upperBound - bounds.lowerBound
                 wanderTarget = bounds.lowerBound + random.next() * span
@@ -250,6 +276,7 @@ public struct PetBrain {
     public mutating func fetch(fromBowlAtX x: Double, y: Double) {
         fetchTarget = (x, y)
         wanderTarget = nil
+        playTarget = nil
         if ![.eating, .burying, .pooping, .held].contains(activity) { activity = .running }
     }
 
@@ -260,6 +287,7 @@ public struct PetBrain {
         activity = .held
         wanderTarget = nil
         fetchTarget = nil
+        playTarget = nil
     }
 
     public mutating func drag(toX x: Double, y: Double) {

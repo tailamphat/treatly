@@ -367,6 +367,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             panel.model.poke()
         }
         let focusX = (ground.minX + ground.maxX) / 2
+        // Its tree (or bowl) is where it can go to swing for fun; the hand grabs the fronds left of centre.
+        if let home = bowlWindows.values.first(where: { $0.window.isVisible })?.window.frame {
+            brain.playground = (home.midX + 22, home.minY)
+        }
         brain.update(dt: dt, level: level, bounds: ground.walkBounds, focusX: focusX, random: &random)
 
         if brain.activity != lastActivity {
@@ -440,6 +444,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         switch brain.activity {
         case .eating: list = p.happy
         case .tricking: list = p.trick
+        case .swinging: list = p.swing ?? ["Wheee!"]
         case .burying: list = p.bury
         case .pooping: list = ["*plop*"]
         case .sitting: list = p.drop

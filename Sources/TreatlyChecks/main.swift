@@ -225,6 +225,16 @@ do {
     }
     check(tricked && after, "playful: shows off a trick, then goes back to roaming")
 
+    // Climbers sometimes walk over to their tree to swing, then carry on.
+    var climber = PetBrain(x: 0, y: 0, temperament: Temperament(walkSpeed: 400, energy: 0, sleepiness: 0, rest: 0...0.2, climbing: 0.5))
+    climber.playground = (x: 300, y: 0)
+    var swung = false, swungAtTree = false
+    for _ in 0..<600 {
+        climber.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng)
+        if climber.activity == .swinging { swung = true; swungAtTree = abs(climber.x - 300) < 1 }
+    }
+    check(swung && swungAtTree, "climbing: goes to its tree to swing")
+
     // Nagging comes in bursts, then it roams, then it comes back.
     var nagger = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, sleepiness: 0, nagDuration: 5, patience: 0.1))
     for _ in 0..<40 { nagger.update(dt: 0.1, level: .whining, bounds: 0...1000, focusX: 500, random: &rng) }

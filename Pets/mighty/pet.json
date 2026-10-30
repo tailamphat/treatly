@@ -53,6 +53,16 @@
         "row": 5,
         "count": 2,
         "fps": 0.6
+      },
+      "trick": {
+        "row": 6,
+        "count": 6,
+        "fps": 3
+      },
+      "swing": {
+        "row": 7,
+        "count": 8,
+        "fps": 5
       }
     },
     "wardrobe": [
@@ -74,7 +84,9 @@
       6
     ],
     "nagSeconds": 25,
-    "patience": 1.0
+    "patience": 1.0,
+    "playfulness": 0.25,
+    "climbing": 0.3
   },
   "phrases": {
     "carry": [
@@ -96,6 +108,16 @@
     ],
     "bury": [
       "Mighty save banana for later."
+    ],
+    "trick": [
+      "*swings arms* MIGHTY!",
+      "*chest pound* {name} is the strongest!",
+      "HOO HOO HAA!"
+    ],
+    "swing": [
+      "Wheee!",
+      "*swings from the palm*",
+      "{name} is king of the palm tree!"
     ]
   },
   "sound": "Basso"

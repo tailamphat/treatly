@@ -87,6 +87,7 @@ public struct SpriteSheet: Codable, Equatable, Sendable {
         case .held: return ["held", "idle"]
         case .tumbling: return ["fall", "sleep", "sit", "idle"]
         case .tricking: return ["trick", "bark", "idle"]
+        case .swinging: return ["swing", "trick", "idle"]
         }
     }
 

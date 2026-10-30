@@ -57,13 +57,15 @@ public struct PetPack: Codable, Equatable, Identifiable, Sendable {
         public var clumsiness: Double?
         /// Chance (0...1) of showing off its `trick` animation when it stops. Defaults to 0.
         public var playfulness: Double?
+        /// Chance (0...1) that, with nothing to do, it swings from its tree (`swing` animation). Defaults to 0.
+        public var climbing: Double?
 
         public var temperament: Temperament {
             let r = rest ?? []
             let restRange = r.count == 2 && r[0] <= r[1] ? r[0]...r[1] : 1.5...4.5
             return Temperament(walkSpeed: walkSpeed, runSpeed: runSpeed, energy: energy ?? 0.15, sleepiness: sleepiness,
                                rest: restRange, nagDuration: nagSeconds ?? 20, patience: patience ?? 1, clumsiness: clumsiness ?? 0,
-                               playfulness: playfulness ?? 0)
+                               playfulness: playfulness ?? 0, climbing: climbing ?? 0)
         }
     }
 
@@ -75,8 +77,10 @@ public struct PetPack: Codable, Equatable, Identifiable, Sendable {
         public var whine: [String]
         public var happy: [String]
         public var bury: [String]
-        /// Said while showing off a trick, e.g. "{name} used Thunderbolt!".
+        /// Said while showing off a trick.
         public var trick: [String]?
+        /// Said while swinging from its tree.
+        public var swing: [String]?
     }
 
     public func validate() throws {
