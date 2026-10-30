@@ -63,7 +63,8 @@
   const sprites = new Set();
   class Sprite {
     constructor(id, scale) {
-      this.d = data[id]; this.s = scale;
+      // Packs can be drawn smaller or bigger than the usual 2.5x (the gorilla is smaller).
+      this.d = data[id]; this.s = scale * (data[id].sheet.scale || 2.5) / 2.5;
       const sh = this.d.sheet;
       this.fw = sh.frameWidth; this.fh = sh.frameHeight;
       const anims = Object.values(sh.animations);

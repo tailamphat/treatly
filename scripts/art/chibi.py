@@ -1206,6 +1206,9 @@ def animations(extra=None):
     }, **(extra or {})}
 
 
+# Pets drawn a little smaller or bigger than the usual 2.5x on screen.
+PET_SCALES = {"mighty": 2.1}
+
 # Pets with extra animation rows beyond the usual six.
 EXTRA_ANIMATIONS = {
     "panda": {"fall": {"row": 6, "count": 3, "fps": 2, "once": True}},
@@ -1247,7 +1250,7 @@ def main():
         write_png(os.path.join(folder, "sheet.png"), pet)
         for item, rows in wears.items():
             write_png(os.path.join(folder, f"wear-{item}.png"), rows)
-        update_pack(pet_id, w, h, mouth)
+        update_pack(pet_id, w, h, mouth, PET_SCALES.get(pet_id, 2.5))
         print("wrote", pet_id)
 
     extras = {f"Resources/Art/poop-{style}.png": poop(style) for style in POOP_STYLES}
