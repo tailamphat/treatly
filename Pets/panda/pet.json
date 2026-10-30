@@ -8,7 +8,13 @@
   "treat": {
     "name": "bamboo",
     "image": "treat.png",
-    "heldImage": "treat-held.png"
+    "heldImages": [
+      "treat.png",
+      "treat-up.png",
+      "treat-steep.png",
+      "treat-upright.png",
+      "treat-shoulder.png"
+    ]
   },
   "sheet": {
     "image": "sheet.png",

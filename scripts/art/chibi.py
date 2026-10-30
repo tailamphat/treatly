@@ -1084,20 +1084,39 @@ def bamboo():
     ], {"h": "#C8EB8A", "b": "#8CCB52", "s": "#5E9A34", "K": "#3E6A22", "g": "#6CBF4A", "G": "#4C9A34"}, "#24451A")
 
 
-def bamboo_held():
-    """The bamboo as the panda holds it: tilted up towards the front."""
-    length, rise = 13, 6
-    g = Grid(length + 6, rise + 9)
-    for i in range(length):
-        x = i + 1
-        y = rise + 3 - (i * rise) // (length - 1)
-        node = i in (4, 9)
-        for dy, role in ((0, "h"), (1, "b"), (2, "s")):
-            g.px([(x, y + dy)], "K" if node else role)
-    # A leaf sprouting from the top end.
-    g.px([(length + 1, 2), (length + 2, 1), (length + 3, 1), (length + 4, 0)], "g")
-    g.px([(length + 2, 2), (length + 3, 2)], "G")
-    return g.render({"h": "#C8EB8A", "b": "#8CCB52", "s": "#5E9A34", "K": "#3E6A22", "g": "#6CBF4A", "G": "#4C9A34"}, "#24451A")
+BAMBOO_PAL = {"h": "#C8EB8A", "b": "#8CCB52", "s": "#5E9A34", "K": "#3E6A22", "g": "#6CBF4A", "G": "#4C9A34"}
+# Ways the panda holds its bamboo, in degrees up from pointing forward. 0 is level;
+# 120 leans back over its shoulder. treat.png covers the level one.
+BAMBOO_HOLDS = {"up": 28, "steep": 55, "upright": 90, "shoulder": 125}
+
+
+def bamboo_held(angle):
+    """The bamboo at `angle` degrees, centred in its image so the paws hold the middle."""
+    length = 13
+    dx, dy = math.cos(math.radians(angle)), -math.sin(math.radians(angle))
+    nx, ny = -dy, dx  # normal: the shine side
+    cells = {}
+    t = -length / 2
+    while t <= length / 2:
+        for off, role in ((-1, "h"), (0, "b"), (1, "s")):
+            x, y = round(t * dx + off * nx), round(t * dy + off * ny)
+            node = any(abs(t - n) < 0.5 for n in (-2.5, 2.5))
+            if (x, y) not in cells or role == "b":
+                cells[(x, y)] = "K" if node else role
+        t += 0.25
+    # A leaf sprouting from the top end, off to one side.
+    tip = (length / 2 + 0.5)
+    for i in range(1, 5):
+        x = round(tip * dx + i * 0.8 * dx + (i * 0.6 + 1) * nx * -1)
+        y = round(tip * dy + i * 0.8 * dy + (i * 0.6 + 1) * ny * -1)
+        cells.setdefault((x, y), "g" if i < 4 else "G")
+    xs = [x for x, _ in cells]; ys = [y for _, y in cells]
+    r = max(max(xs), -min(xs)) + 1
+    h = max(max(ys), -min(ys)) + 1
+    g = Grid(2 * r + 1, 2 * h + 1)
+    for (x, y), role in cells.items():
+        g.px([(x + r, y + h)], role)
+    return g.render(BAMBOO_PAL, "#24451A")
 
 
 def orange():
@@ -1204,7 +1223,8 @@ def main():
                           ("panda", bamboo), ("capybara", orange),
                           ("orange-tabby", fish), ("black-cat", fish), ("kong", banana)):
         extras[f"Pets/{pet_id}/treat.png"] = treat()
-    extras["Pets/panda/treat-held.png"] = bamboo_held()
+    for name, angle in BAMBOO_HOLDS.items():
+        extras[f"Pets/panda/treat-{name}.png"] = bamboo_held(angle)
     for path, rows in extras.items():
         write_png(os.path.join(ROOT, path), rows)
         print("wrote", path)

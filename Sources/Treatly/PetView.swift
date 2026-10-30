@@ -35,7 +35,14 @@ final class PetView: NSView {
     var art: PetArt? { didSet { needsDisplay = true } }
     /// Wardrobe item to draw over the pet, if any.
     var wearing: String? { didSet { needsDisplay = true } }
-    var frameState = PetFrame() { didSet { needsDisplay = true } }
+    var frameState = PetFrame() {
+        didSet {
+            // A new way of holding the treat each time it is picked up.
+            if frameState.carriesTreat, !oldValue.carriesTreat { heldPick = Int.random(in: 0..<1000) }
+            needsDisplay = true
+        }
+    }
+    private var heldPick = 0
 
     /// The part of the view that should take mouse clicks, in view coordinates.
     private(set) var interactiveRect: NSRect = .zero
@@ -74,7 +81,8 @@ final class PetView: NSView {
         var hit = petRect
 
         let carrying = s.carriesTreat || s.activity == .eating
-        if let treat = carrying ? art.heldTreat : art.treat {
+        let held = art.heldTreats.isEmpty ? art.treat : art.heldTreats[heldPick % art.heldTreats.count]
+        if let treat = carrying ? held : art.treat {
             let scale = Self.treatScale * CGFloat(s.treatScale)
             let size = NSSize(width: CGFloat(treat.width) * scale, height: CGFloat(treat.height) * scale)
             let facingLeft = s.facing == .left

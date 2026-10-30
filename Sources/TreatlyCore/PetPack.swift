@@ -32,8 +32,9 @@ public struct PetPack: Codable, Equatable, Identifiable, Sendable {
         /// A PNG in the pack folder, or `sprite`.
         public var image: String?
         public var sprite: PixelSprite?
-        /// Optional PNG drawn while the pet carries it, e.g. held at an angle.
-        public var heldImage: String?
+        /// Optional PNGs drawn while the pet carries it, e.g. held at different angles.
+        /// One is picked at random each time it picks a treat up.
+        public var heldImages: [String]?
     }
 
     /// How the animal behaves. Only `walkSpeed` and `sleepiness` are required.
@@ -76,7 +77,7 @@ public struct PetPack: Codable, Equatable, Identifiable, Sendable {
     public func validate() throws {
         guard sheet != nil || sprite != nil else { throw SpriteError(description: "\(id) needs a 'sheet' or a 'sprite'") }
         // Packs come from strangers; keep their files inside the pack folder.
-        for file in [sheet?.image, treat.image, treat.heldImage].compactMap({ $0 }) where !Self.isPlainFileName(file) {
+        for file in ([sheet?.image, treat.image] + (treat.heldImages ?? [])).compactMap({ $0 }) where !Self.isPlainFileName(file) {
             throw SpriteError(description: "\(id) image '\(file)' must be a file name inside the pack folder")
         }
         guard treat.image != nil || treat.sprite != nil else { throw SpriteError(description: "\(id) treat needs an 'image' or a 'sprite'") }
