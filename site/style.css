@@ -198,7 +198,7 @@ main > section { max-width: 1080px; margin: 0 auto; padding: 56px 16px; }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 28px; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
 .card p { margin: 0; color: var(--muted); font-size: 15px; }
-.card .art { position: relative; height: 90px; display: flex; align-items: flex-end; justify-content: center; gap: 4px; }
+.card .art { position: relative; height: 100px; display: flex; align-items: flex-end; justify-content: center; gap: 4px; }
 
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
 .pet-card {
@@ -232,3 +232,20 @@ footer p { margin: 6px 0; }
   .cmd code { font-size: 12px; }
   .lede { font-size: 17px; }
 }
+
+/* Listening along: a gentle bob and notes floating up. */
+.bob { animation: bob 0.45s ease-in-out infinite alternate; }
+@keyframes bob { from { translate: 0 0; } to { translate: 0 -4px; } }
+.music-note {
+  position: absolute; z-index: 4; pointer-events: none; opacity: 0;
+  font: 800 22px "Pixelify Sans", Menlo, monospace; color: #6a5ad0;
+  animation: floatnote 2.4s ease-out infinite;
+}
+@keyframes floatnote {
+  0% { transform: translateY(0) rotate(-8deg); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translateY(-60px) rotate(8deg); opacity: 0; }
+}
+.card .art .music-note { font-size: 16px; }
+.quirk-tree { position: absolute; left: 50%; bottom: 0; translate: -50% 0; }
+.quirk-swinger { position: absolute; left: 50%; bottom: 10px; translate: -32% 0; }

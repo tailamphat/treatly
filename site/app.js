@@ -43,6 +43,7 @@
     wear: store.get('wear') || 'none',
     bowl: store.get('bowl') || 'classic',
     poop: store.get('poop') || 'cute',
+    music: false,
   };
 
   function loadImage(src) {
@@ -74,19 +75,21 @@
       const cols = Math.max(...anims.map((a) => a.count));
       const rows = Math.max(...anims.map((a) => a.row)) + 1;
       this.el = el('div', 'sprite');
-      this.el.style.width = this.fw * scale + 'px';
-      this.el.style.height = this.fh * scale + 'px';
-      this.el.style.backgroundSize = `${cols * this.fw * scale}px ${rows * this.fh * scale}px`;
+      this.el.style.width = this.fw * this.s + 'px';
+      this.el.style.height = this.fh * this.s + 'px';
+      this.el.style.backgroundSize = `${cols * this.fw * this.s}px ${rows * this.fh * this.s}px`;
       this.wear(null);
       this.play('idle');
       sprites.add(this);
     }
     get w() { return this.fw * this.s; }
     get h() { return this.fh * this.s; }
-    wear(item) {
-      const ok = item && item !== 'none' && (this.d.sheet.wardrobe || []).includes(item);
+    // `extra` goes on top of the chosen item, e.g. headphones while listening to music.
+    wear(item, extra) {
+      const has = (w) => w && w !== 'none' && (this.d.sheet.wardrobe || []).includes(w);
       const layers = [];
-      if (ok) layers.push(`url(pets/${this.d.id}/wear-${item}.png)`);
+      if (has(extra) && extra !== item) layers.push(`url(pets/${this.d.id}/wear-${extra}.png)`);
+      if (has(item)) layers.push(`url(pets/${this.d.id}/wear-${item}.png)`);
       layers.push(`url(pets/${this.d.id}/${this.d.sheet.image})`);
       this.el.style.backgroundImage = layers.join(',');
     }
@@ -174,10 +177,19 @@
       menu: el('div', 'menu', stage),
       bowl: null, dropped: null,
     };
+    if (state.music) {
+      // Music on: it sits down with its headphones on and bobs along.
+      sprite.wear(state.wear, 'headphones');
+      sprite.play('sit');
+      sprite.el.classList.add('bob');
+      hero.x = stage.clientWidth * 0.35;
+      setStep('');
+      notes(stage, () => hero.x, GROUND + sprite.h);
+    }
     hero.menu.innerHTML = '<div>Done</div><div>Snooze 10 min</div><div>Snooze 1 hour</div><hr><div>Next treat</div>';
     renderBowl();
     place();
-    loop(g).catch((e) => { if (!(e instanceof Cancelled)) throw e; });
+    if (!state.music) loop(g).catch((e) => { if (!(e instanceof Cancelled)) throw e; });
   }
 
   // Picks how the treat is held this time and centres it on the mouth (or paws).
@@ -189,6 +201,18 @@
     Object.assign(hero.carry, { src, width: w * ts, height: h * ts });
     hero.carry.style.left = mouth[0] * hero.S - (w * ts) / 2 + 'px';
     hero.carry.style.top = mouth[1] * hero.S - (h * ts) / 2 + 'px';
+  }
+
+  // Music notes floating up beside a listening pet; `x` and `y` give where.
+  function notes(parent, x, y) {
+    // \uFE0E asks for the plain text note, not an emoji tile.
+    ['♪\uFE0E', '♫\uFE0E', '♪\uFE0E', '♫\uFE0E'].forEach((n, i) => {
+      const note = el('span', 'music-note', parent);
+      note.textContent = n;
+      note.style.animationDelay = i * 0.6 + 's';
+      note.style.left = x() + (i % 2 ? 1 : -1) * (24 + i * 6) + 'px';
+      note.style.bottom = y - 10 + 'px';
+    });
   }
 
   function renderBowl() {
@@ -409,6 +433,11 @@
     chips('#pick-poop', POOPS, 'poop', () => {}, (b, style) => {
       if (style !== 'off') art(poopArt(style), 1, b);
     });
+    const music = el('button', 'chip', $('#pick-music'));
+    music.type = 'button';
+    const label = () => { music.textContent = state.music ? '⏸ Stop the music' : '🎵 Play some music'; music.setAttribute('aria-pressed', String(state.music)); };
+    music.addEventListener('click', () => { state.music = !state.music; label(); startHero(); });
+    label();
     refreshChips();
   }
 
@@ -460,6 +489,30 @@
     $('#how-snooze').appendChild(snooze.el);
   }
 
+  function buildQuirks() {
+    const listen = new Sprite('shiba', 2.5);
+    listen.wear(null, 'headphones');
+    listen.play('sit');
+    listen.el.classList.add('bob');
+    $('#quirk-music').appendChild(listen.el);
+    notes($('#quirk-music'), () => $('#quirk-music').clientWidth / 2, 50);
+
+    const panda = new Sprite('panda', 2.5);
+    panda.play('fall');
+    $('#quirk-trip').appendChild(panda.el);
+
+    const tree = art('art/tree-appleReminders.png', 1.6, $('#quirk-swing'));
+    tree.classList.add('quirk-tree');
+    const swinger = new Sprite('mighty', 2);
+    swinger.play('swing');
+    swinger.el.classList.add('quirk-swinger');
+    $('#quirk-swing').appendChild(swinger.el);
+
+    const show = new Sprite('mighty', 2);
+    show.play('trick');
+    $('#quirk-show').appendChild(show.el);
+  }
+
   // ---------- Bits ----------
   document.querySelectorAll('.copy').forEach((b) => b.addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = 'Copied!'; } catch { b.textContent = 'Select & copy'; }
@@ -494,6 +547,7 @@
     buildPickers();
     buildGallery();
     buildHow();
+    buildQuirks();
     refreshChips();
     clock(); setInterval(clock, 30000);
     lastWidth = stage.clientWidth;
