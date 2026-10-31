@@ -112,6 +112,8 @@ public struct PetBrain {
     public static let tumbleDuration: TimeInterval = 1.6
     public static let trickDuration: TimeInterval = 4
     public static let swingDuration: TimeInterval = 5
+    /// How long it stays where it was put down before moving on its own.
+    public static let settleDuration: TimeInterval = 20
 
     private var timer: TimeInterval = 0
     private var wanderTarget: Double?
@@ -129,6 +131,8 @@ public struct PetBrain {
     /// Nagging comes in bursts: `nagging` flips when `nagClock` runs out.
     public private(set) var nagging = false
     private var nagClock: TimeInterval = 0
+    /// Counts down after it is put down; it stays put (nagging in place) until 0.
+    private var settleClock: TimeInterval = 0
 
     public init(x: Double, y: Double, temperament: Temperament) {
         self.x = x
@@ -224,10 +228,20 @@ public struct PetBrain {
             return
         }
 
+        if settleClock > 0 {
+            settleClock -= dt
+            if nagging {
+                activity = nagActivity
+            } else if treatOnGround {
+                rest(for: 0.5)
+            }
+            return
+        }
+
         if nagging {
             // Nags wherever it happens to be, so it shows up all over the screen, not just the middle.
             if move(toward: min(max(x, bounds.lowerBound), bounds.upperBound), y, running: true, dt: dt) {
-                activity = level == .dropping ? .sitting : level == .barking ? .yelling : .whining
+                activity = nagActivity
             }
             return
         }
@@ -291,6 +305,10 @@ public struct PetBrain {
         }
     }
 
+    private var nagActivity: Activity {
+        level == .dropping ? .sitting : level == .barking ? .yelling : .whining
+    }
+
     /// Starts a burst right away when things get worse, then alternates
     /// bursts and breaks.
     private mutating func updateNagging(dt: TimeInterval, rising: Bool) {
@@ -321,6 +339,7 @@ public struct PetBrain {
         fetchTarget = (x, y)
         wanderTarget = nil
         playTarget = nil
+        settleClock = 0
         if ![.eating, .burying, .pooping, .held].contains(activity) { activity = .running }
     }
 
@@ -351,6 +370,7 @@ public struct PetBrain {
     public mutating func putDown() {
         guard activity == .held else { return }
         rest(for: 0.8)
+        settleClock = Self.settleDuration
     }
 
     private mutating func react(_ reaction: Activity) {

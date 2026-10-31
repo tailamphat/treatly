@@ -30,6 +30,17 @@ else
   NOTARIZED=no
 fi
 
+# Sparkle appcast: signs the zip with the EdDSA key in the login Keychain
+# (from generate_keys) and adds this version to appcast.xml, keeping older ones.
+STAGE=build/appcast
+rm -rf "$STAGE" && mkdir -p "$STAGE"
+cp "$ZIP" "$STAGE/"
+[[ -f appcast.xml ]] && cp appcast.xml "$STAGE/appcast.xml"
+.build/artifacts/sparkle/Sparkle/bin/generate_appcast \
+  --download-url-prefix "https://github.com/tailamphat/treatly/releases/download/v$VERSION/" \
+  --link https://github.com/tailamphat/treatly "$STAGE"
+cp "$STAGE/appcast.xml" appcast.xml
+
 SHA=$(shasum -a 256 "$ZIP" | cut -d' ' -f1)
 sed -e "s/^  version \".*\"/  version \"$VERSION\"/" -e "s/^  sha256 \".*\"/  sha256 \"$SHA\"/" \
   packaging/homebrew/treatly.rb > build/treatly.rb
@@ -42,9 +53,11 @@ Release $VERSION
   sha256:     $SHA
   notarized:  $NOTARIZED
   cask:       packaging/homebrew/treatly.rb (version and sha256 updated)
+  appcast:    appcast.xml (new version added)
 
 Next (see docs/releasing.md):
   git tag v$VERSION && git push origin v$VERSION
   upload $ZIP to the v$VERSION GitHub release
+  commit and push appcast.xml to main (installed apps update from it)
   copy packaging/homebrew/treatly.rb to Casks/treatly.rb in tailamphat/homebrew-tap
 DONE

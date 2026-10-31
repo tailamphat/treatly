@@ -190,15 +190,17 @@ do {
     for _ in 0..<100 { fetcher.update(dt: 0.05, level: .carrying, bounds: 0...1000, random: &rng) }
     check(abs(fetcher.y - 300) < 0.001, "wandering keeps its height")
 
-    var held = PetBrain(x: 100, y: 0, temperament: Temperament(walkSpeed: 100, sleepiness: 0))
+    var held = PetBrain(x: 100, y: 0, temperament: Temperament(walkSpeed: 100, sleepiness: 0, nagDuration: 100))
     held.pickUp()
     held.drag(toX: 300, y: 400)
     held.update(dt: 1, level: .whining, bounds: 0...1000, random: &rng)
     check(held.x == 300 && held.activity == .held, "held: ignores escalation and stays put")
     held.putDown()
     check(held.activity == .idle && held.y == 400, "put down: stays where it was dropped")
-    for _ in 0..<200 { held.update(dt: 0.05, level: .dropping, bounds: 0...1000, random: &rng) }
-    check(held.activity == .sitting && held.y == 400, "dropping: nags where it is, at its own height")
+    for _ in 0..<100 { held.update(dt: 0.05, level: .dropping, bounds: 0...1000, random: &rng) }
+    check(held.x == 300 && held.activity == .sitting, "put down: stays a while, nagging where it was dropped")
+    for _ in 0..<Int(PetBrain.settleDuration / 0.05) { held.update(dt: 0.05, level: .dropping, bounds: 0...1000, random: &rng) }
+    check(held.x == 300 && held.activity == .sitting && held.y == 400, "dropping: then keeps nagging where it is, at its own height")
 
     // Clumsy pets trip while walking, lie there a moment, then carry on.
     var clumsy = PetBrain(x: 0, y: 0, temperament: Temperament(walkSpeed: 50, energy: 0, sleepiness: 0, rest: 0...0, clumsiness: 600))
@@ -284,6 +286,7 @@ do {
     var lazy = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, energy: 0, sleepiness: 0, rest: 0...0.1))
     for _ in 0..<3 { lazy.update(dt: 0.1, level: .calm, bounds: 0...1000, random: &rng) }
     check(lazy.activity == .walking, "a calm pet walks when it wanders")
+
     // A low battery makes it tired, then sleepy; the charger perks it up.
     check(Energy(batteryPercent: 80, charging: false) == .normal, "battery above 30%: normal")
     check(Energy(batteryPercent: 30, charging: false) == .tired, "battery at 30%: tired")

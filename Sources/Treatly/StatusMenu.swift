@@ -29,6 +29,7 @@ final class StatusMenu: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
         addSettings(to: menu)
         menu.addItem(.separator())
+        menu.addItem(app.actionItem("Check for Updates…") { $0.updater.checkForUpdates(nil) })
         menu.addItem(Self.quitItem())
     }
 

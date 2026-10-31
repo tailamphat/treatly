@@ -1,4 +1,5 @@
 import AppKit
+import Sparkle
 import TreatlyCore
 
 @MainActor
@@ -42,6 +43,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusMenu: StatusMenu!
     private var poops: [(window: OverlayWindow, view: PoopView, expires: Date)] = []
     private var refreshing = false
+    /// In-app updates from the appcast in Info.plist (SUFeedURL).
+    let updater = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
 
     // MARK: Launch
 

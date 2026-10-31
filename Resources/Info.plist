@@ -30,5 +30,11 @@
 	<string>Your pet turns your reminders into treats, and marks them done when it eats them.</string>
 	<key>NSRemindersUsageDescription</key>
 	<string>Your pet turns your reminders into treats, and marks them done when it eats them.</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/tailamphat/treatly/main/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>yjA8VX9OpjiQcB64D/Q5h81v+vdQngNjs1kn0INx5ek=</string>
 </dict>
 </plist>

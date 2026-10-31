@@ -12,10 +12,18 @@ Treatly ships as a zipped universal app on GitHub Releases, installed with a Hom
    ```
 
    Without this, releases are signed ad hoc and users click **Open Anyway** once (the cask says so).
+3. In-app updates use [Sparkle](https://sparkle-project.org). Its EdDSA signing key lives in the login Keychain of the Mac that makes releases; the public half is `SUPublicEDKey` in `Resources/Info.plist`. Back up the private key, since without it installed apps reject every new update:
+
+   ```sh
+   .build/artifacts/sparkle/Sparkle/bin/generate_keys -x sparkle-private-key   # export, store somewhere safe
+   .build/artifacts/sparkle/Sparkle/bin/generate_keys -f sparkle-private-key   # import on another Mac
+   ```
+
+   Once a release with Sparkle has been out a while, add `auto_updates true` to the cask (not before: plain `brew upgrade` skips such casks, so older installs without Sparkle would never get it).
 
 ## Each release
 
-1. Bump `CFBundleShortVersionString` (and `CFBundleVersion`) in `Resources/Info.plist` and commit.
+1. Bump `CFBundleShortVersionString` and `CFBundleVersion` in `Resources/Info.plist` and commit. Sparkle compares `CFBundleVersion`, so it must go up every release.
 2. Build the release:
 
    ```sh
@@ -24,7 +32,7 @@ Treatly ships as a zipped universal app on GitHub Releases, installed with a Hom
    DEVELOPER_ID="Developer ID Application: Your Name (TEAMID)" NOTARY_PROFILE=treatly-notary scripts/release.sh
    ```
 
-   It runs the checks, builds a universal (Apple Silicon + Intel) app, writes `build/Treatly-<version>.zip`, and puts the version and sha256 into `packaging/homebrew/treatly.rb`.
+   It runs the checks, builds a universal (Apple Silicon + Intel) app, writes `build/Treatly-<version>.zip`, puts the version and sha256 into `packaging/homebrew/treatly.rb`, and adds the signed version to `appcast.xml`.
 3. Tag and publish:
 
    ```sh
@@ -33,8 +41,9 @@ Treatly ships as a zipped universal app on GitHub Releases, installed with a Hom
    ```
 
    (Or create the release on github.com and upload the zip.)
-4. Copy `packaging/homebrew/treatly.rb` to `Casks/treatly.rb` in **tailamphat/homebrew-tap** and push. Once notarized, delete the `caveats` block.
-5. Check it:
+4. After the zip is uploaded, commit and push `appcast.xml` to `main`. Installed apps check `https://raw.githubusercontent.com/tailamphat/treatly/main/appcast.xml` about once a day, so push it only once the download URL works.
+5. Copy `packaging/homebrew/treatly.rb` to `Casks/treatly.rb` in **tailamphat/homebrew-tap** and push. Once notarized, delete the `caveats` block.
+6. Check it:
 
    ```sh
    brew update && brew install --cask tailamphat/tap/treatly

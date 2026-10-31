@@ -22,21 +22,37 @@ for arg in "$@"; do
 done
 
 swift build -c release --product Treatly ${ARCHS[@]+"${ARCHS[@]}"}
-BIN="$(swift build -c release ${ARCHS[@]+"${ARCHS[@]}"} --show-bin-path)/Treatly"
+BIN_DIR="$(swift build -c release ${ARCHS[@]+"${ARCHS[@]}"} --show-bin-path)"
+BIN="$BIN_DIR/Treatly"
 
 APP=build/Treatly.app
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Frameworks"
 cp "$BIN" "$APP/Contents/MacOS/Treatly"
+# Sparkle (in-app updates) is a framework the app loads from Contents/Frameworks.
+ditto "$BIN_DIR/Sparkle.framework" "$APP/Contents/Frameworks/Sparkle.framework"
+install_name_tool -add_rpath @executable_path/../Frameworks "$APP/Contents/MacOS/Treatly"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 cp -R Pets "$APP/Contents/Resources/Pets"
 cp -R Resources/Art "$APP/Contents/Resources/Art"
 
+# Sign inside out: Sparkle's helpers, then the framework, then the app.
+SPARKLE="$APP/Contents/Frameworks/Sparkle.framework/Versions/B"
 if [[ -n "${DEVELOPER_ID:-}" ]]; then
-  codesign --force --options runtime --timestamp --entitlements packaging/Treatly.entitlements --sign "$DEVELOPER_ID" "$APP"
+  SIGN=(codesign --force --options runtime --timestamp --sign "$DEVELOPER_ID")
 else
-  codesign --force --sign - "$APP"
+  SIGN=(codesign --force --sign -)
+fi
+"${SIGN[@]}" "$SPARKLE/XPCServices/Installer.xpc"
+"${SIGN[@]}" --preserve-metadata=entitlements "$SPARKLE/XPCServices/Downloader.xpc"
+"${SIGN[@]}" "$SPARKLE/Autoupdate"
+"${SIGN[@]}" "$SPARKLE/Updater.app"
+"${SIGN[@]}" "$APP/Contents/Frameworks/Sparkle.framework"
+if [[ -n "${DEVELOPER_ID:-}" ]]; then
+  "${SIGN[@]}" --entitlements packaging/Treatly.entitlements "$APP"
+else
+  "${SIGN[@]}" "$APP"
 fi
 
 echo "Built $APP ($(lipo -archs "$APP/Contents/MacOS/Treatly"))"
