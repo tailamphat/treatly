@@ -21,7 +21,8 @@ Tick these off in order for every release. [releasing.md](releasing.md) explains
   cd ../treatly-release && scripts/release.sh
   ```
 
-- [ ] The zip has the new version, both architectures (`lipo -archs`) and every pet.
+- [ ] The zip has the new version, both architectures (`lipo -archs`), every pet and `Sparkle.framework`.
+- [ ] `appcast.xml` got the new version (copy it back from the release checkout, don't commit it yet).
 - [ ] Copy `packaging/homebrew/treatly.rb` back and commit it ("Release x.y.z: cask checksum").
 - [ ] Tag the commit the zip was built from: `git tag vX.Y.Z <commit>`.
 
@@ -34,6 +35,7 @@ Tick these off in order for every release. [releasing.md](releasing.md) explains
   gh release create vX.Y.Z build/Treatly-X.Y.Z.zip --title "Treatly X.Y.Z" --notes-file build/release-notes-X.Y.Z.md
   ```
 
+- [ ] Only after the zip is downloadable: commit and push `appcast.xml` to `main`, so installed apps find the update.
 - [ ] Copy the cask to `Casks/treatly.rb` in **tailamphat/homebrew-tap**, commit and push.
 - [ ] The website deploy (Actions > "Deploy site") finished green.
 
@@ -42,4 +44,5 @@ Tick these off in order for every release. [releasing.md](releasing.md) explains
 - [ ] The download link works and its sha256 matches the cask.
 - [ ] `brew update && brew upgrade --cask treatly` installs the new version (`brew info --cask treatly`).
 - [ ] The installed app launches and shows the new version in About.
+- [ ] https://raw.githubusercontent.com/tailamphat/treatly/main/appcast.xml lists the new version, and "Check for Updates…" in an older install finds it.
 - [ ] The live website shows the new content: https://tailamphat.github.io/treatly/
