@@ -3,6 +3,15 @@
     <channel>
         <title>Treatly</title>
         <item>
+            <title>0.1.5</title>
+            <pubDate>Sat, 31 Oct 2026 10:24:46 +0700</pubDate>
+            <link>https://github.com/tailamphat/treatly</link>
+            <sparkle:version>6</sparkle:version>
+            <sparkle:shortVersionString>0.1.5</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/tailamphat/treatly/releases/download/v0.1.5/Treatly-0.1.5.zip" length="2006604" type="application/octet-stream" sparkle:edSignature="xeK0U5gIRBz+ibt3qF8Kooj4XB7HN3yQHD/I8yuFFgD1AVdEeg4r0oDAMlAwAvw4qic7WMG3GN9TV1KKdb5gBw=="/>
+        </item>
+        <item>
             <title>0.1.4</title>
             <pubDate>Sat, 31 Oct 2026 10:06:36 +0700</pubDate>
             <link>https://github.com/tailamphat/treatly</link>
