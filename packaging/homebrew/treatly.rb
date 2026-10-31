@@ -19,9 +19,10 @@ cask "treatly" do
   # `brew upgrade` backs up the old app first and stops if it's gone (moved to
   # the Trash, or removed by security software). An empty stand-in lets the
   # upgrade or uninstall carry on and put the new app in its place.
-  uninstall_preflight do
-    app = "#{appdir}/Treatly.app"
-    FileUtils.mkdir_p(app) unless File.exist?(app)
+  uninstall_preflight_steps do
+    unless_path_exists "Treatly.app", base: :appdir do
+      mkdir_p "Treatly.app", base: :appdir
+    end
   end
 
   zap trash: [
