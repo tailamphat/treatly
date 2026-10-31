@@ -39,9 +39,9 @@ final class StatusMenu: NSObject, NSMenuDelegate {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
     }
 
-    /// The standard About window: icon, name, version (and build), plus a link to the website.
+    /// The standard About window: icon, name and version, plus a link to the website.
     static func showAbout() {
-        let credits = NSMutableAttributedString(string: "A desktop pet that turns your reminders into treats.\n", attributes: [
+        let credits = NSMutableAttributedString(string: "A pixel pet that lives on your Mac and nags you to finish your todos.\n", attributes: [
             .font: NSFont.systemFont(ofSize: 11), .foregroundColor: NSColor.secondaryLabelColor,
         ])
         credits.append(NSAttributedString(string: "tailamphat.github.io/treatly", attributes: [
@@ -52,7 +52,8 @@ final class StatusMenu: NSObject, NSMenuDelegate {
         credits.addAttribute(.paragraphStyle, value: centered, range: NSRange(location: 0, length: credits.length))
         // A menu bar app has to come forward, or the window opens behind everything.
         NSApp.activate(ignoringOtherApps: true)
-        NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
+        // An empty `.version` hides the build number, which only the updater cares about.
+        NSApp.orderFrontStandardAboutPanel(options: [.credits: credits, .version: ""])
     }
 
     static func quitItem() -> NSMenuItem {
