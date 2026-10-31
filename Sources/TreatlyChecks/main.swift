@@ -156,62 +156,62 @@ do {
 do {
     var rng = SeededRandom(seed: 1)
     var brain = PetBrain(x: 100, y: 0, temperament: Temperament(walkSpeed: 100, sleepiness: 0))
-    for _ in 0..<200 { brain.update(dt: 0.05, level: .dropping, bounds: 0...1000, focusX: 500, random: &rng) }
-    check(abs(brain.x - 500) < 1 && brain.activity == .sitting, "dropping: walks to focus and sits")
+    for _ in 0..<200 { brain.update(dt: 0.05, level: .dropping, bounds: 0...1000, random: &rng) }
+    check(abs(brain.x - 100) < 1 && brain.activity == .sitting, "dropping: sits and nags right where it is")
     check(brain.treatOnGround && !brain.carriesTreat, "dropping: treat on the ground")
 
-    brain.update(dt: 0.05, level: .barking, bounds: 0...1000, focusX: 500, random: &rng)
+    brain.update(dt: 0.05, level: .barking, bounds: 0...1000, random: &rng)
     check(brain.activity == .yelling, "barking: yells once there")
 
     brain.celebrate()
     check(brain.activity == .eating, "celebrate starts eating")
-    for _ in 0..<34 { brain.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<34 { brain.update(dt: 0.05, level: .calm, bounds: 0...1000, random: &rng) }
     check(brain.activity == .pooping, "eating is followed by pooping")
-    for _ in 0..<26 { brain.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<26 { brain.update(dt: 0.05, level: .calm, bounds: 0...1000, random: &rng) }
     check(brain.activity != .pooping && brain.activity != .eating, "pooping ends, back to normal")
     brain.bury()
-    for _ in 0..<34 { brain.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<34 { brain.update(dt: 0.05, level: .calm, bounds: 0...1000, random: &rng) }
     check(brain.activity != .pooping, "burying is not followed by pooping")
 
     var sleepy = PetBrain(x: 100, y: 0, temperament: Temperament(walkSpeed: 100, sleepiness: 1))
-    for _ in 0..<5 { sleepy.update(dt: 0.5, level: .calm, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<5 { sleepy.update(dt: 0.5, level: .calm, bounds: 0...1000, random: &rng) }
     check(sleepy.activity == .sleeping, "calm and sleepy: naps")
-    sleepy.update(dt: 0.05, level: .carrying, bounds: 0...1000, focusX: 500, random: &rng)
+    sleepy.update(dt: 0.05, level: .carrying, bounds: 0...1000, random: &rng)
     check(sleepy.activity == .idle, "a new task wakes it up")
 
     var fetcher = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, sleepiness: 0))
     fetcher.fetch(fromBowlAtX: 60, y: 300)
-    fetcher.update(dt: 0.05, level: .carrying, bounds: 0...1000, focusX: 500, random: &rng)
+    fetcher.update(dt: 0.05, level: .carrying, bounds: 0...1000, random: &rng)
     check(!fetcher.carriesTreat && fetcher.facing == .left, "fetching: heads to the bowl empty-mouthed")
     check(fetcher.activity == .running, "fetching: runs to the bowl")
-    for _ in 0..<400 where fetcher.isFetching { fetcher.update(dt: 0.05, level: .carrying, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<400 where fetcher.isFetching { fetcher.update(dt: 0.05, level: .carrying, bounds: 0...1000, random: &rng) }
     check(!fetcher.isFetching && fetcher.carriesTreat, "fetching: carries the treat after reaching the bowl")
     check(abs(fetcher.x - 60) < 1 && abs(fetcher.y - 300) < 1, "fetching: walks to the bowl wherever it is")
-    for _ in 0..<100 { fetcher.update(dt: 0.05, level: .carrying, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<100 { fetcher.update(dt: 0.05, level: .carrying, bounds: 0...1000, random: &rng) }
     check(abs(fetcher.y - 300) < 0.001, "wandering keeps its height")
 
     var held = PetBrain(x: 100, y: 0, temperament: Temperament(walkSpeed: 100, sleepiness: 0))
     held.pickUp()
     held.drag(toX: 300, y: 400)
-    held.update(dt: 1, level: .whining, bounds: 0...1000, focusX: 900, random: &rng)
+    held.update(dt: 1, level: .whining, bounds: 0...1000, random: &rng)
     check(held.x == 300 && held.activity == .held, "held: ignores escalation and stays put")
     held.putDown()
     check(held.activity == .idle && held.y == 400, "put down: stays where it was dropped")
-    for _ in 0..<200 { held.update(dt: 0.05, level: .dropping, bounds: 0...1000, focusX: 500, random: &rng) }
-    check(held.activity == .sitting && held.y == 400, "dropping: walks to focus at its own height")
+    for _ in 0..<200 { held.update(dt: 0.05, level: .dropping, bounds: 0...1000, random: &rng) }
+    check(held.activity == .sitting && held.y == 400, "dropping: nags where it is, at its own height")
 
     // Clumsy pets trip while walking, lie there a moment, then carry on.
     var clumsy = PetBrain(x: 0, y: 0, temperament: Temperament(walkSpeed: 50, energy: 0, sleepiness: 0, rest: 0...0, clumsiness: 600))
     var tripped = false, recovered = false
     for _ in 0..<400 {
-        clumsy.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng)
+        clumsy.update(dt: 0.05, level: .calm, bounds: 0...1000, random: &rng)
         if clumsy.activity == .tumbling { tripped = true } else if tripped, clumsy.activity != .idle { recovered = true }
     }
     check(tripped && recovered, "clumsy: trips while walking, then gets up and carries on")
     var steady = PetBrain(x: 0, y: 0, temperament: Temperament(walkSpeed: 50, energy: 0, sleepiness: 0, rest: 0...0))
     var steadyTripped = false
     for _ in 0..<400 {
-        steady.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng)
+        steady.update(dt: 0.05, level: .calm, bounds: 0...1000, random: &rng)
         if steady.activity == .tumbling { steadyTripped = true }
     }
     check(!steadyTripped, "not clumsy: never trips")
@@ -220,7 +220,7 @@ do {
     var playful = PetBrain(x: 0, y: 0, temperament: Temperament(walkSpeed: 200, energy: 0, sleepiness: 0, rest: 0...0.2, playfulness: 0.5))
     var tricked = false, after = false
     for _ in 0..<600 {
-        playful.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng)
+        playful.update(dt: 0.05, level: .calm, bounds: 0...1000, random: &rng)
         if playful.activity == .tricking { tricked = true } else if tricked, playful.activity == .walking { after = true }
     }
     check(tricked && after, "playful: shows off a trick, then goes back to roaming")
@@ -230,7 +230,7 @@ do {
     climber.playground = (x: 300, y: 0)
     var swung = false, swungAtTree = false
     for _ in 0..<600 {
-        climber.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng)
+        climber.update(dt: 0.05, level: .calm, bounds: 0...1000, random: &rng)
         if climber.activity == .swinging { swung = true; swungAtTree = abs(climber.x - 300) < 1 }
     }
     check(swung && swungAtTree, "climbing: goes to its tree to swing")
@@ -238,37 +238,37 @@ do {
     busyClimber.playground = (x: 300, y: 0)
     var busySwung = false, nagSwung = false
     for _ in 0..<600 {
-        busyClimber.update(dt: 0.05, level: .carrying, bounds: 0...1000, focusX: 500, random: &rng)
+        busyClimber.update(dt: 0.05, level: .carrying, bounds: 0...1000, random: &rng)
         if busyClimber.activity == .swinging { busySwung = true }
     }
     for _ in 0..<600 {
-        busyClimber.update(dt: 0.05, level: .barking, bounds: 0...1000, focusX: 500, random: &rng)
+        busyClimber.update(dt: 0.05, level: .barking, bounds: 0...1000, random: &rng)
         if busyClimber.activity == .swinging { nagSwung = true }
     }
     check(busySwung && !nagSwung, "climbing: also with a task not yet due, never while nagging")
 
     // Music on: it sits and listens wherever it is. Music off: it carries on.
     var listener = PetBrain(x: 200, y: 0, temperament: Temperament(walkSpeed: 100, energy: 0, sleepiness: 0, rest: 0...0.2))
-    for _ in 0..<40 { listener.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<40 { listener.update(dt: 0.05, level: .calm, bounds: 0...1000, random: &rng) }
     listener.musicPlaying = true
-    listener.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng)
+    listener.update(dt: 0.05, level: .calm, bounds: 0...1000, random: &rng)
     let listeningAt = listener.x
-    for _ in 0..<100 { listener.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<100 { listener.update(dt: 0.05, level: .calm, bounds: 0...1000, random: &rng) }
     check(listener.activity == .listening && listener.x == listeningAt, "music: sits and listens where it is")
     listener.musicPlaying = false
-    listener.update(dt: 0.05, level: .calm, bounds: 0...1000, focusX: 500, random: &rng)
+    listener.update(dt: 0.05, level: .calm, bounds: 0...1000, random: &rng)
     check(listener.activity == .idle, "music stops: gets up again")
     listener.musicPlaying = true
-    for _ in 0..<5 { listener.update(dt: 0.05, level: .barking, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<5 { listener.update(dt: 0.05, level: .barking, bounds: 0...1000, random: &rng) }
     check(listener.activity != .listening, "music: nagging still comes first")
 
     // Nagging comes in bursts, then it roams, then it comes back.
     var nagger = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, sleepiness: 0, nagDuration: 5, patience: 0.1))
-    for _ in 0..<40 { nagger.update(dt: 0.1, level: .whining, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<40 { nagger.update(dt: 0.1, level: .whining, bounds: 0...1000, random: &rng) }
     check(nagger.nagging && nagger.activity == .whining, "whining: starts with a nagging burst")
-    for _ in 0..<15 { nagger.update(dt: 0.1, level: .whining, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<15 { nagger.update(dt: 0.1, level: .whining, bounds: 0...1000, random: &rng) }
     check(!nagger.nagging && nagger.activity != .whining, "after the burst it takes a break instead of sitting forever")
-    for _ in 0..<40 { nagger.update(dt: 0.1, level: .whining, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<40 { nagger.update(dt: 0.1, level: .whining, bounds: 0...1000, random: &rng) }
     check(nagger.nagging, "after the break it nags again")
     check(PetBrain(x: 0, y: 0, temperament: Temperament(walkSpeed: 1, patience: 2)).breakDuration(at: .whining) == 60, "patience stretches the breaks")
 
@@ -279,11 +279,35 @@ do {
 
     // Personalities differ.
     var zoomy = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, energy: 1, sleepiness: 0, rest: 0...0.1))
-    for _ in 0..<3 { zoomy.update(dt: 0.1, level: .calm, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<3 { zoomy.update(dt: 0.1, level: .calm, bounds: 0...1000, random: &rng) }
     check(zoomy.activity == .running, "an energetic pet runs when it wanders")
     var lazy = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, energy: 0, sleepiness: 0, rest: 0...0.1))
-    for _ in 0..<3 { lazy.update(dt: 0.1, level: .calm, bounds: 0...1000, focusX: 500, random: &rng) }
+    for _ in 0..<3 { lazy.update(dt: 0.1, level: .calm, bounds: 0...1000, random: &rng) }
     check(lazy.activity == .walking, "a calm pet walks when it wanders")
+    // A low battery makes it tired, then sleepy; the charger perks it up.
+    check(Energy(batteryPercent: 80, charging: false) == .normal, "battery above 30%: normal")
+    check(Energy(batteryPercent: 30, charging: false) == .tired, "battery at 30%: tired")
+    check(Energy(batteryPercent: 10, charging: false) == .sleepy, "battery at 10%: sleepy")
+    check(Energy(batteryPercent: 5, charging: true) == .normal, "plugged in: normal at any charge")
+    check(Energy(batteryPercent: nil, charging: false) == .normal, "no battery: always normal")
+    var tired = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, energy: 1, sleepiness: 0, rest: 0...0.1))
+    tired.energy = .tired
+    for _ in 0..<3 { tired.update(dt: 0.1, level: .calm, bounds: 0...1000, random: &rng) }
+    let before = tired.x
+    tired.update(dt: 0.1, level: .calm, bounds: 0...1000, random: &rng)
+    check(tired.activity == .walking && abs(tired.x - before) <= 5.01, "tired: never runs, walks at half speed")
+    var sleepyLow = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, sleepiness: 0, rest: 0...0.1))
+    sleepyLow.energy = .sleepy
+    var dozes = 0
+    for _ in 0..<2000 {
+        sleepyLow.update(dt: 0.1, level: .calm, bounds: 0...1000, random: &rng)
+        if sleepyLow.activity == .sleeping { dozes += 1 }
+    }
+    check(dozes > 1500, "sleepy: dozes most of the time")
+    var lowNagger = PetBrain(x: 500, y: 0, temperament: Temperament(walkSpeed: 100, sleepiness: 0, nagDuration: 10))
+    lowNagger.energy = .sleepy
+    for _ in 0..<60 { lowNagger.update(dt: 0.1, level: .whining, bounds: 0...1000, random: &rng) }
+    check(!lowNagger.nagging, "sleepy: nags in shorter bursts")
 }
 
 // MARK: Poop

@@ -511,6 +511,13 @@
     const show = new Sprite('mighty', 2);
     show.play('trick');
     $('#quirk-show').appendChild(show.el);
+
+    const dozy = new Sprite('shiba', 2.5);
+    dozy.play('sleep');
+    $('#quirk-battery').appendChild(dozy.el);
+    const batt = el('div', 'quirk-batt');
+    batt.setAttribute('aria-hidden', 'true');
+    $('#quirk-battery').appendChild(batt);
   }
 
   // ---------- Bits ----------

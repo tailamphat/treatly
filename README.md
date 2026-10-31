@@ -52,6 +52,7 @@ The app lives in the menu bar (paw icon). It needs a real `.app` bundle for the 
 - **Poop**: after eating, the pet leaves a poop for 10 to 15 seconds. Pick Cute, Classic, Golden or Rainbow in Settings, or turn it off.
 - **Wardrobe**: dress the pet in a party hat, bow, crown, bandana, sunglasses, a flower or headphones (Settings or the menu).
 - **Music**: when a music or video app (Music, Spotify, VLC...) is playing, the pet sits down, puts its headphones on and bobs along. Browsers count too if you turn that on in Settings; it's off by default because a browser can keep the speakers busy while silent.
+- **Battery**: on a MacBook, the pet gets tired at 30% battery (walks slowly, yawns, naps more) and sleepy at 10% (dozes most of the time), with a little battery above its head. Plug in and it perks up. Turn it off in Settings.
 - **Menu bar**: choose the pet, rename it, pick lists, set how fast nagging escalates, turn on sound.
 
 ## Art
@@ -62,7 +63,7 @@ For screenshots and development, `open --env TREATLY_DEMO=1 build/Treatly.app` a
 
 ## Make your own pet
 
-Pets are plain JSON with text pixel art. See [docs/pet-packs.md](docs/pet-packs.md). Drop a pack into the folder that the **Pets Folder** button in Settings opens.
+Pets are plain JSON with text pixel art. See [docs/pet-packs.md](docs/pet-packs.md). Drop a pack into the folder that the **Add Your Own Pet…** button in Settings opens.
 
 ## Project layout
 

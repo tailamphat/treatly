@@ -248,4 +248,11 @@ footer p { margin: 6px 0; }
 }
 .card .art .music-note { font-size: 16px; }
 .quirk-tree { position: absolute; left: 50%; bottom: 0; translate: -50% 0; }
+#quirks .cards { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+/* A little pixel battery above the dozing pet, running low. */
+.quirk-batt { position: absolute; left: 50%; top: 22px; translate: -50% 0; width: 24px; height: 12px; border: 2px solid #2b2420; background: #fff; box-sizing: border-box; }
+.quirk-batt::before { content: ""; position: absolute; left: 2px; top: 2px; width: 4px; height: 4px; background: #d64b3c; animation: batt-blink 1.6s steps(2) infinite; }
+.quirk-batt::after { content: ""; position: absolute; right: -6px; top: 2px; width: 2px; height: 4px; background: #2b2420; }
+@keyframes batt-blink { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .quirk-batt::before { animation: none; } }
 .quirk-swinger { position: absolute; left: 50%; bottom: 10px; translate: -32% 0; }

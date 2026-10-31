@@ -40,6 +40,24 @@ public enum Activity: Equatable, Sendable {
 
 public enum Facing: Sendable { case left, right }
 
+/// How much get-up-and-go the pet has, set by the app from the Mac's battery.
+public enum Energy: Equatable, Sendable {
+    case normal
+    /// Walks at half speed, never runs, naps twice as often.
+    case tired
+    /// Dozes most of the time and nags in short bursts.
+    case sleepy
+
+    public static let tiredBelow = 30
+    public static let sleepyBelow = 10
+
+    /// `percent` is nil on a Mac without a battery. Plugged in always means normal.
+    public init(batteryPercent percent: Int?, charging: Bool) {
+        guard let percent, !charging else { self = .normal; return }
+        self = percent <= Self.sleepyBelow ? .sleepy : percent <= Self.tiredBelow ? .tired : .normal
+    }
+}
+
 /// How a particular animal behaves. Every pet pack sets its own.
 public struct Temperament: Equatable, Sendable {
     /// Points per second.
@@ -106,6 +124,8 @@ public struct PetBrain {
     private var playTarget: (x: Double, y: Double)?
     /// Set by the app while the Mac is playing music; the pet sits and listens along.
     public var musicPlaying = false
+    /// Set by the app from the battery; a low battery makes the pet tired, then sleepy.
+    public var energy: Energy = .normal
     /// Nagging comes in bursts: `nagging` flips when `nagClock` runs out.
     public private(set) var nagging = false
     private var nagClock: TimeInterval = 0
@@ -146,7 +166,7 @@ public struct PetBrain {
         [.sitting, .yelling, .whining].contains(activity) || activity == .tumbling && level > .calm && fetchTarget == nil
     }
 
-    public mutating func update<R: RandomSource>(dt: TimeInterval, level: EscalationLevel, bounds: ClosedRange<Double>, focusX: Double, random: inout R) {
+    public mutating func update<R: RandomSource>(dt: TimeInterval, level: EscalationLevel, bounds: ClosedRange<Double>, random: inout R) {
         switch activity {
         case .held:
             return
@@ -205,7 +225,8 @@ public struct PetBrain {
         }
 
         if nagging {
-            if move(toward: min(max(focusX, bounds.lowerBound), bounds.upperBound), y, running: true, dt: dt) {
+            // Nags wherever it happens to be, so it shows up all over the screen, not just the middle.
+            if move(toward: min(max(x, bounds.lowerBound), bounds.upperBound), y, running: true, dt: dt) {
                 activity = level == .dropping ? .sitting : level == .barking ? .yelling : .whining
             }
             return
@@ -237,10 +258,19 @@ public struct PetBrain {
             timer -= dt
             guard timer <= 0 else { break }
             // Naps are rarer with a task to look after.
-            let napChance = level == .calm ? temperament.sleepiness : temperament.sleepiness * 0.3
+            var napChance = level == .calm ? temperament.sleepiness : temperament.sleepiness * 0.3
+            if energy == .tired { napChance = min(1, napChance * 2) }
+            if energy == .sleepy { napChance = 0.85 }
             if random.next() < napChance {
                 activity = .sleeping
                 timer = level == .calm ? 8 + random.next() * 12 : 4 + random.next() * 6
+                if energy == .sleepy { timer *= 2 }
+            } else if energy != .normal {
+                // Too tired for tricks or swinging: just a slow stroll.
+                let span = bounds.upperBound - bounds.lowerBound
+                wanderTarget = bounds.lowerBound + random.next() * span
+                wanderRunning = false
+                activity = .walking
             } else if temperament.playfulness > 0, random.next() < temperament.playfulness {
                 // Only playful pets draw this number, so other pets behave exactly as before.
                 activity = .tricking
@@ -275,7 +305,8 @@ public struct PetBrain {
             return
         }
         nagClock += dt
-        if nagging, nagClock >= temperament.nagDuration {
+        let burst = energy == .sleepy ? temperament.nagDuration / 2 : temperament.nagDuration
+        if nagging, nagClock >= burst {
             nagging = false
             nagClock = 0
             rest(for: 0.5)
@@ -342,9 +373,12 @@ public struct PetBrain {
         let dx = tx - x, dy = ty - y
         let distance = (dx * dx + dy * dy).squareRoot()
         if distance < 1 { return true }
+        // A tired pet never runs and drags its feet.
+        let running = running && energy == .normal
         activity = running ? .running : .walking
         if abs(dx) >= 1 { facing = dx > 0 ? .right : .left }
-        let step = min(distance, (running ? temperament.runSpeed : temperament.walkSpeed) * dt)
+        let speed = running ? temperament.runSpeed : energy == .normal ? temperament.walkSpeed : temperament.walkSpeed / 2
+        let step = min(distance, speed * dt)
         x += dx / distance * step
         y += dy / distance * step
         return distance - step < 1

@@ -10,6 +10,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var reminders: RemindersSource!
     /// Tells the pet when the Mac is playing music, so it can sit and listen.
     private let music = MusicListener()
+    /// Makes the pet tired, then sleepy, as the battery runs low.
+    private let battery = BatteryMonitor()
     var sources: [TaskSource] { [reminders] }
 
     /// Every incomplete task from every connected source.
@@ -368,13 +370,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             lastSettingsPoke = Int(now.timeIntervalSince1970)
             panel.model.poke()
         }
-        let focusX = (ground.minX + ground.maxX) / 2
         // Its tree (or bowl) is where it can go to swing for fun; the hand grabs the fronds left of centre.
         if let home = bowlWindows.values.first(where: { $0.window.isVisible })?.window.frame {
             brain.playground = (home.midX + 22, home.minY)
         }
         brain.musicPlaying = music.isPlaying
-        brain.update(dt: dt, level: level, bounds: ground.walkBounds, focusX: focusX, random: &random)
+        brain.energy = settings.sleepyOnLowBattery ? Energy(batteryPercent: battery.percent, charging: battery.charging) : .normal
+        brain.update(dt: dt, level: level, bounds: ground.walkBounds, random: &random)
 
         if brain.activity != lastActivity {
             if brain.activity == .yelling || brain.activity == .whining { playSound() }
@@ -396,6 +398,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if let current {
             frame.treatScale = current.priority == .high ? 1.4 : current.priority == .medium ? 1.15 : 1
             frame.stinky = current.isOverdue(at: now)
+        }
+        if let percent = battery.percent, brain.energy != .normal || cheering(now: now) {
+            frame.battery = (percent, battery.charging)
         }
         frame.bubble = bubble(now: now)
         petView.frameState = frame
@@ -440,10 +445,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    /// For a few seconds after the charger goes in, the pet perks up and says so.
+    private func cheering(now: Date) -> Bool {
+        guard settings.sleepyOnLowBattery, let at = battery.pluggedInAt else { return false }
+        return now.timeIntervalSince(at) < 3
+    }
+
     /// Picks a phrase when the situation changes, then keeps it steady.
     private func bubble(now: Date) -> String? {
         let p = pack.phrases
         let list: [String]?
+        if cheering(now: now), [.idle, .walking, .running, .sleeping].contains(brain.activity) {
+            return "Ahh, power!"
+        }
         switch brain.activity {
         case .eating: list = p.happy
         case .tricking: list = p.trick
@@ -454,13 +468,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .sitting: list = p.drop
         case .yelling: list = p.yell
         case .whining: list = p.whine
-        case .sleeping: list = ["z z z"]
+        case .sleeping: list = brain.energy == .sleepy ? ["z z z", "Need... a nap...", "So... sleepy..."] : ["z z z"]
         case .held: list = ["Wheee!"]
         case .tumbling: list = ["Oof!", "*tumbles*", "Oopsie!"]
         case .idle, .walking, .running:
             // While carrying, flash the task now and then.
             let showing = brain.carriesTreat && Int(now.timeIntervalSince(becameCurrentAt)) % 30 < 5
-            list = showing ? p.carry : nil
+            // A tired pet yawns now and then.
+            let yawning = brain.energy == .tired && Int(now.timeIntervalSinceReferenceDate) % 40 < 4
+            list = showing ? p.carry : yawning ? ["*yawn*", "So sleepy...", "Battery's low..."] : nil
         }
         let key = "\(brain.activity)|\(current?.id ?? "")|\(list != nil)"
         if key != bubbleKey {

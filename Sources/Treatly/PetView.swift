@@ -11,6 +11,8 @@ struct PetFrame {
     var bubble: String?
     var treatScale = 1.0
     var stinky = false
+    /// Shown above its head while the battery makes it tired, or as it perks up on the charger.
+    var battery: (percent: Int, charging: Bool)?
     var time: TimeInterval = 0
     /// Seconds since the current activity started, for animation frames.
     var activityElapsed: TimeInterval = 0
@@ -123,8 +125,13 @@ final class PetView: NSView {
             }
         }
 
+        var top = petRect
+        if let battery = s.battery {
+            hit = hit.union(drawBattery(battery.percent, charging: battery.charging, above: petRect))
+            top.size.height += 20
+        }
         if let text = s.bubble, !text.isEmpty {
-            hit = hit.union(drawBubble(text, above: petRect))
+            hit = hit.union(drawBubble(text, above: top))
         }
         interactiveRect = hit.insetBy(dx: -4, dy: -4)
     }
@@ -148,6 +155,38 @@ final class PetView: NSView {
             let attributes: [NSAttributedString.Key: Any] = [.font: NSFont.systemFont(ofSize: 15, weight: .bold), .foregroundColor: color]
             (note as NSString).draw(at: NSPoint(x: x, y: y), withAttributes: attributes)
         }
+    }
+
+    /// A little pixel battery, filled to the charge, with a bolt while plugged in.
+    private func drawBattery(_ percent: Int, charging: Bool, above petRect: NSRect) -> NSRect {
+        let px: CGFloat = 2, width: CGFloat = 12, height: CGFloat = 6
+        let origin = NSPoint(x: (petRect.midX - width * px / 2).rounded(), y: petRect.maxY + 4)
+        func cell(_ x: CGFloat, _ y: CGFloat, _ w: CGFloat, _ h: CGFloat) {
+            NSBezierPath(rect: NSRect(x: origin.x + x * px, y: origin.y + y * px, width: w * px, height: h * px)).fill()
+        }
+        NSColor(white: 0.15, alpha: 1).setFill()
+        cell(0, 0, width, 1); cell(0, height - 1, width, 1); cell(0, 0, 1, height); cell(width - 1, 0, 1, height)
+        cell(width, 2, 1, 2)
+        NSColor.white.setFill()
+        cell(1, 1, width - 2, height - 2)
+        let fill = max(1, ((width - 4) * CGFloat(percent) / 100).rounded())
+        let color: NSColor = charging || percent > Energy.tiredBelow
+            ? NSColor(calibratedRed: 0.25, green: 0.61, blue: 0.34, alpha: 1)
+            : percent > Energy.sleepyBelow
+            ? NSColor(calibratedRed: 0.85, green: 0.6, blue: 0.12, alpha: 1)
+            : NSColor(calibratedRed: 0.84, green: 0.29, blue: 0.24, alpha: 1)
+        color.setFill()
+        cell(2, 2, fill, height - 4)
+        var rect = NSRect(x: origin.x, y: origin.y, width: (width + 1) * px, height: height * px)
+        if charging {
+            // A lightning bolt beside it.
+            NSColor(calibratedRed: 0.96, green: 0.77, blue: 0.19, alpha: 1).setFill()
+            for (x, y) in [(15, 6), (14, 5), (15, 5), (13, 4), (14, 4), (15, 4), (16, 4), (14, 3), (15, 3), (14, 2), (13, 1)] as [(CGFloat, CGFloat)] {
+                cell(x, y - 1, 1, 1)
+            }
+            rect.size.width += 5 * px
+        }
+        return rect
     }
 
     private func drawStink(above rect: NSRect, time: TimeInterval) {

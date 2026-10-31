@@ -252,21 +252,33 @@ struct SettingsView: View {
                 .pickerStyle(.segmented)
                 .labelsHidden()
             }
-            Toggle("Sound when yelling", isOn: Binding(get: { app.settings.soundOn }, set: { on in
+            settingSwitch("Sound when yelling", isOn: Binding(get: { app.settings.soundOn }, set: { on in
                 model.run { $0.settings.soundOn = on }
             }))
-            .toggleStyle(.switch)
-            Toggle("Listen along with music", isOn: Binding(get: { app.settings.listenToMusic }, set: { on in
+            settingSwitch("Listen along with music", isOn: Binding(get: { app.settings.listenToMusic }, set: { on in
                 model.run { $0.settings.listenToMusic = on }
             }))
-            .toggleStyle(.switch)
             if app.settings.listenToMusic {
-                Toggle("Count browsers (YouTube…)", isOn: Binding(get: { app.settings.musicFromBrowsers }, set: { on in
+                settingSwitch("Count browsers (YouTube…)", isOn: Binding(get: { app.settings.musicFromBrowsers }, set: { on in
                     model.run { $0.settings.musicFromBrowsers = on }
                 }))
-                .toggleStyle(.switch)
                 .help("Browsers can keep the speakers open while silent, so this is off by default.")
             }
+            settingSwitch("Get sleepy when battery is low", isOn: Binding(get: { app.settings.sleepyOnLowBattery }, set: { on in
+                model.run { $0.settings.sleepyOnLowBattery = on }
+            }))
+            .help("Tired at \(Energy.tiredBelow)%, sleepy at \(Energy.sleepyBelow)%. Perks up when you plug in.")
+        }
+    }
+
+    /// A label on the left and its switch lined up on the right.
+    private func settingSwitch(_ title: String, isOn: Binding<Bool>) -> some View {
+        HStack {
+            Text(title)
+            Spacer()
+            Toggle(title, isOn: isOn)
+                .toggleStyle(.switch)
+                .labelsHidden()
         }
     }
 
@@ -428,7 +440,8 @@ struct SettingsView: View {
     private var footer: some View {
         HStack {
             Button("Refresh") { model.run { $0.refresh() } }
-            Button("Pets Folder") { model.run { $0.openPetsFolder() } }
+            Button("Add Your Own Pet…") { model.run { $0.openPetsFolder() } }
+                .help("Opens the folder for your own pets. Put a pet pack there and restart Treatly.")
             Spacer()
             Button("Quit Treatly") { NSApp.terminate(nil) }
         }

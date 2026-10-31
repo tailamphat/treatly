@@ -42,7 +42,6 @@ final class Settings {
         set { defaults.set(newValue.rawValue, forKey: "poopStyle") }
     }
 
-    /// Off by default: yelling is a speech bubble unless you opt in.
     /// Sit and listen along when music plays. On unless turned off.
     var listenToMusic: Bool {
         get { defaults.object(forKey: "listenToMusic") as? Bool ?? true }
@@ -56,6 +55,13 @@ final class Settings {
         set { defaults.set(newValue, forKey: "musicFromBrowsers") }
     }
 
+    /// Get tired, then sleepy, as the battery runs low. On unless turned off.
+    var sleepyOnLowBattery: Bool {
+        get { defaults.object(forKey: "sleepyOnLowBattery") as? Bool ?? true }
+        set { defaults.set(newValue, forKey: "sleepyOnLowBattery") }
+    }
+
+    /// Off by default: yelling is a speech bubble unless you opt in.
     var soundOn: Bool {
         get { defaults.bool(forKey: "soundOn") }
         set { defaults.set(newValue, forKey: "soundOn") }

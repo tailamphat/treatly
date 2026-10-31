@@ -1,6 +1,6 @@
 # Pet packs
 
-A pet pack is a folder containing `pet.json`. Built-in packs are in `Pets/`; your own go in `~/Library/Application Support/Treatly/Pets/` (Settings > **Pets Folder**). A user pack with the same `id` replaces the built-in one. Restart Treatly after adding a pack.
+A pet pack is a folder containing `pet.json`. Built-in packs are in `Pets/`; your own go in `~/Library/Application Support/Treatly/Pets/` (Settings > **Add Your Own Pet…**). A user pack with the same `id` replaces the built-in one. Restart Treatly after adding a pack.
 
 ```json
 {
