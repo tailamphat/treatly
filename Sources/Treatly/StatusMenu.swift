@@ -29,8 +29,30 @@ final class StatusMenu: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
         addSettings(to: menu)
         menu.addItem(.separator())
+        menu.addItem(app.actionItem("About Treatly") { _ in Self.showAbout() })
         menu.addItem(app.actionItem("Check for Updates…") { $0.updater.checkForUpdates(nil) })
         menu.addItem(Self.quitItem())
+    }
+
+    /// "1.2.3", from Info.plist.
+    static var version: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+    }
+
+    /// The standard About window: icon, name, version (and build), plus a link to the website.
+    static func showAbout() {
+        let credits = NSMutableAttributedString(string: "A desktop pet that turns your reminders into treats.\n", attributes: [
+            .font: NSFont.systemFont(ofSize: 11), .foregroundColor: NSColor.secondaryLabelColor,
+        ])
+        credits.append(NSAttributedString(string: "tailamphat.github.io/treatly", attributes: [
+            .font: NSFont.systemFont(ofSize: 11), .link: URL(string: "https://tailamphat.github.io/treatly/")!,
+        ]))
+        let centered = NSMutableParagraphStyle()
+        centered.alignment = .center
+        credits.addAttribute(.paragraphStyle, value: centered, range: NSRange(location: 0, length: credits.length))
+        // A menu bar app has to come forward, or the window opens behind everything.
+        NSApp.activate(ignoringOtherApps: true)
+        NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
     }
 
     static func quitItem() -> NSMenuItem {

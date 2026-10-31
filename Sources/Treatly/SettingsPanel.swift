@@ -443,6 +443,10 @@ struct SettingsView: View {
             Button("Add Your Own Pet…") { model.run { $0.openPetsFolder() } }
                 .help("Opens the folder for your own pets. Put a pet pack there and restart Treatly.")
             Spacer()
+            Button("Version \(StatusMenu.version)") { StatusMenu.showAbout() }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+                .help("About Treatly")
             Button("Quit Treatly") { NSApp.terminate(nil) }
         }
         .controlSize(.small)
